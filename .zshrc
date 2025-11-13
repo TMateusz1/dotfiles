@@ -12,7 +12,8 @@ eval "$(starship init zsh)"
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-## Aliases
-alias tmuxa='tmux new -As'
 
-
+# Tmux essentials
+alias tls="tmux ls"
+alias tas="tmux new -As"
+alias tk="tmux kill-session -t"
