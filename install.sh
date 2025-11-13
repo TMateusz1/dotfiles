@@ -316,4 +316,4 @@ echo "✅ Volta + Node setup complete."
 
 
 
-echp "[*] Thanks you for using this file, everythings is done... :)"
+echo "[*] Thanks you for using this file, everythings is done... :)"
