@@ -1,5 +1,4 @@
 brew "git"
-brew "cairo"
 brew "make"
 brew "neovim"
 brew "tmux"
