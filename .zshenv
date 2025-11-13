@@ -1,5 +1,7 @@
-. "$HOME/.cargo/env"
-
+# Cargo (Rust)
+if [ -f "$HOME/.cargo/env" ]; then
+  . "$HOME/.cargo/env"
+fi
 ## Brew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
