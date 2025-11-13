@@ -242,6 +242,39 @@ else
   echo "🚀 Oh My Zsh installed successfully."
 fi
 
+echo "[*] Installing Oh My Zsh plugins..."
+
+OMZ_CUSTOM="$HOME/.oh-my-zsh/custom/plugins"
+
+# Ensure the custom plugins directory exists
+mkdir -p "$OMZ_CUSTOM"
+
+install_omz_plugin() {
+  local repo_url="$1"
+  local plugin_dir="$2"
+
+  if [ -d "$plugin_dir" ]; then
+    echo "✅ Plugin already installed: $(basename "$plugin_dir")"
+  else
+    echo "🔧 Installing plugin: $(basename "$plugin_dir")"
+    git clone --depth=1 "$repo_url" "$plugin_dir" >/dev/null 2>&1
+  fi
+}
+
+install_omz_plugin \
+  "https://github.com/zsh-users/zsh-autosuggestions" \
+  "$OMZ_CUSTOM/zsh-autosuggestions"
+
+install_omz_plugin \
+  "https://github.com/zsh-users/zsh-syntax-highlighting" \
+  "$OMZ_CUSTOM/zsh-syntax-highlighting"
+
+install_omz_plugin \
+  "https://github.com/MichaelAquilina/zsh-you-should-use" \
+  "$OMZ_CUSTOM/you-should-use"
+
+echo "✅ All Oh My Zsh plugins installed."
+
 echo "[*] Installing SDKMAN..."
 # 1. Detect SDKMAN (safe)
 if [ -d "$HOME/.sdkman" ]; then
