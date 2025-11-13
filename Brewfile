@@ -13,6 +13,7 @@ brew "rust"
 brew "go"
 brew "sqlc"
 brew "starship"
+brew "k9s"
 
 cask "font-fira-code-nerd-font"
 cask "wezterm"
