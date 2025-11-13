@@ -220,6 +220,33 @@ echo "✅ Starship setup complete."
 
 
 
+TMUX_TARGET="$HOME/.tmux.conf"
+TMUX_SOURCE="$PWD/.tmux.conf"
+
+# 1. If target exists and is NOT a symlink → backup it
+if [ -e "$TMUX_TARGET" ] && [ ! -L "$TMUX_TARGET" ]; then
+  BACKUP="$TMUX_TARGET.bak-$(date +%Y%m%d-%H%M%S)"
+  echo "⚠️  Found existing .tmus.conf. Backing up to: $BACKUP"
+  mv "$TMUX_TARGET" "$BACKUP"
+fi
+
+# 2. If it's a broken symlink → remove it
+if [ -L "$TMUX_TARGET" ] && [ ! -e "$TMUX_TARGET" ]; then
+  echo "⚠️  Removing broken symlink: $TMUX_TARGET"
+  rm "$TMUX_TARGET"
+fi
+
+# 3. If symlink already correct → do nothing
+if [ -L "$TMUX_TARGET" ] && [ "$(readlink "$TMUX_TARGET")" = "$TMUX_SOURCE" ]; then
+  echo "✅ TMux symlink already exists and is correct."
+else
+  echo "🔗 Creating TMUX symlink: $TMUX_TARGET → $TMUX_SOURCE"
+  ln -sfn "$TMUX_SOURCE" "$TMUX_TARGET"
+fi
+echo "✅ TMUX setup complete."
+
+
+
 # /SYMLINKS
 
 
