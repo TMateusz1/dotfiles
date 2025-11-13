@@ -1,0 +1,125 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+add_newline = false
+right_format = """$git_metrics$memory_usage$time"""
+
+[battery]
+charging_symbol = ' '
+discharging_symbol = '󰂁 '
+
+[[battery.display]]
+threshold = 40
+
+[character]
+error_symbol = "[✖](#FF0000) "
+success_symbol = "[❯](#00FF00)" 
+
+[cmd_duration]
+format = " took [$duration]($style)"
+min_time = 10
+
+[directory]
+truncation_length = 3
+read_only = " "
+format = "[$path]($style)[$lock_symbol]($lock_style)"
+
+[git_branch]
+format = " [$symbol$branch]($style)"
+symbol = " "
+style = "#FFAA00"
+
+[git_commit]
+commit_hash_length = 8
+style = "bright white"
+
+[git_state]
+format = '[\($state( $progress_current of $progress_total)\)]($style) '
+disabled = true
+
+[git_status]
+conflicted = "⚔️ "
+ahead = "⇡ ×${count} "
+behind = "⇣ ×${count} "
+diverged = "⇕ ×${ahead_count}  ×${behind_count} "
+untracked = " ×${count} "
+stashed = " 📦 "
+modified = "! ×${count} "
+staged = " ×${count} "
+renamed = " ×${count} "
+deleted = "✘ ×${count} "
+style = "bright-white"
+format = "$all_status$ahead_behind"
+disabled = true
+
+[git_metrics]
+disabled = true
+
+[hostname]
+ssh_only = false
+format = " [$hostname]($style) "
+trim_at = "-"
+style = "#A020F0"
+disabled = true
+
+[memory_usage]
+format = "$symbol[${ram}(  )]($style) "
+threshold = 40
+symbol = "  "
+style = "#6ba4cf"
+disabled = false
+
+[username]
+disabled = true
+style_user = "#00FF00"
+format = "[$user]($style) @"
+show_always = true
+
+[time]
+disabled = false
+format = '[\[ $time \]]($style) '
+time_format = '%I:%M %p'
+
+[package]
+disabled = true
+
+[aws]
+symbol = "  "
+
+[kubernetes]
+format = '[󱃾 $context \($namespace\)](#7dfa94) '
+disabled = false
+
+[c]
+symbol = " "
+
+[dart]
+symbol = " "
+
+[docker_context]
+symbol = " "
+
+[golang]
+symbol = " "
+
+[haskell]
+symbol = " "
+
+[hg_branch]
+symbol = " "
+
+[java]
+symbol = " "
+
+[nix_shell]
+symbol = " "
+
+[nodejs]
+symbol = " "
+
+[python]
+symbol = " "
+
+[rust]
+symbol = " "
+
+[terraform]
+symbol = "󱁢 "
