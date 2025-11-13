@@ -308,7 +308,7 @@ JAVA_VERSION="21.0.9-amzn"
     echo "⚡ Java $JAVA_VERSION already installed."
   else
     echo "🔧 Installing Java $JAVA_VERSION..."
-    sdk install java "$JAVA_VERSION" >/dev/null 2>&1
+    sdk install java "$JAVA_VERSION" 
   fi
 )
 
