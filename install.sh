@@ -47,6 +47,8 @@ else
 fi
 
 
+
+
 # SYMLINKS
 
 echo "[*] Setting up Zsh configs..."
@@ -226,7 +228,7 @@ TMUX_SOURCE="$PWD/.tmux.conf"
 # 1. If target exists and is NOT a symlink → backup it
 if [ -e "$TMUX_TARGET" ] && [ ! -L "$TMUX_TARGET" ]; then
   BACKUP="$TMUX_TARGET.bak-$(date +%Y%m%d-%H%M%S)"
-  echo "⚠️  Found existing .tmus.conf. Backing up to: $BACKUP"
+  echo "⚠️  Found existing .tmux.conf. Backing up to: $BACKUP"
   mv "$TMUX_TARGET" "$BACKUP"
 fi
 
@@ -246,6 +248,30 @@ fi
 echo "✅ TMUX setup complete."
 
 
+echo "[*] Setting up Posting config..."
+POSTING_TARGET="$HOME/.config/posting"
+POSTING_SOURCE="$PWD/posting"
+
+# If ~/.config/nvim exists and is NOT a symlink
+if [ -e "$POSTING_TARGET" ] && [ ! -L "$POSTING_TARGET" ]; then
+  BACKUP="$POSTING_TARGET.bak-$(date +%Y%m%d-%H%M%S)"
+  echo "⚠️  Existing Posting config found. Backing up to: $BACKUP"
+  mv "$POSTING_TARGET" "$BACKUP"
+fi
+
+if [ -L "$POSTING_TARGET" ] && [ ! -e "$POSTING_TARGET" ]; then
+  echo "⚠️  Removing broken symlink: $POSTING_TARGET"
+  rm "$POSTING_TARGET"
+fi
+
+if [ -L "$POSTING_TARGET" ] && [ "$(readlink "$POSTING_TARGET")" = "$POSTING_SOURCE" ]; then
+  echo "✅ Posting symlink already exists and is correct."
+else
+  echo "🔗 Creating Posting symlink: $POSTING_TARGET → $POSTING_SOURCE"
+  ln -sfn "$POSTING_SOURCE" "$POSTING_TARGET"
+fi
+
+echo "✅ Posting symlink setup complete."
 
 # /SYMLINKS
 
@@ -373,6 +399,25 @@ volta install node@lts
 echo "🚀 Node version: $(node -v)"
 echo "🚀 npm version:  $(npm -v)"
 echo "✅ Volta + Node setup complete."
+
+
+# Posting install
+
+echo "[*] Checking if 'posting' command exists..."
+
+if ! command -v posting >/dev/null 2>&1; then
+  echo "⚠️  'posting' is not installed. Installing now..."
+
+  echo "[*] Installing uv (if needed)..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+
+  echo "[*] Installing Posting tool..."
+  uv tool install --python 3.12 posting
+
+  echo "✅ Posting has been installed."
+else
+  echo "✅ 'posting' command found — skipping installation."
+fi
 
 
 

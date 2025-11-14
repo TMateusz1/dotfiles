@@ -17,3 +17,5 @@ export SDKMAN_DIR="$HOME/.sdkman"
 alias tls="tmux ls"
 alias tas="tmux new -As"
 alias tk="tmux kill-session -t"
+
+. "$HOME/.local/bin/env"
