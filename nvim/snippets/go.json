@@ -2,5 +2,13 @@
   "iferr": {
     "prefix": "iferr",
     "body": ["if err != nil {", "\t$1", "}"]
+  },
+  "handlerMethod": {
+    "prefix": "hmeth",
+    "body": [
+      "func (${2:h} ${1:*Handler}) ${3:Handle}(w http.ResponseWriter, r *http.Request) {",
+      "\t$4",
+      "}"
+    ]
   }
 }
