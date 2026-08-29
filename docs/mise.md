@@ -32,33 +32,9 @@ Global (`mise/config.toml`):
 
 - [`delta`](https://github.com/dandavison/delta) — git diff pager, see
   [git.md](./git.md)
-- [`atuin`](https://github.com/atuinsh/atuin) — shell history, see
-  [atuin.md](./atuin.md)
-- [`tmux`](https://github.com/tmux/tmux) (via `tmux/tmux-builds`) — terminal
-  multiplexer, see [tmux.md](./tmux.md)
-- [`lazygit`](https://github.com/jesseduffield/lazygit) — git TUI, see
-  [lazygit.md](./lazygit.md)
-- [`bat`](https://github.com/sharkdp/bat) — `cat` replacement, see
-  [bat.md](./bat.md)
-- [`zoxide`](https://github.com/ajeetdsouza/zoxide) — smarter `cd`, see
-  [zoxide.md](./zoxide.md)
-- [`eza`](https://github.com/eza-community/eza) (via `cargo:eza`) — `ls`
-  replacement, see [eza.md](./eza.md)
-- `rust` — the Rust language toolchain (`rustc`, `cargo`). Originally added
-  because `eza` needs it to build (no macOS binary release exists — see
-  [eza.md](./eza.md#installing-eza-on-macos-required-adding-a-rust-toolchain)),
-  but it's a general-purpose language tool in its own right, not scoped to
-  that one use.
-- [`fd`](https://github.com/sharkdp/fd) — `find` replacement, see
-  [fd.md](./fd.md)
-- [`fzf`](https://github.com/junegunn/fzf) — fuzzy finder, see
-  [fzf.md](./fzf.md)
-- [`jq`](https://github.com/jqlang/jq) — JSON processor, see
-  [jq.md](./jq.md)
-- [`yq`](https://github.com/mikefarah/yq) — YAML/JSON/XML processor, see
-  [yq.md](./yq.md)
-- [`ripgrep`](https://github.com/BurntSushi/ripgrep) (`rg`) — grep
-  replacement, see [ripgrep.md](./ripgrep.md)
+- CLI/TUI tools — `atuin`, `tmux`, `lazygit`, `bat`, `zoxide`, `eza`, `fd`,
+  `fzf`, `jq`, `yq`, `ripgrep` — see [cli_tools.md](./cli_tools.md)
+- `rust` — language toolchain, see [langs.md](./langs.md)
 
 Repo-local (`mise.toml`):
 

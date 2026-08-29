@@ -8,8 +8,9 @@ topic files rather than one growing config:
 - `git/delta.gitconfig` — wires up
   [delta](https://github.com/dandavison/delta) as the diff pager
   (`core.pager`, `interactive.diffFilter`) and themes it with Catppuccin
-  Mocha (accent: blue, `#89b4fa`, matching [atuin](./atuin.md)'s accent for
-  cross-tool consistency). Diff backgrounds use tinted grounds rather than
+  Mocha (accent: blue, `#89b4fa`, matching
+  [atuin](./cli_tools.md#atuin)'s accent for cross-tool consistency). Diff
+  backgrounds use tinted grounds rather than
   saturated blocks so syntax highlighting stays readable inside a diff; see
   the comments in the file for the exact contrast targets. Also sets
   `merge.conflictStyle = zdiff3` and `diff.colorMoved = default`.

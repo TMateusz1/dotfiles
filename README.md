@@ -12,8 +12,8 @@ follows.
 A symlink/install script hasn't been built yet — for now, treat this as
 config-in-progress. Each tool directory is named so that a future linker can
 map `<tool>/` → `~/.config/<tool>/` directly, except where a tool's own
-target path forces an exception (documented in that tool's page under
-`docs/`, e.g. [tmux](./docs/tmux.md)).
+target path forces an exception (documented in that tool's entry under
+`docs/`, e.g. [tmux](./docs/cli_tools.md#tmux)).
 
 ## Layout
 
@@ -22,33 +22,24 @@ mise.toml, mise.lock   # tools/tasks for working on this repo itself
 mise/                  # global mise config → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 atuin/                 # atuin config → ~/.config/atuin/
-tmux/                  # tmux config → ~/.tmux.conf (see docs/tmux.md)
+tmux/                  # tmux config → ~/.tmux.conf (see docs/cli_tools.md#tmux)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
 eza/                   # eza theme → ~/.config/eza/
-fzf/                   # fzf theme (needs shell wiring, see docs/fzf.md)
-ripgrep/               # ripgrep config (needs shell wiring, see docs/ripgrep.md)
-docs/                  # per-tool notes (what's configured, and why)
+fzf/                   # fzf theme (needs shell wiring, see docs/cli_tools.md#fzf)
+ripgrep/               # ripgrep config (needs shell wiring, see docs/cli_tools.md#ripgrep)
+docs/                  # notes on what's configured, and why
 ```
 
 ## Tools configured so far
 
-| Tool                      | Docs                                 |
-| ------------------------- | ------------------------------------ |
-| mise                      | [docs/mise.md](./docs/mise.md)       |
-| git (+ delta)             | [docs/git.md](./docs/git.md)         |
-| atuin                     | [docs/atuin.md](./docs/atuin.md)     |
-| tmux                      | [docs/tmux.md](./docs/tmux.md)       |
-| lazygit                   | [docs/lazygit.md](./docs/lazygit.md) |
-| bat                       | [docs/bat.md](./docs/bat.md)         |
-| zoxide                    | [docs/zoxide.md](./docs/zoxide.md)   |
-| eza                       | [docs/eza.md](./docs/eza.md)         |
-| fd                        | [docs/fd.md](./docs/fd.md)           |
-| fzf                       | [docs/fzf.md](./docs/fzf.md)         |
-| jq                        | [docs/jq.md](./docs/jq.md)           |
-| yq                        | [docs/yq.md](./docs/yq.md)           |
-| ripgrep                   | [docs/ripgrep.md](./docs/ripgrep.md) |
-| linting / pre-commit (hk) | [docs/linting.md](./docs/linting.md) |
+| Topic                                                                        | Docs                                     |
+| ---------------------------------------------------------------------------- | ---------------------------------------- |
+| mise                                                                         | [docs/mise.md](./docs/mise.md)           |
+| git (+ delta)                                                                | [docs/git.md](./docs/git.md)             |
+| CLI tools (atuin, tmux, lazygit, bat, zoxide, eza, fd, fzf, jq, yq, ripgrep) | [docs/cli_tools.md](./docs/cli_tools.md) |
+| languages (rust)                                                             | [docs/langs.md](./docs/langs.md)         |
+| linting / pre-commit (hk)                                                    | [docs/linting.md](./docs/linting.md)     |
 
 ## Contributing / working on this repo
 

@@ -34,23 +34,24 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
 - **`taplo`** / **`taplo-format`** — TOML lint and format/fix (`**/*.toml`).
 - **`yamlfmt`** — YAML format check/fix (`**/*.yml`, `**/*.yaml`). Format
   only — no semantic YAML linter is wired in; see
-  [lazygit.md](./lazygit.md#validation) for why. `.yamlfmt` at the repo
-  root sets `retain_line_breaks: true` so intentional blank-line section
-  separators (e.g. in `lazygit/config.yml`) survive formatting.
+  [cli_tools.md#lazygit](./cli_tools.md#lazygit) for why. `.yamlfmt` at the
+  repo root sets `retain_line_breaks: true` so intentional blank-line
+  section separators (e.g. in `lazygit/config.yml`) survive formatting.
 - **`tmux-check`** — not a linter (none exists for tmux config), but a
   custom step that loads `tmux/.tmux.conf` on a throwaway, isolated tmux
   server and reports syntax/unknown-option errors. See
-  [tmux.md](./tmux.md).
+  [cli_tools.md#tmux](./cli_tools.md#tmux).
 - **`bat-check`** — same idea for `bat/config`: no linter exists for bat's
   args-file format, so this pipes a throwaway line through `bat` with
   `BAT_CONFIG_PATH` pointed at the file, which fails loudly on any
-  unknown/malformed flag. See [bat.md](./bat.md).
+  unknown/malformed flag. See [cli_tools.md#bat](./cli_tools.md#bat).
 - **`fzf-check`** / **`ripgrep-check`** — same idea again for `fzf/config`
   and `ripgrep/config`. Both tools exit `2` specifically on a bad flag
   (vs. `0`/`1` for a normal found/not-found result), so these checks treat
   exit `2` as failure and everything else as pass — otherwise a legitimate
   "no match" would look like a broken config. See
-  [fzf.md](./fzf.md#validation) / [ripgrep.md](./ripgrep.md#validation).
+  [cli_tools.md#fzf](./cli_tools.md#fzf) /
+  [cli_tools.md#ripgrep](./cli_tools.md#ripgrep).
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra
