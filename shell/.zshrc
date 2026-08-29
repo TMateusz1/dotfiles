@@ -91,6 +91,12 @@ if command -v glow >/dev/null 2>&1; then
   alias glow="glow --style \"\$XDG_CONFIG_HOME/glow/glamour.json\""
 fi
 
+if command -v gh >/dev/null 2>&1; then
+  # gh's own documented env var for its Markdown renderer (`gh help
+  # environment`) — reuses this repo's glow theme, no gh config file needed.
+  export GLAMOUR_STYLE="$XDG_CONFIG_HOME/glow/glamour.json"
+fi
+
 if command -v yazi >/dev/null 2>&1; then
   # Standard yazi wrapper (from its own quick-start docs): `cd`s the shell to
   # wherever yazi was left, since yazi itself is a child process and can't

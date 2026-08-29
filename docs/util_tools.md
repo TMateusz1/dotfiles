@@ -124,6 +124,42 @@ this repo's policy no custom step fills that gap (see
 signal if this file ever breaks, but that check isn't automated going
 forward.
 
+## gh
+
+No config file is shipped here, deliberately. [gh](https://cli.github.com/)
+(the GitHub CLI) stores its settings in `~/.config/gh/config.yml`, but its
+auth tokens live in a *separate* `hosts.yml` next to it — in principle,
+symlinking just `config.yml` (not the whole directory) would be safe. It's
+skipped anyway because there's nothing worth overriding beyond theming, and
+theming doesn't need a file at all: `shell/.zshrc` exports `GLAMOUR_STYLE`
+(gh's own documented environment variable — see `gh help environment`)
+pointing at this repo's vendored [glow](#glow) theme, reusing it rather
+than vendoring a second copy.
+
+## glab
+
+No config file is shipped here either, for a stricter reason than
+[gh](#gh) above: [glab](https://gitlab.com/gitlab-org/cli) (the GitLab CLI)
+keeps its auth token *inside the same* `~/.config/glab-cli/config.yml` that
+would otherwise hold its settings — confirmed directly (`glab config`'s own
+output shows a `hosts: gitlab.com: token:` field living right in that
+file). Whether `glab auth login` ends up writing that token in plaintext
+there depends on whether a system keyring is available at login time —
+not something this repo can guarantee across every machine it gets applied
+to. Symlinking that file (or its directory) risks a real credential
+landing inside a tracked, public file, which conflicts directly with
+[AGENTS.md](../AGENTS.md)'s "never commit secrets" rule — so this repo
+doesn't touch `~/.config/glab-cli/` at all, and doesn't attempt to theme
+glab either: unlike gh, checked directly and confirmed `glab`'s
+`glamour_style` setting has no environment-variable override, only the
+persisted (and therefore unsafe-to-symlink) config file.
+
+**Also worth knowing:** `glab config set` without `--global` writes a
+*second*, repo-local config to `.git/glab-cli/` inside whatever git
+repository the current directory happens to be in — discovered directly
+while testing this. Not specific to this repo; worth remembering before
+running that command inside any git repository.
+
 ## glow
 
 `glow/` maps to `~/.config/glow/`

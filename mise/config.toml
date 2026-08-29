@@ -27,3 +27,5 @@ disable_backends = ["asdf", "vfox"]
 "aqua:charmbracelet/glow" = "3.0.0"
 "aqua:ClementTsang/bottom" = "0.14.9"
 "aqua:sxyazi/yazi" = "26.8.15"
+"aqua:cli/cli" = "2.98.0"
+"gitlab:gitlab-org/cli" = "1.115.0"
