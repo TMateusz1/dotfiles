@@ -40,6 +40,15 @@ Global (`mise/config.toml`):
   [lazygit.md](./lazygit.md)
 - [`bat`](https://github.com/sharkdp/bat) — `cat` replacement, see
   [bat.md](./bat.md)
+- [`zoxide`](https://github.com/ajeetdsouza/zoxide) — smarter `cd`, see
+  [zoxide.md](./zoxide.md)
+- [`eza`](https://github.com/eza-community/eza) (via `cargo:eza`) — `ls`
+  replacement, see [eza.md](./eza.md)
+- `rust` — the Rust language toolchain (`rustc`, `cargo`). Originally added
+  because `eza` needs it to build (no macOS binary release exists — see
+  [eza.md](./eza.md#installing-eza-on-macos-required-adding-a-rust-toolchain)),
+  but it's a general-purpose language tool in its own right, not scoped to
+  that one use.
 
 Repo-local (`mise.toml`):
 
@@ -60,9 +69,10 @@ real `~/.config/mise/config.toml`. Run `mise config` from the repo root to
 see this for yourself.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
-having `delta`/`atuin`/`tmux`/`lazygit`/`bat` on `PATH` while hacking on this
-repo isn't a problem — but it's worth knowing so a stray tool showing up in
-`mise config` output inside this repo doesn't come as a surprise.
+having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza` on `PATH` while
+hacking on this repo isn't a problem — but it's worth knowing so a stray
+tool showing up in `mise config` output inside this repo doesn't come as a
+surprise.
 
 **Caution when testing changes to `mise/config.toml`:** never run a mise
 command with an explicit `--global` flag (e.g. `mise lock --global`, `mise

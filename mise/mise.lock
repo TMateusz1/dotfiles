@@ -2,6 +2,36 @@
 
 lockfile_version = 1
 
+[[tools."aqua:ajeetdsouza/zoxide"]]
+version = "0.10.0"
+backend = "aqua:ajeetdsouza/zoxide"
+specifiers = ["0.10.0"]
+
+[tools."aqua:ajeetdsouza/zoxide"."platforms.linux-arm64"]
+checksum = "sha256:f1f16c5d6298d63dee467eedea1cdcd8490e43e493bea43acd416dc9033ef641"
+url = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.10.0/zoxide-0.10.0-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/ajeetdsouza/zoxide/releases/assets/466316402"
+
+[tools."aqua:ajeetdsouza/zoxide"."platforms.linux-x64"]
+checksum = "sha256:2d93385b99f3e82cf2701609a1bffcad863fbeb75aa3fe7eb6be4d29be68b1ae"
+url = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.10.0/zoxide-0.10.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/ajeetdsouza/zoxide/releases/assets/466316293"
+
+[tools."aqua:ajeetdsouza/zoxide"."platforms.linux-x64-musl"]
+checksum = "sha256:2d93385b99f3e82cf2701609a1bffcad863fbeb75aa3fe7eb6be4d29be68b1ae"
+url = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.10.0/zoxide-0.10.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/ajeetdsouza/zoxide/releases/assets/466316293"
+
+[tools."aqua:ajeetdsouza/zoxide"."platforms.macos-arm64"]
+checksum = "sha256:b55ae6f2f5f23d0a6ccb3bd4eeb2af9c7e0a6556e5255c82100e40305129bbb0"
+url = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.10.0/zoxide-0.10.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/ajeetdsouza/zoxide/releases/assets/466316174"
+
+[tools."aqua:ajeetdsouza/zoxide"."platforms.windows-x64"]
+checksum = "sha256:f465ae548f8754c8e7edbc60b45fbf58c92bfe123db83d790252d6810fa5daf1"
+url = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.10.0/zoxide-0.10.0-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/ajeetdsouza/zoxide/releases/assets/466316769"
+
 [[tools."aqua:atuinsh/atuin"]]
 version = "18.20.1"
 backend = "aqua:atuinsh/atuin"
@@ -66,6 +96,31 @@ url_api = "https://api.github.com/repos/dandavison/delta/releases/assets/3836623
 checksum = "sha256:ac8ebb4a9f1cbee8b9ea897ba119808a244181adae6f3bed1f3b6b923c50b557"
 url = "https://github.com/dandavison/delta/releases/download/0.19.2/delta-0.19.2-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/dandavison/delta/releases/assets/383663165"
+
+[[tools."aqua:eza-community/eza"]]
+version = "0.23.5"
+backend = "aqua:eza-community/eza"
+specifiers = ["0.23.5"]
+
+[tools."aqua:eza-community/eza"."platforms.linux-arm64"]
+checksum = "sha256:40b87ae8628aa2ff0f0d2dc24ab52f689631366385c3da630bae745671fd71ec"
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228867"
+
+[tools."aqua:eza-community/eza"."platforms.linux-x64"]
+checksum = "sha256:35c70c5c43c29108075e58b893234c67ef585f0b53a7eaf8e9e7d4eec9f339b4"
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228887"
+
+[tools."aqua:eza-community/eza"."platforms.linux-x64-musl"]
+checksum = "sha256:e06eebab74b73d6b7d51a796a353824b001bea82df077706382e100815d28904"
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228890"
+
+[tools."aqua:eza-community/eza"."platforms.windows-x64"]
+checksum = "sha256:bbef561f5cfc8e778649b65e69c9c6e4c836c0fbe83ee3d0a5128091d797ed8a"
+url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza.exe_x86_64-pc-windows-gnu.tar.gz"
+url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228877"
 
 [[tools."aqua:jesseduffield/lazygit"]]
 version = "0.64.1"
@@ -151,3 +206,13 @@ url_api = "https://api.github.com/repos/tmux/tmux-builds/releases/assets/5287348
 checksum = "sha256:0a763dd0380aa980d239509654da1bc7455843706a3c050f6709c8cd2e13d12d"
 url = "https://github.com/tmux/tmux-builds/releases/download/v3.7c/tmux-3.7c-macos-arm64.tar.gz"
 url_api = "https://api.github.com/repos/tmux/tmux-builds/releases/assets/528734861"
+
+[[tools."cargo:eza"]]
+version = "0.23.5"
+backend = "cargo:eza"
+specifiers = ["0.23.5"]
+
+[[tools.rust]]
+version = "1.98.0"
+backend = "core:rust"
+specifiers = ["1.98.0"]

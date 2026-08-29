@@ -25,6 +25,7 @@ atuin/                 # atuin config → ~/.config/atuin/
 tmux/                  # tmux config → ~/.tmux.conf (see docs/tmux.md)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
+eza/                   # eza theme → ~/.config/eza/
 docs/                  # per-tool notes (what's configured, and why)
 ```
 
@@ -38,6 +39,8 @@ docs/                  # per-tool notes (what's configured, and why)
 | tmux                      | [docs/tmux.md](./docs/tmux.md)       |
 | lazygit                   | [docs/lazygit.md](./docs/lazygit.md) |
 | bat                       | [docs/bat.md](./docs/bat.md)         |
+| zoxide                    | [docs/zoxide.md](./docs/zoxide.md)   |
+| eza                       | [docs/eza.md](./docs/eza.md)         |
 | linting / pre-commit (hk) | [docs/linting.md](./docs/linting.md) |
 
 ## Contributing / working on this repo
