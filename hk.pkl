@@ -84,6 +84,18 @@ local linters = new Mapping<String, Step> {
       fi
       """
   }
+  // shellcheck has no zsh dialect (only sh/bash/dash/ksh) and hard-errors
+  // (SC2148) on a shebang-less file with no dialect specified — but
+  // --shell=bash turned out to produce zero false positives against this
+  // file's zsh-specific syntax (path+=, typeset -U, ...), while still
+  // catching a real issue (an unused-appearing var, since fixed). SC1090/
+  // SC1091 ("can't follow this source") are excluded: unavoidable noise for
+  // an rc file that legitimately sources dynamic/generated content
+  // (oh-my-zsh, .zshrc.local, fzf's own init).
+  ["zshrc-check"] {
+    glob = "shell/.zshrc"
+    check = "shellcheck --shell=bash --exclude=SC1090,SC1091 {{files}}"
+  }
 }
 
 hooks {

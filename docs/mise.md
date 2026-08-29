@@ -44,8 +44,9 @@ Repo-local (`mise.toml`):
 - [`claude-code`](https://github.com/anthropics/claude-code)
 - [`hk`](https://hk.jdx.dev), [`taplo`](https://github.com/tamasfe/taplo),
   [`rumdl`](https://github.com/rvben/rumdl),
-  [`yamlfmt`](https://github.com/google/yamlfmt) — lint/format tooling, see
-  [linting.md](./linting.md)
+  [`yamlfmt`](https://github.com/google/yamlfmt),
+  [`shellcheck`](https://github.com/koalaman/shellcheck) — lint/format
+  tooling, see [linting.md](./linting.md)
 
 ## A quirk worth knowing: `mise/config.toml` is also read here
 

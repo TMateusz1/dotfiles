@@ -16,7 +16,8 @@ postinstall = "hk install --mise"
 ```
 
 So simply running `mise install` in the repo (which you need anyway, to get
-`hk`/`taplo`/`rumdl`/`yamlfmt` themselves) installs the `pre-commit` git
+`hk`/`taplo`/`rumdl`/`yamlfmt`/`shellcheck` themselves) installs the
+`pre-commit` git
 hook too. No separate setup step.
 
 ## What's checked
@@ -58,6 +59,12 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   auto-writes default files into whatever config dir it's pointed at, so
   this never touches the real directory). See
   [core_tools.md#k9s](./core_tools.md#k9s).
+- **`zshrc-check`** — `shellcheck --shell=bash` (shellcheck has no zsh
+  dialect, but `bash` mode was verified to produce zero false positives
+  against this file's zsh-specific syntax while still catching a real
+  issue), excluding `SC1090`/`SC1091` (unavoidable noise for an rc file
+  that legitimately sources dynamic content). See
+  [shell.md](./shell.md#validation).
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra

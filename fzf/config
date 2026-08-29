@@ -1,5 +1,8 @@
---color=bg+:#313244,bg:#1E1E2E,spinner:#F5E0DC,hl:#F38BA8
---color=fg:#CDD6F4,header:#F38BA8,info:#CBA6F7,pointer:#F5E0DC
---color=marker:#B4BEFE,fg+:#CDD6F4,prompt:#CBA6F7,hl+:#F38BA8
---color=selected-bg:#45475A
---color=border:#6C7086,label:#CDD6F4
+# Catppuccin Mocha, blue accent — matches this repo's accent everywhere else
+# (delta, atuin, tmux, lazygit, eza), unlike the official catppuccin/fzf
+# theme (which uses a fixed red/mauve/rosewater mix with no blue). See
+# docs/util_tools.md#fzf.
+--color=bg:#1e1e2e,bg+:#313244,fg:#cdd6f4,fg+:#cdd6f4
+--color=hl:#89b4fa,hl+:#89b4fa,info:#a6adc8,marker:#a6e3a1
+--color=pointer:#89b4fa,spinner:#89b4fa,prompt:#89b4fa,header:#89b4fa
+--color=border:#6c7086,label:#cdd6f4,query:#cdd6f4

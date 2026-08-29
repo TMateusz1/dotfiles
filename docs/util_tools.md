@@ -73,16 +73,15 @@ matching the blue accent used everywhere else in this repo. Sets
 per-filetype colors (directories, symlinks, executables, ...), permission
 bit colors, and size/date colors.
 
-**Important — `LS_COLORS`/`EZA_COLORS` silently override this theme:**
-verified directly: with `LS_COLORS` set in the environment (common —
-macOS/most shells set a default), eza's file-kind colors (directories,
-executables, etc.) come from `LS_COLORS` instead of `theme.yml`, with no
-warning. Other elements (permissions, size, user, timestamps) aren't
-affected. Confirmed by testing the same command with and without
-`LS_COLORS` set. **Follow-up for whenever shell integration is set up**
-(see [zoxide](#zoxide) for the same "not yet" caveat): the shell startup
-file should not export a conflicting `LS_COLORS`/`EZA_COLORS`, or this
-theme will only partially apply.
+**`LS_COLORS`/`EZA_COLORS` silently override this theme — confirmed live,
+not hypothetical.** With `LS_COLORS` set in the environment, eza's
+file-kind colors (directories, executables, etc.) come from `LS_COLORS`
+instead of `theme.yml`, with no warning; other elements (permissions,
+size, user, timestamps) aren't affected. This wasn't just a theoretical
+risk: testing `shell/.zshrc`'s actual environment found `LS_COLORS`
+genuinely set and actively overriding the theme. Fixed with `unset
+LS_COLORS` in the eza block — see
+[shell.md](./shell.md#found-and-fixed-while-setting-this-up).
 
 **Installing eza on macOS required adding a Rust toolchain:** eza publishes
 GitHub release binaries for Linux and Windows only — checked its releases
@@ -120,22 +119,22 @@ by default beyond what fd already respects (`.gitignore`, `.ignore`,
 ## fzf
 
 `fzf/config` is a flat options file (one flag per line, same format as
-[bat](#bat)'s), vendored verbatim from the official
-[catppuccin/fzf](https://github.com/catppuccin/fzf) Mocha theme (the `.rc`
-variant — a plain options file, as opposed to the `.sh` variant which wraps
-the same content in a shell `export`).
+[bat](#bat)'s), using this repo's blue accent (`#89b4fa`) for matches,
+pointer, prompt, and header.
 
-Unlike the other tools' Catppuccin themes in this repo, catppuccin/fzf
-ships one fixed Mocha palette rather than per-accent variants, so this
-doesn't use the blue accent used elsewhere (delta, atuin, tmux, lazygit,
-eza) — using the official theme as-is took priority over hand-editing it
-for consistency.
+This originally vendored the official
+[catppuccin/fzf](https://github.com/catppuccin/fzf) Mocha theme instead
+(which ships one fixed palette, not blue) — see
+[shell.md](./shell.md#found-and-fixed-while-setting-this-up) for why it was
+replaced: `shell/.zshrc` had already independently hardcoded this blue
+scheme inline (proven working, never actually referencing this file), so
+this file's content was updated to match it exactly rather than keep two
+diverging fzf themes in the repo.
 
-**Deferred: activating it.** [fzf](https://github.com/junegunn/fzf) has no
-auto-discovered config path. Loading this file requires
-`export FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/config"` (or the
-resolved absolute path) in a shell startup file, which doesn't exist in
-this repo yet — same gap as [zoxide](#zoxide)'s shell hook.
+**Activated.** `shell/.zshrc` sets
+`FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/config"` (guarded — fzf
+hard-fails if this points to a missing file, unlike ripgrep below — see
+[shell.md](./shell.md)).
 
 **Validation:** no linter exists for fzf's options-file format. `fzf-check`
 in `hk.pkl` loads this file via `FZF_DEFAULT_OPTS_FILE` and runs a
@@ -171,10 +170,11 @@ muted subtext tone (`#a6adc8`, RGB `166,173,200`) for line numbers:
 --colors=line:fg:166,173,200
 ```
 
-**Deferred: activating it.** ripgrep has no auto-discovered config path —
-only `RIPGREP_CONFIG_PATH`, an environment variable that must point at this
-file. That has to be set in a shell startup file, which doesn't exist in
-this repo yet — same gap as [zoxide](#zoxide) and [fzf](#fzf).
+**Activated.** ripgrep has no auto-discovered config path — only
+`RIPGREP_CONFIG_PATH`, which `shell/.zshrc` now exports (see
+[shell.md](./shell.md)). Unlike [fzf](#fzf), ripgrep degrades gracefully
+if this points to a missing file (a stderr warning, still exits `0` —
+verified directly), so no existence guard was needed there.
 
 **Validation:** no linter exists for ripgrep's options-file format.
 `ripgrep-check` in `hk.pkl` loads this file via `RIPGREP_CONFIG_PATH` and
@@ -252,7 +252,6 @@ before jumping), `_ZO_EXCLUDE_DIRS` (globs to exclude from ranking),
 `_ZO_MAXAGE` (prune entries once total "age" exceeds this),
 `_ZO_RESOLVE_SYMLINKS` (resolve symlinks before storing a path).
 
-**Deferred: shell integration.** The `eval "$(zoxide init zsh)"` line has
-to live in a shell startup file (`.zshrc` or similar), which doesn't exist
-in this repo yet. Nothing to configure here until that lands — tracked as
-a gap, not forgotten.
+**Activated.** `shell/.zshrc` has `eval "$(zoxide init zsh)"` plus
+`alias cd="z"` — see [shell.md](./shell.md). None of the optional
+`_ZO_*` env vars above are set; defaults are fine for now.

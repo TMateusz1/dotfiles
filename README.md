@@ -15,19 +15,23 @@ map `<tool>/` → `~/.config/<tool>/` directly, except where a tool's own
 target path forces an exception (documented in that tool's entry under
 `docs/`, e.g. [tmux](./docs/core_tools.md#tmux)).
 
+`shell/.zshrc` (→ `~/.zshrc`) already activates most of the shell
+integration these tools need — see [docs/shell.md](./docs/shell.md).
+
 ## Layout
 
 ```text
 mise.toml, mise.lock   # tools/tasks for working on this repo itself
 mise/                  # global mise config → ~/.config/mise/
 git/                   # git config → ~/.config/git/
+shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
 atuin/                 # atuin config → ~/.config/atuin/
 tmux/                  # tmux config → ~/.tmux.conf (see docs/core_tools.md#tmux)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
 eza/                   # eza theme → ~/.config/eza/
-fzf/                   # fzf theme (needs shell wiring, see docs/util_tools.md#fzf)
-ripgrep/               # ripgrep config (needs shell wiring, see docs/util_tools.md#ripgrep)
+fzf/                   # fzf theme → ~/.config/fzf/ (see docs/util_tools.md#fzf)
+ripgrep/               # ripgrep config → ~/.config/ripgrep/ (see docs/util_tools.md#ripgrep)
 starship/              # starship prompt → ~/.config/starship.toml (flat, see docs/util_tools.md#starship)
 k9s/                   # k9s config + skin (see docs/core_tools.md#k9s)
 docs/                  # notes on what's configured, and why
@@ -39,6 +43,7 @@ docs/                  # notes on what's configured, and why
 | ------------------------------------------------------------------------ | ------------------------------------------ |
 | mise                                                                     | [docs/mise.md](./docs/mise.md)             |
 | git (+ delta)                                                            | [docs/git.md](./docs/git.md)               |
+| shell (zsh)                                                              | [docs/shell.md](./docs/shell.md)           |
 | Util tools (atuin, bat, zoxide, eza, fd, fzf, jq, yq, ripgrep, starship) | [docs/util_tools.md](./docs/util_tools.md) |
 | Core tools (tmux, lazygit, k9s)                                          | [docs/core_tools.md](./docs/core_tools.md) |
 | languages (rust, go)                                                     | [docs/langs.md](./docs/langs.md)           |

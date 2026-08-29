@@ -74,6 +74,10 @@ pinned module version, not a downloaded-binary checksum.
 
 Go's own env-var config file (`GOENV`, for things like `GOPROXY`/`GOFLAGS`)
 resolves to `~/Library/Application Support/go/env` on macOS — **not**
-XDG's `~/.config/go/env` (Go uses `os.UserConfigDir()`, which isn't
-XDG-compliant on macOS). Nothing is set there; noted here only so a future
-"why isn't `~/.config/go/env` doing anything" doesn't cost time.
+XDG's `~/.config/go/env`. Unlike [k9s](./core_tools.md#k9s), this one
+doesn't get fixed by [shell/.zshrc exporting `XDG_CONFIG_HOME`](./shell.md):
+verified directly (`go env GOENV` with and without it set) that Go's
+`os.UserConfigDir()` ignores `XDG_CONFIG_HOME` entirely on Darwin —
+unconditionally `~/Library/Application Support`, not read from the
+environment at all. Nothing is set there; noted here only so a future "why
+isn't `~/.config/go/env` doing anything" doesn't cost time.

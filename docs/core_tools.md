@@ -19,9 +19,10 @@ non-XDG-on-macOS behavior as Go's own env file (see
 directory named `k9s/` regardless, matching the tool name, per this repo's
 usual convention — the actual OS-dependent target is what varies, same
 shape of exception as [starship](./util_tools.md#starship) and
-[tmux](#tmux). If the eventual shell setup ends up exporting
-`$XDG_CONFIG_HOME` globally (a few tools in this repo now have a reason to
-want that), this placement concern disappears on its own.
+[tmux](#tmux). **Resolved:** `shell/.zshrc` now exports
+`XDG_CONFIG_HOME` globally (see [shell.md](./shell.md)), so on a machine
+with that shell config in place, k9s does land at `~/.config/k9s/` after
+all — this exception only still applies without it.
 
 **Found and fixed while setting this up:** both files were named `.yml`.
 k9s expects `.yaml` — verified this isn't cosmetic: with `.yml`, k9s
