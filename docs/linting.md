@@ -55,20 +55,16 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
 
 Several config formats in this repo have no real third-party linter:
 tmux.conf, bat's/fzf's/ripgrep's flat args files, k9s's YAML schema, and
-kitty's config. Earlier revisions of `hk.pkl` hand-rolled a custom step for
-each of these anyway — loading tmux.conf on a throwaway server, piping a
-line through bat, grepping k9s's stderr for an `ERROR` line, reaching into
-kitty's internal `kitty.config` Python module, and so on. Each one
-individually was verified to work at the time, but collectively they were
-custom-built validation logic invented specifically because no real tool
-existed — exactly the kind of thing worth being suspicious of long-term
-(more surface to maintain, more places an internal API change silently
-breaks a check no one's looking at). Removed. These files were verified by
-hand against the real binary when each was set up (see their own
-`docs/*_tools.md` entries) and aren't checked automatically going forward.
-The rule now: wire up a step only when a real, established tool exists for
-the format (like `shellcheck` above) — never build a bespoke one to fill
-the gap.
+kitty's config. The rule: wire up an `hk.pkl` step only when a real,
+established tool exists for the format (like `shellcheck` above) — never
+build a bespoke one to fill the gap (e.g. loading a config on a throwaway
+server, or grepping a tool's stderr for an error string). A hand-rolled
+check like that is more fragile than the thing it's protecting and is
+maintenance surface for a safety net that only looks real — an internal
+API or output-format change can silently break it with no one noticing.
+These files are instead verified by hand against the real binary when set
+up (see their own `docs/*_tools.md` entries) and aren't checked
+automatically going forward.
 
 ## Why rumdl, not markdownlint
 

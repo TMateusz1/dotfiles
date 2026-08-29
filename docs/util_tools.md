@@ -36,29 +36,23 @@ directly). Contents:
 format is a flat args file (one CLI flag per line, blank lines ignored) —
 not TOML, despite the name of other tools' config files in this repo.
 
+The file is named `bat/config` with **no extension** — bat's real config
+file has none, unlike this repo's other `.toml`-named configs; a
+`.toml`-suffixed file would never be found once symlinked.
+
 **What's configured:** `--theme="Catppuccin Mocha"` (bundled with bat
 itself — no vendoring needed, unlike [atuin](#atuin) or
 [lazygit](./core_tools.md#lazygit)); `--style=numbers,changes,header` (line
 numbers, git-modification markers, filename header; deliberately excludes
 bat's other defaults, `grid` and `snip`, for a leaner look);
 `--italic-text=always` (comments etc. render italic where the theme uses
-it, off by default).
+it, off by default). `--style=header` (rather than the current default
+`header-filename`) remains a supported alias in 0.26.1.
 
-**Found and fixed while setting this up:** the file was named
-`config.toml`. bat's real config file has **no file extension at all** —
-so a `.toml`-suffixed file would never have been found once symlinked;
-renamed to `bat/config`. The flag values themselves were already correct —
-verified `--style=header` is still a valid component in 0.26.1 (default is
-now `header-filename`, but plain `header` remains a supported alias), and
-`--italic-text=always` plus the theme name resolve as documented, tested
-against the actual installed binary.
-
-**Validation:** no linter exists for bat's config format (checked), and per
-this repo's policy no custom step fills that gap (see
-[linting.md](./linting.md)) — an earlier version of this repo had one,
-since removed. Verified by hand against the real bat binary when this was
-set up (a deliberately broken config produced a clear error; this file
-didn't), not something checked automatically going forward.
+**Validation:** no linter exists for bat's config format, and per this
+repo's policy no custom step fills that gap (see [linting.md](./linting.md)).
+A deliberately broken config produces a clear error from the real bat
+binary; this file doesn't, but that check isn't automated going forward.
 
 ## eza
 
@@ -73,32 +67,26 @@ matching the blue accent used everywhere else in this repo. Sets
 per-filetype colors (directories, symlinks, executables, ...), permission
 bit colors, and size/date colors.
 
-**`LS_COLORS`/`EZA_COLORS` silently override this theme — confirmed live,
-not hypothetical.** With `LS_COLORS` set in the environment, eza's
-file-kind colors (directories, executables, etc.) come from `LS_COLORS`
-instead of `theme.yml`, with no warning; other elements (permissions,
-size, user, timestamps) aren't affected. This wasn't just a theoretical
-risk: testing `shell/.zshrc`'s actual environment found `LS_COLORS`
-genuinely set and actively overriding the theme. Fixed with `unset
-LS_COLORS` in the eza block — see
-[shell.md](./shell.md#found-and-fixed-while-setting-this-up).
+**`LS_COLORS`/`EZA_COLORS` silently override this theme if either is set**
+— eza prefers them over `theme.yml` for file-kind colors (directories,
+executables, etc.) with no warning; other elements (permissions, size,
+user, timestamps) aren't affected. `shell/.zshrc` unsets `LS_COLORS` in the
+eza block for exactly this reason — see [shell.md](./shell.md).
 
-**Installing eza on macOS required adding a Rust toolchain:** eza publishes
-GitHub release binaries for Linux and Windows only — checked its releases
-directly, and confirmed at the source that aqua's own registry definition
+**Installing eza on macOS requires a Rust toolchain.** eza publishes GitHub
+release binaries for Linux and Windows only; aqua's own registry definition
 (`aqua-registry/pkgs/eza-community/eza`) unconditionally routes `darwin` to
 `type: cargo` across every version. So on macOS, `aqua:eza-community/eza`
 and `cargo:eza` are the same thing, and cargo has no standalone install —
 it ships with the rest of the Rust toolchain. See
 [langs.md](./langs.md#rust) for that toolchain; it's a meaningfully heavier
 dependency than anything else here (compiles from source, ~35s vs. an
-instant binary download), a deliberate tradeoff the user chose over
-`vfox:eza` (would contradict this repo's `disable_backends = ["asdf",
-"vfox"]` rule) or skipping eza. The `cargo:eza` lock entry in
-`mise/mise.lock` has no per-platform checksums, unlike the aqua-backed
-tools here — expected, not a gap: cargo-managed installs don't work that
-way; reproducibility comes from the pinned crate version (`--locked`) and
-crates.io's immutability instead.
+instant binary download) — the tradeoff chosen over `vfox:eza` (would
+contradict this repo's `disable_backends = ["asdf", "vfox"]` rule) or
+skipping eza entirely. The `cargo:eza` lock entry in `mise/mise.lock` has no
+per-platform checksums, unlike the aqua-backed tools here — expected, not a
+gap: cargo-managed installs don't work that way; reproducibility comes from
+the pinned crate version (`--locked`) and crates.io's immutability instead.
 
 **Validation:** no linter exists for eza's theme format beyond generic YAML
 syntax (`yamlfmt`, already applied via `hk.pkl`'s catch-all `**/*.yml`
@@ -120,16 +108,10 @@ by default beyond what fd already respects (`.gitignore`, `.ignore`,
 
 `fzf/config` is a flat options file (one flag per line, same format as
 [bat](#bat)'s), using this repo's blue accent (`#89b4fa`) for matches,
-pointer, prompt, and header.
-
-This originally vendored the official
-[catppuccin/fzf](https://github.com/catppuccin/fzf) Mocha theme instead
-(which ships one fixed palette, not blue) — see
-[shell.md](./shell.md#found-and-fixed-while-setting-this-up) for why it was
-replaced: `shell/.zshrc` had already independently hardcoded this blue
-scheme inline (proven working, never actually referencing this file), so
-this file's content was updated to match it exactly rather than keep two
-diverging fzf themes in the repo.
+pointer, prompt, and header — rather than the official
+[catppuccin/fzf](https://github.com/catppuccin/fzf) Mocha theme (which
+ships one fixed, non-blue palette), for consistency with the accent used
+everywhere else in this repo.
 
 **Activated.** `shell/.zshrc` sets
 `FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/config"` (guarded — fzf
@@ -138,11 +120,9 @@ hard-fails if this points to a missing file, unlike ripgrep below — see
 
 **Validation:** no linter exists for fzf's options-file format, and per
 this repo's policy no custom step fills that gap (see
-[linting.md](./linting.md)) — an earlier version of this repo had one,
-since removed. Verified by hand against the real fzf binary when this was
-set up (fzf exits `2` on a bad flag; a deliberately broken config
-reproduced that, this file didn't), not something checked automatically
-going forward.
+[linting.md](./linting.md)). fzf exits `2` on a bad flag, giving a clear
+signal if this file ever breaks, but that check isn't automated going
+forward.
 
 ## jq
 
@@ -179,9 +159,8 @@ verified directly), so no existence guard was needed there.
 
 **Validation:** no linter exists for ripgrep's options-file format, and per
 this repo's policy no custom step fills that gap (see
-[linting.md](./linting.md)) — an earlier version of this repo had one,
-since removed. Verified by hand against the real ripgrep binary when this
-was set up, not something checked automatically going forward.
+[linting.md](./linting.md)); not something checked automatically going
+forward.
 
 ## starship
 

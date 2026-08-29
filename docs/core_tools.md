@@ -11,24 +11,22 @@ tooling have their own pages: [git.md](./git.md), [mise.md](./mise.md),
 ## k9s
 
 `k9s/config.yaml` and `k9s/skins/catppuccin-mocha.yaml` map to
-`~/.config/k9s/` **only if `$XDG_CONFIG_HOME` is set**. Checked directly
-(`k9s info`): on macOS, absent that env var, [k9s](https://k9scli.io/)
-defaults to `~/Library/Application Support/k9s/` instead — same
-non-XDG-on-macOS behavior as Go's own env file (see
-[langs.md#go](./langs.md#go); k9s is a Go binary too). Kept the repo
-directory named `k9s/` regardless, matching the tool name, per this repo's
-usual convention — the actual OS-dependent target is what varies, same
-shape of exception as [starship](./util_tools.md#starship) and
-[tmux](#tmux). **Resolved:** `shell/.zshrc` now exports
-`XDG_CONFIG_HOME` globally (see [shell.md](./shell.md)), so on a machine
-with that shell config in place, k9s does land at `~/.config/k9s/` after
-all — this exception only still applies without it.
+`~/.config/k9s/` **only if `$XDG_CONFIG_HOME` is set**. On macOS, absent
+that env var, [k9s](https://k9scli.io/) defaults to
+`~/Library/Application Support/k9s/` instead — same non-XDG-on-macOS
+behavior as Go's own env file (see [langs.md#go](./langs.md#go); k9s is a
+Go binary too). The repo directory is still named `k9s/`, matching the
+tool name, per this repo's usual convention — the actual OS-dependent
+target is what varies, same shape of exception as
+[starship](./util_tools.md#starship) and [tmux](#tmux). In practice this
+doesn't come up on a machine with this repo's `shell/.zshrc` in place,
+since it exports `XDG_CONFIG_HOME` globally (see [shell.md](./shell.md)),
+landing k9s at `~/.config/k9s/` as expected — the exception only applies
+without that shell config.
 
-**Found and fixed while setting this up:** both files were named `.yml`.
-k9s expects `.yaml` — verified this isn't cosmetic: with `.yml`, k9s
-doesn't even create a default `config.yaml`, it just silently uses hardcoded
-defaults and never touches the file at all (confirmed by running against
-both extensions and diffing what k9s reports/creates). Renamed both files.
+Both files use the `.yaml` extension, not `.yml` — k9s requires it: with
+`.yml`, k9s doesn't create or read a config file at all, it silently falls
+back to hardcoded defaults with no error.
 
 **What's configured:** `config.yaml` sets `ui.skin: catppuccin-mocha`,
 `ui.enableMouse: false`, `ui.noIcons: false` — all verified against k9s's
@@ -54,55 +52,45 @@ the [lazygit](#lazygit) case that did get aligned to its official theme.
 Worth revisiting if that read is wrong.
 
 **Validation:** no established linter exists for k9s's config, and per this
-repo's policy (see [linting.md](./linting.md)) no bespoke one was built to
-fill the gap either — an earlier version of this repo had a custom
-`k9s-check` step that grepped `k9s info`'s stderr for an `ERROR` line, since
-removed. The config was verified by hand against the real k9s binary when
-this was set up (schema-checked keys, confirmed `.yml` vs `.yaml` behavior
-directly), not something checked automatically going forward.
+repo's policy (see [linting.md](./linting.md)) no bespoke one fills the
+gap. Not checked automatically going forward.
 
 ## lazygit
 
-`lazygit/config.yml` maps to `~/.config/lazygit/config.yml`
-([lazygit](https://github.com/jesseduffield/lazygit) follows XDG directly —
-no exception needed here, unlike [tmux](#tmux) below).
+`lazygit/config.yml` maps to `~/.config/lazygit/config.yml` — YAML,
+matching lazygit's config format (`.yml`, not `.toml`, despite some other
+tools in this repo using TOML). No placement exception needed here:
+[lazygit](https://github.com/jesseduffield/lazygit) follows XDG directly,
+unlike [tmux](#tmux) below.
 
 **What's configured:** `git.diffRenderers` renders diffs through
 [delta](https://github.com/dandavison/delta) (`delta --dark
 --paging=never`) instead of lazygit's own diff view — see
-[git.md](./git.md). `gui.theme` is the official
+[git.md](./git.md). `gui.theme` matches the official
 [catppuccin/lazygit](https://github.com/catppuccin/lazygit) Mocha "blue"
-variant, matching the blue accent used everywhere else in this repo —
-inlined directly since lazygit's config has no "load an external theme
-file" mechanism to vendor against, unlike [atuin](./util_tools.md#atuin).
-`gui.authorColors: '*': '#b4befe'` gives every commit author the same
-lavender color instead of lazygit's default random-per-author colors, also
-from the official theme. `gui.nerdFontsVersion: "3"` enables Nerd Font
-icons, consistent with the icon usage in [tmux](#tmux)'s statusline below.
-
-**Found and fixed while setting this up:** the file was originally named
-`config.toml` with YAML content inside — lazygit's config is YAML
-(`config.yml`); renamed. The theme block had an `overlapBorderColor` key;
-checked against lazygit's own published JSON schema
+variant key-for-key, including `inactiveViewSelectedLineBgColor` and
+`cherryPickedCommitBgColor` — inlined directly since lazygit's config has no
+"load an external theme file" mechanism to vendor against, unlike
+[atuin](./util_tools.md#atuin). Every color comes from that official theme
+rather than a hand-picked shade, per [AGENTS.md](../AGENTS.md)'s "prefer
+the official Catppuccin port over a hand-rolled palette" rule.
+`overlapBorderColor` isn't set here — it isn't a valid key in lazygit's own
+published JSON schema
 ([schema/config.json](https://github.com/jesseduffield/lazygit/blob/master/schema/config.json))
-— it isn't a valid key and doesn't exist in the official theme either;
-removed as dead config. `inactiveViewSelectedLineBgColor` and
-`cherryPickedCommitBgColor` were hand-picked shades that diverged from the
-official theme; aligned with it per AGENTS.md's "prefer the official
-Catppuccin port over a hand-rolled palette" rule.
+or in the official theme. `gui.authorColors: '*': '#b4befe'` gives every
+commit author the same lavender color instead of lazygit's default
+random-per-author colors, also from the official theme.
+`gui.nerdFontsVersion: "3"` enables Nerd Font icons, consistent with the
+icon usage in [tmux](#tmux)'s statusline below.
 
-**Validation:** no YAML *linter* is wired in here — checked, and the one
-static-binary Rust option (`ryl`) self-describes as still maturing, so it
-was skipped rather than added half-heartedly (same call as skipping a tmux
-linter below, and this repo's general policy — see
-[linting.md](./linting.md)). `yamlfmt` (format-only,
-Google-maintained, single static binary) is wired in for
-`**/*.yml`/`**/*.yaml` generally; `.yamlfmt` at the repo root sets
+**Validation:** no YAML *linter* is wired in here — the one static-binary
+Rust option (`ryl`) self-describes as still maturing, so it's skipped
+rather than added half-heartedly (same call as skipping a tmux linter
+below, and this repo's general policy — see [linting.md](./linting.md)).
+`yamlfmt` (format-only, Google-maintained, single static binary) is wired
+in for `**/*.yml`/`**/*.yaml` generally; `.yamlfmt` at the repo root sets
 `retain_line_breaks: true` so this file's blank-line section separators
-survive formatting. The config itself was validated against the real,
-installed lazygit binary (schema-checked theme keys, then loaded end-to-end
-under a pty against a throwaway git repo — it reached full TUI
-initialization with no parse errors).
+survive formatting.
 
 ## tmux
 
@@ -130,10 +118,6 @@ plugins, just tmux's own format strings, which also means there's nothing
 here to vet for trust beyond tmux itself.
 
 **Validation:** there's no established third-party linter for `tmux.conf`
-(checked; nothing comparable to `taplo`/`rumdl` exists for tmux config
-syntax), and per this repo's policy no custom step was built to fill the
-gap — an earlier version of this repo had one (loading the config on a
-throwaway tmux server), since removed. See [linting.md](./linting.md). The
-config was verified by hand against the real tmux binary when this was set
-up (it loaded cleanly, no syntax/unknown-option errors), not something
-checked automatically going forward.
+(nothing comparable to `taplo`/`rumdl` exists for tmux config syntax), and
+per this repo's policy no custom step fills the gap — see
+[linting.md](./linting.md). Not checked automatically going forward.

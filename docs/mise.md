@@ -80,9 +80,8 @@ config` output inside this repo doesn't come as a surprise.
 command with an explicit `--global` flag (e.g. `mise lock --global`, `mise
 use --global`) from inside this repo without first setting
 `MISE_GLOBAL_CONFIG_FILE` to point at `mise/config.toml`. Without that
-override, `--global` means the machine's *real* `~/.config/mise/config.toml`
-— a mistake made once already, which wrote an unwanted `mise.lock` into a
-real `~/.config/mise/` outside this repo. Plain `mise install`/`mise x --`
-(no `--global`) are fine and is how this repo's own tooling gets tested —
-they resolve against the ambient project-tier configs described above
-without touching the real global config file.
+override, `--global` targets the machine's *real* `~/.config/mise/config.toml`,
+not this repo's staged copy — an easy way to accidentally write a lockfile
+or tool pin outside the repo. Plain `mise install`/`mise x --` (no
+`--global`) are fine — they resolve against the ambient project-tier configs
+described above without touching the real global config file.
