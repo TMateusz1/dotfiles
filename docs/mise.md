@@ -38,6 +38,8 @@ Global (`mise/config.toml`):
   multiplexer, see [tmux.md](./tmux.md)
 - [`lazygit`](https://github.com/jesseduffield/lazygit) — git TUI, see
   [lazygit.md](./lazygit.md)
+- [`bat`](https://github.com/sharkdp/bat) — `cat` replacement, see
+  [bat.md](./bat.md)
 
 Repo-local (`mise.toml`):
 
@@ -58,9 +60,9 @@ real `~/.config/mise/config.toml`. Run `mise config` from the repo root to
 see this for yourself.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
-having `delta`/`atuin`/`tmux`/`lazygit` on `PATH` while hacking on this repo
-isn't a problem — but it's worth knowing so a stray tool showing up in `mise
-config` output inside this repo doesn't come as a surprise.
+having `delta`/`atuin`/`tmux`/`lazygit`/`bat` on `PATH` while hacking on this
+repo isn't a problem — but it's worth knowing so a stray tool showing up in
+`mise config` output inside this repo doesn't come as a surprise.
 
 **Caution when testing changes to `mise/config.toml`:** never run a mise
 command with an explicit `--global` flag (e.g. `mise lock --global`, `mise

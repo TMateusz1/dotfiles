@@ -41,6 +41,10 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   custom step that loads `tmux/.tmux.conf` on a throwaway, isolated tmux
   server and reports syntax/unknown-option errors. See
   [tmux.md](./tmux.md).
+- **`bat-check`** — same idea for `bat/config`: no linter exists for bat's
+  args-file format, so this pipes a throwaway line through `bat` with
+  `BAT_CONFIG_PATH` pointed at the file, which fails loudly on any
+  unknown/malformed flag. See [bat.md](./bat.md).
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra

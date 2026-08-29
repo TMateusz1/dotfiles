@@ -31,6 +31,13 @@ local linters = new Mapping<String, Step> {
       exit $status
       """
   }
+  // bat's config is a flat args file with no linter of its own; the closest
+  // useful check is asking bat itself to parse it while rendering a
+  // throwaway line, which fails loudly on an unknown/malformed flag.
+  ["bat-check"] {
+    glob = "bat/config"
+    check = "printf 'x\\n' | BAT_CONFIG_PATH={{files}} bat --paging=never --color=never -"
+  }
 }
 
 hooks {
