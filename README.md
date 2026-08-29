@@ -29,13 +29,13 @@ docs/                  # per-tool notes (what's configured, and why)
 
 ## Tools configured so far
 
-| Tool | Docs |
-|---|---|
-| mise | [docs/mise.md](./docs/mise.md) |
-| git (+ delta) | [docs/git.md](./docs/git.md) |
-| atuin | [docs/atuin.md](./docs/atuin.md) |
-| tmux | [docs/tmux.md](./docs/tmux.md) |
-| lazygit | [docs/lazygit.md](./docs/lazygit.md) |
+| Tool                      | Docs                                 |
+| ------------------------- | ------------------------------------ |
+| mise                      | [docs/mise.md](./docs/mise.md)       |
+| git (+ delta)             | [docs/git.md](./docs/git.md)         |
+| atuin                     | [docs/atuin.md](./docs/atuin.md)     |
+| tmux                      | [docs/tmux.md](./docs/tmux.md)       |
+| lazygit                   | [docs/lazygit.md](./docs/lazygit.md) |
 | linting / pre-commit (hk) | [docs/linting.md](./docs/linting.md) |
 
 ## Contributing / working on this repo

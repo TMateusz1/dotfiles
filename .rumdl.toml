@@ -4,3 +4,18 @@
 # hard line-wrapping isn't enforced here: tables, links, and inline code
 # routinely exceed 80 chars and that's fine.
 disable = ["MD013"]
+
+[MD055]
+# GitHub-style tables: every row has both leading and trailing pipes.
+# The default ("consistent") only enforces agreement within a single table,
+# so a whole new table using a different style wouldn't be caught.
+style = "leading-and-trailing"
+
+[MD060]
+# Pad cells so every column's pipes line up vertically in source — this is
+# the other half of "GitHub table format"; MD055 alone only covers leading/
+# trailing pipes, not spacing. Disabled by default upstream (opt-in).
+# max-width stays at its default (0): since MD013 is disabled above, that
+# means unlimited — tables stay fully aligned regardless of width.
+enabled = true
+style = "aligned"

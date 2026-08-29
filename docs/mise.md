@@ -3,10 +3,10 @@
 This repo uses [mise](https://mise.jdx.dev) as the tool manager, in two
 separate roles — don't confuse them:
 
-| Config | Path | Purpose |
-|---|---|---|
-| Repo-local | `mise.toml` / `mise.lock` (repo root) | Tools/tasks needed to work *on this dotfiles repo itself* |
-| Global | `mise/config.toml` / `mise/mise.lock` | The user's global mise config, symlinked to `~/.config/mise/config.toml` — governs tool versions available in every project on the machine |
+| Config     | Path                                  | Purpose                                                                                                                                    |
+| ---------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Repo-local | `mise.toml` / `mise.lock` (repo root) | Tools/tasks needed to work *on this dotfiles repo itself*                                                                                  |
+| Global     | `mise/config.toml` / `mise/mise.lock` | The user's global mise config, symlinked to `~/.config/mise/config.toml` — governs tool versions available in every project on the machine |
 
 Both configs set:
 

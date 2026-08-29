@@ -26,7 +26,11 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
 
 - **`rumdl`** — Markdown lint + fix (`**/*.md`). Config: `.rumdl.toml`
   disables `MD013` (line-length) — tables and links routinely exceed 80
-  chars in these docs, and that's fine.
+  chars in these docs, and that's fine. `MD055` is pinned to
+  `leading-and-trailing` (every table row starts and ends with `|`, i.e.
+  GitHub-style tables) rather than the default `consistent`, which only
+  checks agreement within a single table and wouldn't catch a whole new
+  table written in a different style.
 - **`taplo`** / **`taplo-format`** — TOML lint and format/fix (`**/*.toml`).
 - **`yamlfmt`** — YAML format check/fix (`**/*.yml`, `**/*.yaml`). Format
   only — no semantic YAML linter is wired in; see
