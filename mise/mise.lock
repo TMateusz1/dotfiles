@@ -187,6 +187,36 @@ url = "https://github.com/golangci/golangci-lint/releases/download/v2.13.2/golan
 url_api = "https://api.github.com/repos/golangci/golangci-lint/releases/assets/532995335"
 provenance = "github-attestations"
 
+[[tools."aqua:gotestyourself/gotestsum"]]
+version = "1.13.0"
+backend = "aqua:gotestyourself/gotestsum"
+specifiers = ["1.13.0"]
+
+[tools."aqua:gotestyourself/gotestsum"."platforms.linux-arm64"]
+checksum = "sha256:7644a4c5cd1bb978d56245aeab25a586ac5ac62adebed20a399548867c13499d"
+url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/gotestyourself/gotestsum/releases/assets/291996834"
+
+[tools."aqua:gotestyourself/gotestsum"."platforms.linux-x64"]
+checksum = "sha256:11ccddeaf708ef228889f9fe2f68291a75b27013ddfc3b18156e094f5f40e8ee"
+url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/gotestyourself/gotestsum/releases/assets/291996833"
+
+[tools."aqua:gotestyourself/gotestsum"."platforms.linux-x64-musl"]
+checksum = "sha256:11ccddeaf708ef228889f9fe2f68291a75b27013ddfc3b18156e094f5f40e8ee"
+url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/gotestyourself/gotestsum/releases/assets/291996833"
+
+[tools."aqua:gotestyourself/gotestsum"."platforms.macos-arm64"]
+checksum = "sha256:509cb27aef747f48faf9bce424f59dcf79572c905204b990ee935bbfcc7fa0e9"
+url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/gotestyourself/gotestsum/releases/assets/291996838"
+
+[tools."aqua:gotestyourself/gotestsum"."platforms.windows-x64"]
+checksum = "sha256:fd5a6dc69e46a0970593e70d85a7e75f16714e9c61d6d72ccc324eb82df5bb8a"
+url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_windows_amd64.tar.gz"
+url_api = "https://api.github.com/repos/gotestyourself/gotestsum/releases/assets/291996823"
+
 [[tools."aqua:jesseduffield/lazygit"]]
 version = "0.64.1"
 backend = "aqua:jesseduffield/lazygit"
@@ -316,6 +346,36 @@ checksum = "sha256:ece3dd8bb50d39f93610506273ea262feb91e5c486bbddbb10abf91b2a6c0
 url = "https://github.com/mikefarah/yq/releases/download/v4.53.6/yq_windows_amd64.exe"
 url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/522027974"
 provenance = "cosign"
+
+[[tools."aqua:mvdan/gofumpt"]]
+version = "0.11.0"
+backend = "aqua:mvdan/gofumpt"
+specifiers = ["0.11.0"]
+
+[tools."aqua:mvdan/gofumpt"."platforms.linux-arm64"]
+checksum = "sha256:9272c2d1738acc1acae33793419e74c69653e70fe56bec4ad9044b12b54715e5"
+url = "https://github.com/mvdan/gofumpt/releases/download/v0.11.0/gofumpt_v0.11.0_linux_arm64"
+url_api = "https://api.github.com/repos/mvdan/gofumpt/releases/assets/491232873"
+
+[tools."aqua:mvdan/gofumpt"."platforms.linux-x64"]
+checksum = "sha256:9f247ec294f5082375c7b062f3ddf48c8212a8711f65a6d75f5129f7fda0d7da"
+url = "https://github.com/mvdan/gofumpt/releases/download/v0.11.0/gofumpt_v0.11.0_linux_amd64"
+url_api = "https://api.github.com/repos/mvdan/gofumpt/releases/assets/491232932"
+
+[tools."aqua:mvdan/gofumpt"."platforms.linux-x64-musl"]
+checksum = "sha256:9f247ec294f5082375c7b062f3ddf48c8212a8711f65a6d75f5129f7fda0d7da"
+url = "https://github.com/mvdan/gofumpt/releases/download/v0.11.0/gofumpt_v0.11.0_linux_amd64"
+url_api = "https://api.github.com/repos/mvdan/gofumpt/releases/assets/491232932"
+
+[tools."aqua:mvdan/gofumpt"."platforms.macos-arm64"]
+checksum = "sha256:18936628f195369a80a129c73ee33d23e39086286dab538781ba826effc7e10b"
+url = "https://github.com/mvdan/gofumpt/releases/download/v0.11.0/gofumpt_v0.11.0_darwin_arm64"
+url_api = "https://api.github.com/repos/mvdan/gofumpt/releases/assets/491232979"
+
+[tools."aqua:mvdan/gofumpt"."platforms.windows-x64"]
+checksum = "sha256:e7ae4253344a600f1116e4b5c7d0d0fcc108abbbf383c3d786a530077b4d4622"
+url = "https://github.com/mvdan/gofumpt/releases/download/v0.11.0/gofumpt_v0.11.0_windows_amd64.exe"
+url_api = "https://api.github.com/repos/mvdan/gofumpt/releases/assets/491232806"
 
 [[tools."aqua:sharkdp/bat"]]
 version = "0.26.1"

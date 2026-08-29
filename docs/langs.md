@@ -45,6 +45,17 @@ rule) and skipping eza were the alternatives considered.
   there's no Go code at all. So there's nothing that belongs in a dotfiles
   repo for it; a per-project `.golangci.yml` is a property of that project,
   not a personal setting.
+- **`gofumpt`** (via `aqua:mvdan/gofumpt`) — stricter `gofmt`. CLI-flags
+  only (`-lang`, `-modpath`, `-extra`, ...), no config file — checked its
+  `-h` output directly.
+- **`gotestsum`** (via `aqua:gotestyourself/gotestsum`) — nicer `go test`
+  output. Also CLI-flags only, no config file of any kind (project-level or
+  global) — checked its full `--help` output directly.
+
+`gofumpt` and `gotestsum` are plain aqua binary releases, unlike `gopls`/
+`goimports` below — they don't need a local `go` toolchain to install (no
+`go install`/`cargo install` step), so they don't carry a `depends = ["go"]`
+entry; there'd be nothing for it to order against.
 
 Both `gopls` and `goimports` install via mise's `go:` backend, which runs
 `go install <module>@version` — meaning they need a working `go` toolchain

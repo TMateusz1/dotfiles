@@ -20,3 +20,5 @@ disable_backends = ["asdf", "vfox"]
 "aqua:golangci/golangci-lint" = "2.13.2"
 "go:golang.org/x/tools/gopls" = { version = "0.23.0", depends = ["go"] }
 "go:golang.org/x/tools/cmd/goimports" = { version = "0.49.0", depends = ["go"] }
+"aqua:mvdan/gofumpt" = "0.11.0"
+"aqua:gotestyourself/gotestsum" = "1.13.0"
