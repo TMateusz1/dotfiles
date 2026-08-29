@@ -48,6 +48,12 @@ Repo-local (`mise.toml`):
   [`shellcheck`](https://github.com/koalaman/shellcheck) — lint/format
   tooling, see [linting.md](./linting.md)
 
+The repo-root `mise.toml` also declares `[dotfiles]` and
+`[bootstrap.repos]` — not tools, but mise's own native symlinking and
+git-checkout provisioning, applied explicitly (never automatically) via
+`mise bootstrap dotfiles apply`/`mise bootstrap repos apply`. See
+[bootstrap.md](./bootstrap.md).
+
 ## A quirk worth knowing: `mise/config.toml` is also read here
 
 mise resolves config by walking up the directory tree, and `mise/config.toml`

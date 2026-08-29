@@ -1,6 +1,10 @@
 [settings]
 lockfile = true
 disable_backends = ["asdf", "vfox"]
+# Relative dotfile sources below resolve against this file's own directory
+# (the repo root), not against dotfiles.root — so dotfiles.root is
+# deliberately left unset. See docs/bootstrap.md.
+dotfiles.default_mode = "symlink"
 
 [env]
 HK_MISE = 1
@@ -20,3 +24,47 @@ postinstall = "hk install --mise"
 [tasks.pre-commit]
 description = "Run hk's pre-commit checks (mirrors the installed git hook)"
 run = "hk run pre-commit"
+
+# Bootstrap tasks — see docs/bootstrap.md. None of these run automatically
+# (not on `mise install`, not via any hook); run them explicitly, from the
+# repo root, when you're ready to apply this repo to a machine.
+[tasks."bootstrap:status"]
+description = "Show what bootstrap would change, without applying anything"
+run = ["mise bootstrap dotfiles status", "mise bootstrap repos status"]
+
+[tasks."bootstrap:dry-run"]
+description = "Preview the dotfile symlinks bootstrap would create, without creating them"
+run = "mise bootstrap dotfiles apply --dry-run"
+
+[tasks."bootstrap:dotfiles"]
+description = "Symlink this repo's configs into place"
+run = "mise bootstrap dotfiles apply"
+
+[tasks."bootstrap:zsh-plugins"]
+description = "Clone/update oh-my-zsh and its custom plugins"
+run = "mise bootstrap repos apply"
+
+[tasks."bootstrap:all"]
+description = "Run bootstrap:dotfiles and bootstrap:zsh-plugins"
+depends = ["bootstrap:dotfiles", "bootstrap:zsh-plugins"]
+
+[dotfiles]
+"~/.zshrc" = "shell/.zshrc"
+"~/.tmux.conf" = "tmux/.tmux.conf"
+"~/.config/starship.toml" = "starship/starship.toml"
+"~/.config/git" = "git"
+"~/.config/atuin" = "atuin"
+"~/.config/bat" = "bat"
+"~/.config/eza" = "eza"
+"~/.config/fzf" = "fzf"
+"~/.config/ripgrep" = "ripgrep"
+"~/.config/lazygit" = "lazygit"
+"~/.config/k9s" = "k9s"
+
+[bootstrap.repos]
+# oh-my-zsh has no tagged releases (it's designed to track master via its
+# own self-update); the three plugins below are pinned to real tags.
+"~/.oh-my-zsh" = { url = "https://github.com/ohmyzsh/ohmyzsh.git", ref = "master" }
+"~/.oh-my-zsh/custom/plugins/zsh-autosuggestions" = { url = "https://github.com/zsh-users/zsh-autosuggestions.git", ref = "v0.7.1" }
+"~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" = { url = "https://github.com/zsh-users/zsh-syntax-highlighting.git", ref = "0.8.0" }
+"~/.oh-my-zsh/custom/plugins/you-should-use" = { url = "https://github.com/MichaelAquilina/zsh-you-should-use.git", ref = "1.11.1" }

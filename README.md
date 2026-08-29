@@ -9,11 +9,12 @@ follows.
 
 ## Status
 
-A symlink/install script hasn't been built yet — for now, treat this as
-config-in-progress. Each tool directory is named so that a future linker can
-map `<tool>/` → `~/.config/<tool>/` directly, except where a tool's own
-target path forces an exception (documented in that tool's entry under
-`docs/`, e.g. [tmux](./docs/core_tools.md#tmux)).
+Symlinking is implemented (via mise's own `[dotfiles]`/`[bootstrap.repos]`
+— see [docs/bootstrap.md](./docs/bootstrap.md)) but **not yet applied to
+any machine**. Each tool directory is named so that `<tool>/` → normally
+`~/.config/<tool>/`, except where a tool's own target path forces an
+exception (documented in that tool's entry under `docs/`, e.g.
+[tmux](./docs/core_tools.md#tmux)).
 
 `shell/.zshrc` (→ `~/.zshrc`) already activates most of the shell
 integration these tools need — see [docs/shell.md](./docs/shell.md).
@@ -48,6 +49,7 @@ docs/                  # notes on what's configured, and why
 | Core tools (tmux, lazygit, k9s)                                          | [docs/core_tools.md](./docs/core_tools.md) |
 | languages (rust, go)                                                     | [docs/langs.md](./docs/langs.md)           |
 | linting / pre-commit (hk)                                                | [docs/linting.md](./docs/linting.md)       |
+| bootstrap (symlinks + zsh plugins)                                       | [docs/bootstrap.md](./docs/bootstrap.md)   |
 
 ## Contributing / working on this repo
 

@@ -13,6 +13,10 @@ notes written across [util_tools.md](./util_tools.md) and
 time. Cross-checked every one of those notes against this file specifically
 (see below).
 
+Getting this file (and oh-my-zsh plus its custom plugins) actually onto a
+machine is [bootstrap.md](./bootstrap.md)'s job, not this file's — this
+doc only covers what's *in* `.zshrc`.
+
 ## What's configured
 
 - `path+=(...)` for `~/.local/bin`, `~/bin`, `~/go/bin` (only if the
