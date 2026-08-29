@@ -96,6 +96,28 @@ local linters = new Mapping<String, Step> {
     glob = "shell/.zshrc"
     check = "shellcheck --shell=bash --exclude=SC1090,SC1091 {{files}}"
   }
+  // kitty's config format has no third-party linter, but kitty itself can
+  // parse it headlessly via `kitty +runpy` + its own `kitty.config` module —
+  // no window/GPU/display needed (verified), unlike actually launching
+  // kitty. It's lenient on unknown keys (a warning, not a failing exit), but
+  // does raise on a genuinely invalid value for a real option (verified
+  // both directly). kitty is deliberately NOT part of the default toolset
+  // (see mise.desktop.toml/docs/bootstrap.md) — it isn't guaranteed to be
+  // on PATH here, so this skips cleanly rather than failing when absent.
+  ["kitty-check"] {
+    glob = "kitty/kitty.conf"
+    check = """
+      if ! command -v kitty >/dev/null 2>&1; then
+        exit 0
+      fi
+      output=$(kitty +runpy 'import sys; from kitty.config import load_config; load_config(sys.argv[1])' {{files}} 2>&1)
+      status=$?
+      if [ "$status" -ne 0 ] || printf '%s' "$output" | grep -qi "ignoring unknown config key"; then
+        printf '%s\\n' "$output" >&2
+        exit 1
+      fi
+      """
+  }
 }
 
 hooks {

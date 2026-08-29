@@ -56,6 +56,7 @@ shorthand.
 "~/.config/ripgrep" = "ripgrep"
 "~/.config/lazygit" = "lazygit"
 "~/.config/k9s" = "k9s"
+"~/.config/kitty" = "kitty"
 ```
 
 Directory entries (`git`, `atuin`, `bat`, ...) symlink the *whole*
@@ -121,6 +122,16 @@ Only one file for all desktop/GUI apps for now (kitty + a font); split into
 more files only if this grows unwieldy. Not yet extended to Linux
 (`flatpak:`/`flatpak-user:`) or the Mac App Store (`mas:`) — same manager
 system, addable later without restructuring.
+
+**Installing the app (opt-in) and symlinking its config (not opt-in) are
+separate.** `kitty`'s `[dotfiles]` entry lives in the ordinary `mise.toml`
+`[dotfiles]` table above, applied by `bootstrap:dotfiles`/`bootstrap:all`
+same as everything else — only *installing the kitty binary itself* is
+gated behind `bootstrap:all-desktop`. Running `bootstrap:all` without ever
+running `bootstrap:all-desktop` leaves a `~/.config/kitty/` symlink in
+place for an app that isn't installed yet — harmless, just inert until
+kitty is actually installed. See [desktop_tools.md](./desktop_tools.md)
+for kitty's own config.
 
 ## Verified without touching this machine
 

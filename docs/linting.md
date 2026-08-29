@@ -65,6 +65,12 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   issue), excluding `SC1090`/`SC1091` (unavoidable noise for an rc file
   that legitimately sources dynamic content). See
   [shell.md](./shell.md#validation).
+- **`kitty-check`** — no third-party linter exists, but kitty itself can
+  parse its config headlessly (`kitty +runpy` + its own `kitty.config`
+  module) with no window/GPU/display needed. Skips cleanly if `kitty`
+  isn't on `PATH`, since it's deliberately opt-in
+  (`mise.desktop.toml`), not part of the always-loaded toolset. See
+  [desktop_tools.md#kitty](./desktop_tools.md#kitty).
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra

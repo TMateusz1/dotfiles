@@ -39,6 +39,11 @@ Global (`mise/config.toml`):
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) — see [langs.md](./langs.md)
 
+Desktop (`mise.desktop.toml`, opt-in only — see [bootstrap.md](./bootstrap.md)):
+
+- `kitty`, `font-jetbrains-mono-nerd-font` (via `brew-cask:`) — see
+  [desktop_tools.md](./desktop_tools.md)
+
 Repo-local (`mise.toml`):
 
 - [`claude-code`](https://github.com/anthropics/claude-code)
