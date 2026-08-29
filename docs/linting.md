@@ -28,6 +28,10 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   disables `MD013` (line-length) — tables and links routinely exceed 80
   chars in these docs, and that's fine.
 - **`taplo`** / **`taplo-format`** — TOML lint and format/fix (`**/*.toml`).
+- **`tmux-check`** — not a linter (none exists for tmux config), but a
+  custom step that loads `tmux/.tmux.conf` on a throwaway, isolated tmux
+  server and reports syntax/unknown-option errors. See
+  [tmux.md](./tmux.md).
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra

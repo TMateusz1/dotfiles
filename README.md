@@ -10,8 +10,10 @@ follows.
 ## Status
 
 A symlink/install script hasn't been built yet — for now, treat this as
-config-in-progress. Each tool directory is already named so that a future
-linker can map `<tool>/` → `~/.config/<tool>/` directly.
+config-in-progress. Each tool directory is named so that a future linker can
+map `<tool>/` → `~/.config/<tool>/` directly, except where a tool's own
+target path forces an exception (documented in that tool's page under
+`docs/`, e.g. [tmux](./docs/tmux.md)).
 
 ## Layout
 
@@ -20,6 +22,7 @@ mise.toml, mise.lock   # tools/tasks for working on this repo itself
 mise/                  # global mise config → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 atuin/                 # atuin config → ~/.config/atuin/
+tmux/                  # tmux config → ~/.tmux.conf (see docs/tmux.md)
 docs/                  # per-tool notes (what's configured, and why)
 ```
 
@@ -30,6 +33,7 @@ docs/                  # per-tool notes (what's configured, and why)
 | mise | [docs/mise.md](./docs/mise.md) |
 | git (+ delta) | [docs/git.md](./docs/git.md) |
 | atuin | [docs/atuin.md](./docs/atuin.md) |
+| tmux | [docs/tmux.md](./docs/tmux.md) |
 | linting / pre-commit (hk) | [docs/linting.md](./docs/linting.md) |
 
 ## Contributing / working on this repo

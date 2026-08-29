@@ -26,6 +26,11 @@ below), even though no linking script exists yet.
   change (new dotfile directory, new convention, new mise task) is not done
   until the docs reflect it. Don't let docs drift — future sessions and the
   user rely on them being accurate, not historical.
+- **Never run git commands that mutate repo/working-tree state on your
+  own** — no `add`, `commit`, `stash`, `push`, or similar, without the user
+  explicitly asking for that specific action in that turn. Git is the
+  user's tool, not the agent's: edit files, and leave staging/committing/
+  everything else git to the user.
 
 ## Repository layout
 

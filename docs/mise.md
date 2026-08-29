@@ -34,6 +34,8 @@ Global (`mise/config.toml`):
   [git.md](./git.md)
 - [`atuin`](https://github.com/atuinsh/atuin) — shell history, see
   [atuin.md](./atuin.md)
+- [`tmux`](https://github.com/tmux/tmux) (via `tmux/tmux-builds`) — terminal
+  multiplexer, see [tmux.md](./tmux.md)
 
 Repo-local (`mise.toml`):
 
@@ -53,6 +55,17 @@ real `~/.config/mise/config.toml`. Run `mise config` from the repo root to
 see this for yourself.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
-having `delta`/`atuin` on `PATH` while hacking on this repo isn't a problem —
-but it's worth knowing so a stray tool showing up in `mise config` output
-inside this repo doesn't come as a surprise.
+having `delta`/`atuin`/`tmux` on `PATH` while hacking on this repo isn't a
+problem — but it's worth knowing so a stray tool showing up in `mise config`
+output inside this repo doesn't come as a surprise.
+
+**Caution when testing changes to `mise/config.toml`:** never run a mise
+command with an explicit `--global` flag (e.g. `mise lock --global`, `mise
+use --global`) from inside this repo without first setting
+`MISE_GLOBAL_CONFIG_FILE` to point at `mise/config.toml`. Without that
+override, `--global` means the machine's *real* `~/.config/mise/config.toml`
+— a mistake made once already, which wrote an unwanted `mise.lock` into a
+real `~/.config/mise/` outside this repo. Plain `mise install`/`mise x --`
+(no `--global`) are fine and is how this repo's own tooling gets tested —
+they resolve against the ambient project-tier configs described above
+without touching the real global config file.

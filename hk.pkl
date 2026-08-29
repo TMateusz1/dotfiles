@@ -14,6 +14,19 @@ local linters = new Mapping<String, Step> {
   ["check-added-large-files"] = Builtins.check_added_large_files
   ["trailing-whitespace"] = Builtins.trailing_whitespace
   ["newlines"] = Builtins.newlines
+  // tmux has no established third-party linter; the closest useful check is
+  // asking tmux itself to load the config on a throwaway server and report
+  // any syntax/option errors, then tear the server down.
+  ["tmux-check"] {
+    glob = "tmux/.tmux.conf"
+    check = """
+      sock=$(mktemp -u)
+      tmux -S "$sock" -f {{files}} new-session -d \; kill-server
+      status=$?
+      rm -f "$sock"
+      exit $status
+      """
+  }
 }
 
 hooks {

@@ -5,3 +5,4 @@ disable_backends = ["asdf", "vfox"]
 [tools]
 "aqua:dandavison/delta" = "0.19.2"
 "aqua:atuinsh/atuin" = "18.20.1"
+"aqua:tmux/tmux-builds" = "3.7c"
