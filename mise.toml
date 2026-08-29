@@ -68,6 +68,7 @@ run = "mise -E desktop bootstrap packages apply"
 "~/.config/lazygit" = "lazygit"
 "~/.config/k9s" = "k9s"
 "~/.config/kitty" = "kitty"
+"~/.config/mise/config.toml" = "mise/config.toml"
 
 [bootstrap.repos]
 # oh-my-zsh has no tagged releases (it's designed to track master via its

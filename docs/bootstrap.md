@@ -57,6 +57,7 @@ shorthand.
 "~/.config/lazygit" = "lazygit"
 "~/.config/k9s" = "k9s"
 "~/.config/kitty" = "kitty"
+"~/.config/mise/config.toml" = "mise/config.toml"
 ```
 
 Directory entries (`git`, `atuin`, `bat`, ...) symlink the *whole*
@@ -153,10 +154,23 @@ machine's real files:
    step exists to catch.
 
 **Found, not fixed — needs your decision:** this machine's *real* global
-mise config already has a `[dotfiles]` entry for `~/.config/git` (source
-resolving to `~/.config/git/delta.gitconfig`), predating this repo's own
-entry for the same target and conflicting with it. Likely a leftover from
-earlier experimentation with `dotfiles.root`/`dotfiles.default_mode`
-(already set in that same real config, pointing at `~/.dotfiles`, not this
-repo). Not touched — reconciling or removing that old entry is a call
-about your live machine config, not this repo.
+mise config (`~/.config/mise/config.toml`) already has an *entire*
+`[dotfiles]` table of its own — not just one stray entry. It's this
+machine's leftover declaration from an older dotfiles repo
+(`~/dev/dotfiles2`): the file is itself a symlink into that repo (its own
+`"~/.config/mise/config.toml" = "config.toml"` line is self-referencing,
+resolved relative to dotfiles2's `mise/` directory), and it separately
+declares `~/.tmux.conf`, `~/.zshrc`, `~/.config/atuin/config.toml`,
+`~/.config/bat/config`, `~/.config/git/delta.gitconfig`,
+`~/.config/k9s/config.yaml` (+ its skin), `~/.config/lazygit/config.yml`,
+`~/.config/nvim`, and `~/.config/starship.toml` — nearly every path this
+repo now also declares. `mise bootstrap dotfiles apply` surfaces these as
+"conflicting dotfile declarations" one at a time (first hit is usually
+`~/.config/git`, since it's alphabetically early), not all at once.
+`--force` does **not** resolve this — `--force` only overrides a real
+pre-existing file/directory blocking a symlink target; two configs both
+declaring the same target is a different error, and has to be resolved by
+removing the losing declaration. The fix is to delete that whole old
+`[dotfiles]` table from the real `~/.config/mise/config.toml` (keep
+`[tool_alias]`/`[settings]`/`[tools]`) — a one-time edit to a live machine
+file, not something this repo's tooling does for you.
