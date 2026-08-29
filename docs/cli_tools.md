@@ -222,6 +222,52 @@ runs a throwaway search; ripgrep exits `2` specifically on a bad flag (vs.
 real config error from an expected non-match — same pattern as fzf-check
 above. Verified both directions.
 
+## starship
+
+`starship/starship.toml` maps to **`~/.config/starship.toml`** — a flat
+file directly in `~/.config/`, *not* `~/.config/starship/starship.toml`.
+Checked directly: `starship` has no notion of a `starship/` config
+subdirectory at all; the directory here exists only to keep this repo's
+one-directory-per-tool convention, matching how [tmux](#tmux) below keeps
+its own directory despite also mapping outside the usual
+`~/.config/<tool>/` pattern.
+
+**What's configured:** module order (`directory`, `git_branch`,
+`git_status`, `git_state`, `golang`, `python`, `nodejs`, `helm`, then
+`jobs`/`character`), with `$cmd_duration` on the right edge to keep the
+left prompt short. Comments in the file note *why* `golang`/`python`/
+`nodejs` render `$version` (~20-80ms, measured, cheap enough per prompt)
+while `helm` stays symbol-only (~700ms measured — rendering its version
+would exec `helm version` on every prompt in a chart directory).
+
+**Theme:** the `[palettes.catppuccin_mocha]` table is a byte-for-byte match
+of the official [catppuccin/starship](https://github.com/catppuccin/starship)
+Mocha palette (`themes/mocha.toml`), verified by diffing all 26 values.
+One deliberate addition beyond the official palette: a `cyan` key
+duplicating `sky`'s value — starship recognizes bare `cyan` as a built-in
+color name, so without this alias any style that used it would fall back
+to the terminal's own cyan instead of a theme-consistent color. Not a
+mistake; a completeness fix.
+
+**Validation:** starship does **not** fail loudly on a bad config — a
+malformed file still exits `0`, only logging to stderr, so no exit-code
+check (like `bat-check`/`fzf-check`) is possible. Investigated the stderr
+signal directly and found it's not reliable enough to gate on:
+
+- Genuine TOML syntax errors *do* print a reliable, repeatable `ERROR` line
+  to stderr — but syntax validity is already covered by the generic
+  `taplo` lint step (`**/*.toml`), so a bespoke check here would be pure
+  redundancy.
+- Semantic errors (e.g. an unknown key) print a `WARN` line — but only
+  the *first* time that exact config content is checked. Verified directly:
+  re-running `starship print-config` against byte-identical broken content
+  produces the warning once, then silently nothing on the next run,
+  meaning a persistent typo could go undetected depending on whatever
+  ran first. Not something to build a gate on.
+
+No `starship-check` step was added, given neither signal holds up on its
+own merits — not an oversight.
+
 ## tmux
 
 `tmux/.tmux.conf` maps to **`~/.tmux.conf`** — not the XDG path

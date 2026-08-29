@@ -22,3 +22,4 @@ disable_backends = ["asdf", "vfox"]
 "go:golang.org/x/tools/cmd/goimports" = { version = "0.49.0", depends = ["go"] }
 "aqua:mvdan/gofumpt" = "0.11.0"
 "aqua:gotestyourself/gotestsum" = "1.13.0"
+"aqua:starship/starship" = "1.26.0"
