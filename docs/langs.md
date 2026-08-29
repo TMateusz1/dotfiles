@@ -12,10 +12,57 @@ Originally added because [eza](./cli_tools.md#eza) needs `cargo` to build
 ships with the rest of the toolchain). Kept as a general-purpose language
 tool in its own right, not scoped to that one use — confirmed both `rustc`
 and `cargo` resolve directly on `PATH`, not just usable internally by
-mise's cargo backend.
+mise's cargo backend. `cargo:eza`'s dependency on it is declared explicitly
+in `mise/config.toml` (`depends = ["rust"]`), same pattern used for
+`gopls`/`goimports` depending on `go` below.
 
 It's a meaningfully heavier dependency than the static-binary CLI tools in
 this repo (a full toolchain vs. an instant binary download) — see
 [cli_tools.md#eza](./cli_tools.md#eza) for the tradeoff that led to adding
 it, and why `vfox:eza` (this repo's `disable_backends = ["asdf", "vfox"]`
 rule) and skipping eza were the alternatives considered.
+
+## go
+
+`go` (mise's `core:go` backend), plus the dev tooling that goes with it:
+
+- **`gopls`** (via `go:golang.org/x/tools/gopls`) — the Go language server.
+  No standalone config file: gopls is configured through LSP client
+  initialization options, not a file of its own. This repo doesn't have an
+  `nvim/` config yet, so there's nothing to wire it into — deferred, same
+  as the shell-integration gaps noted in [cli_tools.md](./cli_tools.md).
+  Per [AGENTS.md](../AGENTS.md)'s Neovim conventions, LSP server *binaries*
+  come from mise (here), and Neovim only ever configures the client — never
+  installs the server itself.
+- **`goimports`** (via `go:golang.org/x/tools/cmd/goimports`) — import
+  formatter, CLI-flags only, no config file. Same "wire into nvim later"
+  situation as gopls.
+- **`golangci-lint`** (via `aqua:golangci/golangci-lint`) — Go meta-linter.
+  Checked directly (`golangci-lint config path` against this repo): its
+  config file (`.golangci.yml`/`.toml`/`.json`) is discovered by walking up
+  from each *Go project's* own directory, with no global/user-level
+  fallback — confirmed by the "no config file detected" result here, where
+  there's no Go code at all. So there's nothing that belongs in a dotfiles
+  repo for it; a per-project `.golangci.yml` is a property of that project,
+  not a personal setting.
+
+Both `gopls` and `goimports` install via mise's `go:` backend, which runs
+`go install <module>@version` — meaning they need a working `go` toolchain
+present at install time. That's declared explicitly, not left implicit:
+
+```toml
+"go:golang.org/x/tools/gopls" = { version = "0.23.0", depends = ["go"] }
+```
+
+Same pattern for `cargo:eza` depending on `rust` above. Verified mise
+accepts and parses `depends` without warning (`mise doctor`/`mise config`
+clean) and tools still install correctly with it in place. Their
+`mise/mise.lock` entries have no per-platform checksums, same reasoning as
+[eza's](./cli_tools.md#eza) `cargo:` entry: reproducibility comes from the
+pinned module version, not a downloaded-binary checksum.
+
+Go's own env-var config file (`GOENV`, for things like `GOPROXY`/`GOFLAGS`)
+resolves to `~/Library/Application Support/go/env` on macOS — **not**
+XDG's `~/.config/go/env` (Go uses `os.UserConfigDir()`, which isn't
+XDG-compliant on macOS). Nothing is set there; noted here only so a future
+"why isn't `~/.config/go/env` doing anything" doesn't cost time.

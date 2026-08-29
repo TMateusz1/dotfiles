@@ -38,7 +38,7 @@ docs/                  # notes on what's configured, and why
 | mise                                                                         | [docs/mise.md](./docs/mise.md)           |
 | git (+ delta)                                                                | [docs/git.md](./docs/git.md)             |
 | CLI tools (atuin, tmux, lazygit, bat, zoxide, eza, fd, fzf, jq, yq, ripgrep) | [docs/cli_tools.md](./docs/cli_tools.md) |
-| languages (rust)                                                             | [docs/langs.md](./docs/langs.md)         |
+| languages (rust, go)                                                         | [docs/langs.md](./docs/langs.md)         |
 | linting / pre-commit (hk)                                                    | [docs/linting.md](./docs/linting.md)     |
 
 ## Contributing / working on this repo

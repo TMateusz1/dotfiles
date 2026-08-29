@@ -34,7 +34,8 @@ Global (`mise/config.toml`):
   [git.md](./git.md)
 - CLI/TUI tools — `atuin`, `tmux`, `lazygit`, `bat`, `zoxide`, `eza`, `fd`,
   `fzf`, `jq`, `yq`, `ripgrep` — see [cli_tools.md](./cli_tools.md)
-- `rust` — language toolchain, see [langs.md](./langs.md)
+- Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`) — see
+  [langs.md](./langs.md)
 
 Repo-local (`mise.toml`):
 
@@ -56,9 +57,9 @@ see this for yourself.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
 having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
-`yq`/`ripgrep` on `PATH` while hacking on this repo isn't a problem — but
-it's worth knowing so a stray tool showing up in `mise config` output
-inside this repo doesn't come as a surprise.
+`yq`/`ripgrep`/`rust`/`go` on `PATH` while hacking on this repo isn't a
+problem — but it's worth knowing so a stray tool showing up in `mise
+config` output inside this repo doesn't come as a surprise.
 
 **Caution when testing changes to `mise/config.toml`:** never run a mise
 command with an explicit `--global` flag (e.g. `mise lock --global`, `mise

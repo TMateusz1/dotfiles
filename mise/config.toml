@@ -10,9 +10,13 @@ disable_backends = ["asdf", "vfox"]
 "aqua:sharkdp/bat" = "0.26.1"
 "aqua:ajeetdsouza/zoxide" = "0.10.0"
 "rust" = "1.98.0"
-"cargo:eza" = "0.23.5"
+"cargo:eza" = { version = "0.23.5", depends = ["rust"] }
 "aqua:sharkdp/fd" = "10.5.0"
 "aqua:junegunn/fzf" = "0.74.3"
 "aqua:jqlang/jq" = "1.8.2"
 "aqua:mikefarah/yq" = "4.53.6"
 "aqua:BurntSushi/ripgrep" = "15.2.0"
+"go" = "1.27.0"
+"aqua:golangci/golangci-lint" = "2.13.2"
+"go:golang.org/x/tools/gopls" = { version = "0.23.0", depends = ["go"] }
+"go:golang.org/x/tools/cmd/goimports" = { version = "0.49.0", depends = ["go"] }
