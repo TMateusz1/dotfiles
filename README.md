@@ -23,6 +23,7 @@ mise/                  # global mise config → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 atuin/                 # atuin config → ~/.config/atuin/
 tmux/                  # tmux config → ~/.tmux.conf (see docs/tmux.md)
+lazygit/               # lazygit config → ~/.config/lazygit/
 docs/                  # per-tool notes (what's configured, and why)
 ```
 
@@ -34,6 +35,7 @@ docs/                  # per-tool notes (what's configured, and why)
 | git (+ delta) | [docs/git.md](./docs/git.md) |
 | atuin | [docs/atuin.md](./docs/atuin.md) |
 | tmux | [docs/tmux.md](./docs/tmux.md) |
+| lazygit | [docs/lazygit.md](./docs/lazygit.md) |
 | linting / pre-commit (hk) | [docs/linting.md](./docs/linting.md) |
 
 ## Contributing / working on this repo

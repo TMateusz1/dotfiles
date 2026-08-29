@@ -15,3 +15,6 @@ mise.*.local.toml
 .env
 .env.*
 !.env.example
+
+# linter caches
+.rumdl_cache/

@@ -36,12 +36,15 @@ Global (`mise/config.toml`):
   [atuin.md](./atuin.md)
 - [`tmux`](https://github.com/tmux/tmux) (via `tmux/tmux-builds`) — terminal
   multiplexer, see [tmux.md](./tmux.md)
+- [`lazygit`](https://github.com/jesseduffield/lazygit) — git TUI, see
+  [lazygit.md](./lazygit.md)
 
 Repo-local (`mise.toml`):
 
 - [`claude-code`](https://github.com/anthropics/claude-code)
 - [`hk`](https://hk.jdx.dev), [`taplo`](https://github.com/tamasfe/taplo),
-  [`rumdl`](https://github.com/rvben/rumdl) — lint/format tooling, see
+  [`rumdl`](https://github.com/rvben/rumdl),
+  [`yamlfmt`](https://github.com/google/yamlfmt) — lint/format tooling, see
   [linting.md](./linting.md)
 
 ## A quirk worth knowing: `mise/config.toml` is also read here
@@ -55,9 +58,9 @@ real `~/.config/mise/config.toml`. Run `mise config` from the repo root to
 see this for yourself.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
-having `delta`/`atuin`/`tmux` on `PATH` while hacking on this repo isn't a
-problem — but it's worth knowing so a stray tool showing up in `mise config`
-output inside this repo doesn't come as a surprise.
+having `delta`/`atuin`/`tmux`/`lazygit` on `PATH` while hacking on this repo
+isn't a problem — but it's worth knowing so a stray tool showing up in `mise
+config` output inside this repo doesn't come as a surprise.
 
 **Caution when testing changes to `mise/config.toml`:** never run a mise
 command with an explicit `--global` flag (e.g. `mise lock --global`, `mise

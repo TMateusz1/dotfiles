@@ -7,6 +7,10 @@ local linters = new Mapping<String, Step> {
   // toml
   ["taplo"] = Builtins.taplo
   ["taplo-format"] = Builtins.taplo_format
+  // yaml — format only. No mature, established, static-binary YAML linter
+  // exists yet (the Rust option, ryl, self-describes as still maturing); see
+  // docs/linting.md.
+  ["yamlfmt"] = Builtins.yamlfmt
   // repo hygiene — enforces the "never commit secrets" rule from AGENTS.md
   // and catches common accidents, all built into hk (no extra tool installs)
   ["detect-private-key"] = Builtins.detect_private_key

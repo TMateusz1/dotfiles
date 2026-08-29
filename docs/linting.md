@@ -16,8 +16,8 @@ postinstall = "hk install --mise"
 ```
 
 So simply running `mise install` in the repo (which you need anyway, to get
-`hk`/`taplo`/`rumdl` themselves) installs the `pre-commit` git hook too. No
-separate setup step.
+`hk`/`taplo`/`rumdl`/`yamlfmt` themselves) installs the `pre-commit` git
+hook too. No separate setup step.
 
 ## What's checked
 
@@ -28,6 +28,11 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   disables `MD013` (line-length) — tables and links routinely exceed 80
   chars in these docs, and that's fine.
 - **`taplo`** / **`taplo-format`** — TOML lint and format/fix (`**/*.toml`).
+- **`yamlfmt`** — YAML format check/fix (`**/*.yml`, `**/*.yaml`). Format
+  only — no semantic YAML linter is wired in; see
+  [lazygit.md](./lazygit.md#validation) for why. `.yamlfmt` at the repo
+  root sets `retain_line_breaks: true` so intentional blank-line section
+  separators (e.g. in `lazygit/config.yml`) survive formatting.
 - **`tmux-check`** — not a linter (none exists for tmux config), but a
   custom step that loads `tmux/.tmux.conf` on a throwaway, isolated tmux
   server and reports syntax/unknown-option errors. See
