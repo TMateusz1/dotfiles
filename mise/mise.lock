@@ -2,6 +2,41 @@
 
 lockfile_version = 1
 
+[[tools."aqua:atuinsh/atuin"]]
+version = "18.20.1"
+backend = "aqua:atuinsh/atuin"
+specifiers = ["18.20.1"]
+
+[tools."aqua:atuinsh/atuin"."platforms.linux-arm64"]
+checksum = "sha256:95e465ab3d9c328732b3e129f7bdd3864d32948afb6c18f306101ee11ba57177"
+url = "https://github.com/atuinsh/atuin/releases/download/v18.20.1/atuin-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/531543785"
+provenance = "github-attestations"
+
+[tools."aqua:atuinsh/atuin"."platforms.linux-x64"]
+checksum = "sha256:f2dc7cd19fba87efdea37d80695f7d29364bd66384098fa5bdbc3e0654be4e33"
+url = "https://github.com/atuinsh/atuin/releases/download/v18.20.1/atuin-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/531543852"
+provenance = "github-attestations"
+
+[tools."aqua:atuinsh/atuin"."platforms.linux-x64-musl"]
+checksum = "sha256:1ad3e8162b4570118a3e05ae6b9ca0575aad0bb018a83001805c4f52d4fe9c8f"
+url = "https://github.com/atuinsh/atuin/releases/download/v18.20.1/atuin-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/531543854"
+provenance = "github-attestations"
+
+[tools."aqua:atuinsh/atuin"."platforms.macos-arm64"]
+checksum = "sha256:690281d1b907973856ddc4430461f880530cc3f52398a331c284b2f9371f5025"
+url = "https://github.com/atuinsh/atuin/releases/download/v18.20.1/atuin-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/531543786"
+provenance = "github-attestations"
+
+[tools."aqua:atuinsh/atuin"."platforms.windows-x64"]
+checksum = "sha256:58f0086480efada13396920481642b137f4d2984b9bdf4bf4aa9f27cf8bdff34"
+url = "https://github.com/atuinsh/atuin/releases/download/v18.20.1/atuin-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/531543850"
+provenance = "github-attestations"
+
 [[tools."aqua:dandavison/delta"]]
 version = "0.19.2"
 backend = "aqua:dandavison/delta"

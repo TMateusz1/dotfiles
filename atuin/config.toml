@@ -1,0 +1,12 @@
+
+# ~/.config/atuin/config.toml
+
+auto_sync = false
+sync_frequency = "5m"
+search_mode = "fuzzy"
+filter_mode = "global"
+style = "compact"
+enter_accept = true
+
+[theme]
+name = "catppuccin-mocha-blue"
