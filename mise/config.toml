@@ -23,3 +23,4 @@ disable_backends = ["asdf", "vfox"]
 "aqua:mvdan/gofumpt" = "0.11.0"
 "aqua:gotestyourself/gotestsum" = "1.13.0"
 "aqua:starship/starship" = "1.26.0"
+"aqua:derailed/k9s" = "0.51.0"

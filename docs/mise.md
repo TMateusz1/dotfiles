@@ -33,7 +33,7 @@ Global (`mise/config.toml`):
 - [`delta`](https://github.com/dandavison/delta) — git diff pager, see
   [git.md](./git.md)
 - CLI/TUI tools — `atuin`, `tmux`, `lazygit`, `bat`, `zoxide`, `eza`, `fd`,
-  `fzf`, `jq`, `yq`, `ripgrep`, `starship` — see
+  `fzf`, `jq`, `yq`, `ripgrep`, `starship`, `k9s` — see
   [cli_tools.md](./cli_tools.md)
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) — see [langs.md](./langs.md)
@@ -58,8 +58,9 @@ see this for yourself.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
 having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
-`yq`/`ripgrep`/`starship`/`rust`/`go` on `PATH` while hacking on this repo
-isn't a problem — but it's worth knowing so a stray tool showing up in `mise
+`yq`/`ripgrep`/`starship`/`k9s`/`rust`/`go` on `PATH` while hacking on this
+repo isn't a problem — but it's worth knowing so a stray tool showing up in
+`mise
 config` output inside this repo doesn't come as a surprise.
 
 **Caution when testing changes to `mise/config.toml`:** never run a mise

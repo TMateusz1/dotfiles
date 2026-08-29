@@ -52,6 +52,12 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   "no match" would look like a broken config. See
   [cli_tools.md#fzf](./cli_tools.md#fzf) /
   [cli_tools.md#ripgrep](./cli_tools.md#ripgrep).
+- **`k9s-check`** — k9s always exits `0`, but reliably logs an `ERROR`
+  line on malformed config; this check greps for it via the non-interactive
+  `k9s info` command, run against a disposable copy of `k9s/` (k9s
+  auto-writes default files into whatever config dir it's pointed at, so
+  this never touches the real directory). See
+  [cli_tools.md#k9s](./cli_tools.md#k9s).
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra

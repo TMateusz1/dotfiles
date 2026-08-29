@@ -29,18 +29,19 @@ eza/                   # eza theme → ~/.config/eza/
 fzf/                   # fzf theme (needs shell wiring, see docs/cli_tools.md#fzf)
 ripgrep/               # ripgrep config (needs shell wiring, see docs/cli_tools.md#ripgrep)
 starship/              # starship prompt → ~/.config/starship.toml (flat, see docs/cli_tools.md#starship)
+k9s/                   # k9s config + skin (see docs/cli_tools.md#k9s)
 docs/                  # notes on what's configured, and why
 ```
 
 ## Tools configured so far
 
-| Topic                                                                                  | Docs                                     |
-| -------------------------------------------------------------------------------------- | ---------------------------------------- |
-| mise                                                                                   | [docs/mise.md](./docs/mise.md)           |
-| git (+ delta)                                                                          | [docs/git.md](./docs/git.md)             |
-| CLI tools (atuin, tmux, lazygit, bat, zoxide, eza, fd, fzf, jq, yq, ripgrep, starship) | [docs/cli_tools.md](./docs/cli_tools.md) |
-| languages (rust, go)                                                                   | [docs/langs.md](./docs/langs.md)         |
-| linting / pre-commit (hk)                                                              | [docs/linting.md](./docs/linting.md)     |
+| Topic                                                                                       | Docs                                     |
+| ------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| mise                                                                                        | [docs/mise.md](./docs/mise.md)           |
+| git (+ delta)                                                                               | [docs/git.md](./docs/git.md)             |
+| CLI tools (atuin, tmux, lazygit, bat, zoxide, eza, fd, fzf, jq, yq, ripgrep, starship, k9s) | [docs/cli_tools.md](./docs/cli_tools.md) |
+| languages (rust, go)                                                                        | [docs/langs.md](./docs/langs.md)         |
+| linting / pre-commit (hk)                                                                   | [docs/linting.md](./docs/linting.md)     |
 
 ## Contributing / working on this repo
 

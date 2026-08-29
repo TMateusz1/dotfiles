@@ -151,6 +151,64 @@ config every other tool here has (it's arbitrary user-authored jq code, not
 settings), so nothing generic belongs there; skipped rather than inventing
 filler content.
 
+## k9s
+
+`k9s/config.yaml` and `k9s/skins/catppuccin-mocha.yaml` map to
+`~/.config/k9s/` **only if `$XDG_CONFIG_HOME` is set**. Checked directly
+(`k9s info`): on macOS, absent that env var, [k9s](https://k9scli.io/)
+defaults to `~/Library/Application Support/k9s/` instead — same
+non-XDG-on-macOS behavior as Go's own env file (see
+[langs.md#go](./langs.md#go); k9s is a Go binary too). Kept the repo
+directory named `k9s/` regardless, matching the tool name, per this repo's
+usual convention — the actual OS-dependent target is what varies, same
+shape of exception as [starship](#starship) and [tmux](#tmux) above. If
+the eventual shell setup ends up exporting `$XDG_CONFIG_HOME` globally (a
+few tools in this repo now have a reason to want that), this placement
+concern disappears on its own.
+
+**Found and fixed while setting this up:** both files were named `.yml`.
+k9s expects `.yaml` — verified this isn't cosmetic: with `.yml`, k9s
+doesn't even create a default `config.yaml`, it just silently uses hardcoded
+defaults and never touches the file at all (confirmed by running against
+both extensions and diffing what k9s reports/creates). Renamed both files.
+
+**What's configured:** `config.yaml` sets `ui.skin: catppuccin-mocha`,
+`ui.enableMouse: false`, `ui.noIcons: false` — all verified against k9s's
+own published JSON schema
+([schemas/k9s.json](https://github.com/derailed/k9s/blob/master/internal/config/json/schemas/k9s.json))
+to confirm they're current, not stale/renamed keys.
+
+**Theme:** the skin is based on the official
+[catppuccin/k9s](https://github.com/catppuccin/k9s) Mocha theme — most
+sections (help, frame.title/menu/crumbs/status, views.table/xray/charts/
+yaml/logs) match it byte-for-byte, confirmed by diffing against
+`dist/catppuccin-mocha.yaml`. Three sections deliberately diverge, all in
+the same direction as personalization seen elsewhere in this repo:
+`body.logoColor` and `frame.border.focusColor` use this repo's blue accent
+(`#89b4fa`) instead of the official mauve/lavender; `frame.border.fgColor`
+uses a muted overlay0 gray instead of mauve; and `dialog` stays consistent
+with the rest of the dark UI (dark background, light text, blue focus
+button) rather than the official theme's lighter, higher-contrast "pop-out"
+dialog style (light-gray background, dark text, pink focus button). Left
+as-is rather than reverted to official — reads as a coherent, deliberate
+choice (blue accent + fully-dark UI) rather than arbitrary drift, unlike
+the lazygit case that did get aligned to its official theme. Worth
+revisiting if that read is wrong.
+
+**Validation:** k9s always exits `0`, even on malformed config — no
+exit-code check is possible (same situation as
+[starship](#starship)/[eza](#eza)). Unlike starship's semantic warnings,
+though, k9s's parse-failure message (`ERROR ... Unable to unmarshal`) *is*
+reliably reproducible on repeat identical-content runs — verified directly,
+no dedup/caching involved. `k9s-check` in `hk.pkl` greps for it via the
+non-interactive `k9s info` command (no real cluster needed). One important
+subtlety: `k9s info` auto-writes missing default files (`aliases.yaml`
+etc.) into whatever config directory it's pointed at — so the check runs
+against a disposable `mktemp -d` copy of `k9s/`, never the real directory.
+(Found out the hard way: an earlier manual test pointed straight at the
+real repo directory and left a stray `aliases.yaml` behind, since cleaned
+up.)
+
 ## lazygit
 
 `lazygit/config.yml` maps to `~/.config/lazygit/config.yml`

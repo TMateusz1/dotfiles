@@ -64,6 +64,26 @@ local linters = new Mapping<String, Step> {
       [ "$status" -ne 2 ]
       """
   }
+  // k9s always exits 0 and never fails loudly, even on malformed YAML — but
+  // it does log an "ERROR ... Unable to unmarshal" line, reliably (unlike
+  // starship's dedup'd warnings — verified this repeats identically on
+  // repeat runs). `k9s info` is non-interactive and needs no real cluster,
+  // but it also auto-writes missing default files (aliases.yaml etc.) into
+  // whatever config dir it's pointed at — so this runs against a disposable
+  // copy, never the real k9s/ directory, to avoid polluting the repo.
+  ["k9s-check"] {
+    glob = "k9s/config.yaml"
+    check = """
+      dir=$(mktemp -d)
+      cp -r "$(dirname {{files}})" "$dir/k9s"
+      output=$(XDG_CONFIG_HOME="$dir" k9s info < /dev/null 2>&1)
+      rm -rf "$dir"
+      if printf '%s' "$output" | grep -qi error; then
+        printf '%s\\n' "$output" >&2
+        exit 1
+      fi
+      """
+  }
 }
 
 hooks {
