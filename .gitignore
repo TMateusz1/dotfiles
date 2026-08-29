@@ -1,0 +1,17 @@
+# macOS cruft
+.DS_Store
+
+# editor swap/backup files
+*.swp
+*.swo
+*~
+
+# mise local overrides — machine-specific, never committed (see AGENTS.md)
+mise.local.toml
+mise.*.local.toml
+.mise.local.toml
+
+# secrets / env files — never committed (see AGENTS.md)
+.env
+.env.*
+!.env.example

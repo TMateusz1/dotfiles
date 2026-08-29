@@ -1,0 +1,6 @@
+[settings]
+lockfile = true
+disable_backends = ["asdf", "vfox"]
+
+[tools]
+"aqua:anthropics/claude-code" = "2.1.251"
