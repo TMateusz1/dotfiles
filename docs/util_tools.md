@@ -53,12 +53,12 @@ now `header-filename`, but plain `header` remains a supported alias), and
 `--italic-text=always` plus the theme name resolve as documented, tested
 against the actual installed binary.
 
-**Validation:** no linter exists for bat's config format (checked). The
-closest useful check — wired into `hk.pkl` as `bat-check` — pipes a
-throwaway line through `bat` with `BAT_CONFIG_PATH` pointed at this file;
-bat fails loudly with a clear error on any unknown or malformed flag
-(verified against a deliberately broken config first, to confirm the check
-has teeth).
+**Validation:** no linter exists for bat's config format (checked), and per
+this repo's policy no custom step fills that gap (see
+[linting.md](./linting.md)) — an earlier version of this repo had one,
+since removed. Verified by hand against the real bat binary when this was
+set up (a deliberately broken config produced a clear error; this file
+didn't), not something checked automatically going forward.
 
 ## eza
 
@@ -136,12 +136,13 @@ diverging fzf themes in the repo.
 hard-fails if this points to a missing file, unlike ripgrep below — see
 [shell.md](./shell.md)).
 
-**Validation:** no linter exists for fzf's options-file format. `fzf-check`
-in `hk.pkl` loads this file via `FZF_DEFAULT_OPTS_FILE` and runs a
-throwaway filter; fzf exits `2` specifically on a bad flag (vs. `0`/`1` for
-a normal found/not-found result), so the check distinguishes a real config
-error from an expected non-match. Verified both directions: passes against
-this file, fails against a deliberately broken one.
+**Validation:** no linter exists for fzf's options-file format, and per
+this repo's policy no custom step fills that gap (see
+[linting.md](./linting.md)) — an earlier version of this repo had one,
+since removed. Verified by hand against the real fzf binary when this was
+set up (fzf exits `2` on a bad flag; a deliberately broken config
+reproduced that, this file didn't), not something checked automatically
+going forward.
 
 ## jq
 
@@ -176,12 +177,11 @@ muted subtext tone (`#a6adc8`, RGB `166,173,200`) for line numbers:
 if this points to a missing file (a stderr warning, still exits `0` —
 verified directly), so no existence guard was needed there.
 
-**Validation:** no linter exists for ripgrep's options-file format.
-`ripgrep-check` in `hk.pkl` loads this file via `RIPGREP_CONFIG_PATH` and
-runs a throwaway search; ripgrep exits `2` specifically on a bad flag (vs.
-`0`/`1` for a normal found/not-found result), so the check distinguishes a
-real config error from an expected non-match — same pattern as
-[fzf-check](#fzf). Verified both directions.
+**Validation:** no linter exists for ripgrep's options-file format, and per
+this repo's policy no custom step fills that gap (see
+[linting.md](./linting.md)) — an earlier version of this repo had one,
+since removed. Verified by hand against the real ripgrep binary when this
+was set up, not something checked automatically going forward.
 
 ## starship
 
@@ -211,9 +211,11 @@ to the terminal's own cyan instead of a theme-consistent color. Not a
 mistake; a completeness fix.
 
 **Validation:** starship does **not** fail loudly on a bad config — a
-malformed file still exits `0`, only logging to stderr, so no exit-code
-check (like [bat-check](#bat)/[fzf-check](#fzf)) is possible. Investigated
-the stderr signal directly and found it's not reliable enough to gate on:
+malformed file still exits `0`, only logging to stderr, so no simple
+exit-code check is possible. Investigated the stderr signal directly and
+found it's not reliable enough to gate on anyway, on top of this repo's
+general policy against hand-rolling checks for formats with no real linter
+(see [linting.md](./linting.md)):
 
 - Genuine TOML syntax errors *do* print a reliable, repeatable `ERROR` line
   to stderr — but syntax validity is already covered by the generic

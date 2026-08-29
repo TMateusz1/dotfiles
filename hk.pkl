@@ -1,6 +1,13 @@
 amends "package://github.com/jdx/hk/releases/download/v1.56.1/hk@1.56.1#/Config.pkl"
 import "package://github.com/jdx/hk/releases/download/v1.56.1/hk@1.56.1#/Builtins.pkl"
 
+// Only wire up a step here when a real, established tool exists for the
+// format (rumdl, taplo, yamlfmt, shellcheck, ...) or it's one of hk's own
+// built-in hygiene utilities below. Several config formats in this repo
+// (tmux.conf, bat's/fzf's/ripgrep's args files, k9s's YAML schema, kitty's
+// config) have no real linter — those were hand-verified against the real
+// binary when each was set up (see their docs/ entries), not wired into a
+// bespoke custom step here. See docs/linting.md.
 local linters = new Mapping<String, Step> {
   // markdown
   ["rumdl"] = Builtins.rumdl
@@ -18,72 +25,6 @@ local linters = new Mapping<String, Step> {
   ["check-added-large-files"] = Builtins.check_added_large_files
   ["trailing-whitespace"] = Builtins.trailing_whitespace
   ["newlines"] = Builtins.newlines
-  // tmux has no established third-party linter; the closest useful check is
-  // asking tmux itself to load the config on a throwaway server and report
-  // any syntax/option errors, then tear the server down.
-  ["tmux-check"] {
-    glob = "tmux/.tmux.conf"
-    check = """
-      sock=$(mktemp -u)
-      tmux -S "$sock" -f {{files}} new-session -d \; kill-server
-      status=$?
-      rm -f "$sock"
-      exit $status
-      """
-  }
-  // bat's config is a flat args file with no linter of its own; the closest
-  // useful check is asking bat itself to parse it while rendering a
-  // throwaway line, which fails loudly on an unknown/malformed flag.
-  ["bat-check"] {
-    glob = "bat/config"
-    check = "printf 'x\\n' | BAT_CONFIG_PATH={{files}} bat --paging=never --color=never -"
-  }
-  // Same idea for fzf's and ripgrep's options files: both exit 2 on a
-  // genuinely bad flag/config, vs. 0/1 for a normal "found"/"not found"
-  // result, so checking for exit 2 specifically distinguishes a real
-  // config error from an expected non-match.
-  ["fzf-check"] {
-    glob = "fzf/config"
-    check = """
-      if printf 'x\\n' | FZF_DEFAULT_OPTS_FILE={{files}} fzf --filter=x >/dev/null; then
-        status=0
-      else
-        status=$?
-      fi
-      [ "$status" -ne 2 ]
-      """
-  }
-  ["ripgrep-check"] {
-    glob = "ripgrep/config"
-    check = """
-      if printf '' | RIPGREP_CONFIG_PATH={{files}} rg foo; then
-        status=0
-      else
-        status=$?
-      fi
-      [ "$status" -ne 2 ]
-      """
-  }
-  // k9s always exits 0 and never fails loudly, even on malformed YAML — but
-  // it does log an "ERROR ... Unable to unmarshal" line, reliably (unlike
-  // starship's dedup'd warnings — verified this repeats identically on
-  // repeat runs). `k9s info` is non-interactive and needs no real cluster,
-  // but it also auto-writes missing default files (aliases.yaml etc.) into
-  // whatever config dir it's pointed at — so this runs against a disposable
-  // copy, never the real k9s/ directory, to avoid polluting the repo.
-  ["k9s-check"] {
-    glob = "k9s/config.yaml"
-    check = """
-      dir=$(mktemp -d)
-      cp -r "$(dirname {{files}})" "$dir/k9s"
-      output=$(XDG_CONFIG_HOME="$dir" k9s info < /dev/null 2>&1)
-      rm -rf "$dir"
-      if printf '%s' "$output" | grep -qi error; then
-        printf '%s\\n' "$output" >&2
-        exit 1
-      fi
-      """
-  }
   // shellcheck has no zsh dialect (only sh/bash/dash/ksh) and hard-errors
   // (SC2148) on a shebang-less file with no dialect specified — but
   // --shell=bash turned out to produce zero false positives against this
@@ -95,28 +36,6 @@ local linters = new Mapping<String, Step> {
   ["zshrc-check"] {
     glob = "shell/.zshrc"
     check = "shellcheck --shell=bash --exclude=SC1090,SC1091 {{files}}"
-  }
-  // kitty's config format has no third-party linter, but kitty itself can
-  // parse it headlessly via `kitty +runpy` + its own `kitty.config` module —
-  // no window/GPU/display needed (verified), unlike actually launching
-  // kitty. It's lenient on unknown keys (a warning, not a failing exit), but
-  // does raise on a genuinely invalid value for a real option (verified
-  // both directly). kitty is deliberately NOT part of the default toolset
-  // (see mise.desktop.toml/docs/bootstrap.md) — it isn't guaranteed to be
-  // on PATH here, so this skips cleanly rather than failing when absent.
-  ["kitty-check"] {
-    glob = "kitty/kitty.conf"
-    check = """
-      if ! command -v kitty >/dev/null 2>&1; then
-        exit 0
-      fi
-      output=$(kitty +runpy 'import sys; from kitty.config import load_config; load_config(sys.argv[1])' {{files}} 2>&1)
-      status=$?
-      if [ "$status" -ne 0 ] || printf '%s' "$output" | grep -qi "ignoring unknown config key"; then
-        printf '%s\\n' "$output" >&2
-        exit 1
-      fi
-      """
   }
 }
 

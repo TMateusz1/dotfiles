@@ -64,24 +64,15 @@ official theme's `scrollbar_handle_color`/`scrollbar_track_color` and
 `mark1`–`mark3` colors — minor, rarely-used features; addable later
 without disturbing anything if wanted.
 
-**Validation:** no third-party linter exists for kitty's config format,
-but kitty itself can parse it **without spawning a window or touching the
-GPU/display** — `kitty +runpy` runs Python using kitty's own bundled
-interpreter, so `from kitty.config import load_config; load_config(path)`
-validates purely in-process. This matters because the more obvious
-approach (actually starting kitty, even with `--start-as=hidden`) still
-creates a real OS-level window-server object and needs a display —
-verified `+runpy` needs neither, making it safe for headless CI too.
-Behavior is lenient for unknown keys (`Ignoring unknown config key: ...`,
-still exits `0`) but raises a real Python exception (non-zero exit) for a
-genuinely invalid *value* on a real option — verified both directly
-(deliberately broken key vs. deliberately broken value). `kitty-check` in
-`hk.pkl` treats either signal as failure.
-
-**Also worth knowing:** kitty is deliberately *not* part of the always-on
-toolset (it lives in `mise.desktop.toml`, opt-in only — see
-[bootstrap.md](./bootstrap.md)), so it isn't guaranteed to be on `PATH`
-during an ordinary `hk check --all`. `kitty-check` skips cleanly (exit `0`)
-rather than failing when `kitty` isn't found, matching the same
-graceful-degradation shape used throughout `shell/.zshrc`'s `command -v`
-guards.
+**Validation:** no third-party linter exists for kitty's config format, and
+per this repo's policy no custom step fills that gap (see
+[linting.md](./linting.md)) — an earlier version of this repo had one,
+since removed. Verified by hand against the real kitty binary instead: `kitty
++runpy 'from kitty.config import load_config; load_config(path)'` parses
+the config purely in-process, with no window/GPU/display needed (unlike
+actually starting kitty), and is a handy one-liner if you want to
+spot-check this file again later — it's lenient on unknown keys but raises
+a real error on an invalid value for a recognized option (verified both).
+Not wired into an automated check, partly because kitty is also opt-in
+(`mise.desktop.toml`) and wouldn't reliably be on `PATH` during an ordinary
+`hk check --all` anyway.

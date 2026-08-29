@@ -53,19 +53,13 @@ choice (blue accent + fully-dark UI) rather than arbitrary drift, unlike
 the [lazygit](#lazygit) case that did get aligned to its official theme.
 Worth revisiting if that read is wrong.
 
-**Validation:** k9s always exits `0`, even on malformed config — no
-exit-code check is possible (same situation as
-[starship](./util_tools.md#starship)/[eza](./util_tools.md#eza)). Unlike
-starship's semantic warnings, though, k9s's parse-failure message
-(`ERROR ... Unable to unmarshal`) *is* reliably reproducible on repeat
-identical-content runs — verified directly, no dedup/caching involved.
-`k9s-check` in `hk.pkl` greps for it via the non-interactive `k9s info`
-command (no real cluster needed). One important subtlety: `k9s info`
-auto-writes missing default files (`aliases.yaml` etc.) into whatever
-config directory it's pointed at — so the check runs against a disposable
-`mktemp -d` copy of `k9s/`, never the real directory. (Found out the hard
-way: an earlier manual test pointed straight at the real repo directory and
-left a stray `aliases.yaml` behind, since cleaned up.)
+**Validation:** no established linter exists for k9s's config, and per this
+repo's policy (see [linting.md](./linting.md)) no bespoke one was built to
+fill the gap either — an earlier version of this repo had a custom
+`k9s-check` step that grepped `k9s info`'s stderr for an `ERROR` line, since
+removed. The config was verified by hand against the real k9s binary when
+this was set up (schema-checked keys, confirmed `.yml` vs `.yaml` behavior
+directly), not something checked automatically going forward.
 
 ## lazygit
 
@@ -100,7 +94,8 @@ Catppuccin port over a hand-rolled palette" rule.
 **Validation:** no YAML *linter* is wired in here — checked, and the one
 static-binary Rust option (`ryl`) self-describes as still maturing, so it
 was skipped rather than added half-heartedly (same call as skipping a tmux
-linter below — see [linting.md](./linting.md)). `yamlfmt` (format-only,
+linter below, and this repo's general policy — see
+[linting.md](./linting.md)). `yamlfmt` (format-only,
 Google-maintained, single static binary) is wired in for
 `**/*.yml`/`**/*.yaml` generally; `.yamlfmt` at the repo root sets
 `retain_line_breaks: true` so this file's blank-line section separators
@@ -136,7 +131,9 @@ here to vet for trust beyond tmux itself.
 
 **Validation:** there's no established third-party linter for `tmux.conf`
 (checked; nothing comparable to `taplo`/`rumdl` exists for tmux config
-syntax). The closest useful substitute — wired into `hk.pkl` as
-`tmux-check` — asks tmux itself to load the config on a throwaway, isolated
-server and reports any syntax/unknown-option errors, then tears the server
-down. See [linting.md](./linting.md).
+syntax), and per this repo's policy no custom step was built to fill the
+gap — an earlier version of this repo had one (loading the config on a
+throwaway tmux server), since removed. See [linting.md](./linting.md). The
+config was verified by hand against the real tmux binary when this was set
+up (it loaded cleanly, no syntax/unknown-option errors), not something
+checked automatically going forward.

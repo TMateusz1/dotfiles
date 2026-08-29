@@ -38,44 +38,37 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   [core_tools.md#lazygit](./core_tools.md#lazygit) for why. `.yamlfmt` at
   the repo root sets `retain_line_breaks: true` so intentional blank-line
   section separators (e.g. in `lazygit/config.yml`) survive formatting.
-- **`tmux-check`** — not a linter (none exists for tmux config), but a
-  custom step that loads `tmux/.tmux.conf` on a throwaway, isolated tmux
-  server and reports syntax/unknown-option errors. See
-  [core_tools.md#tmux](./core_tools.md#tmux).
-- **`bat-check`** — same idea for `bat/config`: no linter exists for bat's
-  args-file format, so this pipes a throwaway line through `bat` with
-  `BAT_CONFIG_PATH` pointed at the file, which fails loudly on any
-  unknown/malformed flag. See [util_tools.md#bat](./util_tools.md#bat).
-- **`fzf-check`** / **`ripgrep-check`** — same idea again for `fzf/config`
-  and `ripgrep/config`. Both tools exit `2` specifically on a bad flag
-  (vs. `0`/`1` for a normal found/not-found result), so these checks treat
-  exit `2` as failure and everything else as pass — otherwise a legitimate
-  "no match" would look like a broken config. See
-  [util_tools.md#fzf](./util_tools.md#fzf) /
-  [util_tools.md#ripgrep](./util_tools.md#ripgrep).
-- **`k9s-check`** — k9s always exits `0`, but reliably logs an `ERROR`
-  line on malformed config; this check greps for it via the non-interactive
-  `k9s info` command, run against a disposable copy of `k9s/` (k9s
-  auto-writes default files into whatever config dir it's pointed at, so
-  this never touches the real directory). See
-  [core_tools.md#k9s](./core_tools.md#k9s).
 - **`zshrc-check`** — `shellcheck --shell=bash` (shellcheck has no zsh
   dialect, but `bash` mode was verified to produce zero false positives
   against this file's zsh-specific syntax while still catching a real
   issue), excluding `SC1090`/`SC1091` (unavoidable noise for an rc file
   that legitimately sources dynamic content). See
-  [shell.md](./shell.md#validation).
-- **`kitty-check`** — no third-party linter exists, but kitty itself can
-  parse its config headlessly (`kitty +runpy` + its own `kitty.config`
-  module) with no window/GPU/display needed. Skips cleanly if `kitty`
-  isn't on `PATH`, since it's deliberately opt-in
-  (`mise.desktop.toml`), not part of the always-loaded toolset. See
-  [desktop_tools.md#kitty](./desktop_tools.md#kitty).
+  [shell.md](./shell.md#validation). This one stays because shellcheck is
+  a real, established linter — not something hand-rolled for the occasion.
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra
   tool installs. `detect-private-key` in particular backs the "never commit
   secrets" rule in [AGENTS.md](../AGENTS.md).
+
+## No established linter, no check
+
+Several config formats in this repo have no real third-party linter:
+tmux.conf, bat's/fzf's/ripgrep's flat args files, k9s's YAML schema, and
+kitty's config. Earlier revisions of `hk.pkl` hand-rolled a custom step for
+each of these anyway — loading tmux.conf on a throwaway server, piping a
+line through bat, grepping k9s's stderr for an `ERROR` line, reaching into
+kitty's internal `kitty.config` Python module, and so on. Each one
+individually was verified to work at the time, but collectively they were
+custom-built validation logic invented specifically because no real tool
+existed — exactly the kind of thing worth being suspicious of long-term
+(more surface to maintain, more places an internal API change silently
+breaks a check no one's looking at). Removed. These files were verified by
+hand against the real binary when each was set up (see their own
+`docs/*_tools.md` entries) and aren't checked automatically going forward.
+The rule now: wire up a step only when a real, established tool exists for
+the format (like `shellcheck` above) — never build a bespoke one to fill
+the gap.
 
 ## Why rumdl, not markdownlint
 

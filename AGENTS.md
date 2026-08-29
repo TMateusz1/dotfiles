@@ -121,6 +121,20 @@ Rule specific to the **global** config:
   do *not* use this prefix — the prefix is only for tasks meant to be
   available everywhere.
 
+## Linting conventions (`hk.pkl`)
+
+- Only wire up a lint/format step for a config format when a real,
+  established tool exists for it (rumdl, taplo, yamlfmt, shellcheck, ...).
+- If no such tool exists for a format, **don't build one.** No hand-rolled
+  shell script that reaches into a tool's internals, loads a config on a
+  throwaway server, or greps stderr for an error string to fake a check —
+  even when a plausible mechanism exists, it's more fragile/invented than
+  the thing it's protecting, and it's maintenance surface for a safety net
+  that only looks real. Verify that config by hand against the real binary
+  when you write it (document what you checked, in that tool's `docs/`
+  page), and leave it unchecked going forward rather than maintaining
+  bespoke validation logic for a gap no real tool fills.
+
 ## Neovim conventions (`nvim/`)
 
 - Standard modern layout: `init.lua` bootstraps
