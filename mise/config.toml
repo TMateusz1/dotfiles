@@ -1,0 +1,6 @@
+[settings]
+lockfile = true
+disable_backends = ["asdf", "vfox"]
+
+[tools]
+"aqua:dandavison/delta" = "0.19.2"

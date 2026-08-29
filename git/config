@@ -1,0 +1,6 @@
+; entry point read by git from ~/.config/git/config (XDG) once this
+; directory is symlinked into place — kept split into topic files
+; (see git/*.gitconfig) rather than one growing file.
+
+[include]
+    path = delta.gitconfig

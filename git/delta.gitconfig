@@ -1,0 +1,47 @@
+[core]
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+# Every colour below is a Catppuccin Mocha value, so diffs match gitsigns in
+# Neovim and the lazygit skin instead of falling back to delta's own computed
+# red/green, which drifted with whichever terminal palette was loaded.
+[delta]
+    navigate = true
+    line-numbers = true
+    hyperlinks = true
+    dark = true
+    syntax-theme = Catppuccin Mocha
+
+    file-style = "#89b4fa" bold
+    file-decoration-style = "#89b4fa" ul
+
+    hunk-header-style = file line-number syntax
+    hunk-header-decoration-style = "#45475a" box
+    hunk-header-file-style = "#89b4fa"
+    hunk-header-line-number-style = "#a6adc8"
+
+    # Tinted grounds rather than saturated blocks: syntax highlighting stays
+    # above 8:1 on the base rows and above 5.8:1 on the emphasised ones, so the
+    # code inside a diff is still the most readable thing in it.
+    minus-style = syntax "#3a2531"
+    minus-emph-style = syntax "#5c3444"
+    plus-style = syntax "#24352c"
+    plus-emph-style = syntax "#35543f"
+    zero-style = syntax
+
+    line-numbers-minus-style = "#f38ba8"
+    line-numbers-plus-style = "#a6e3a1"
+    line-numbers-zero-style = "#6c7086"
+    line-numbers-left-style = "#45475a"
+    line-numbers-right-style = "#45475a"
+
+    whitespace-error-style = "#f38ba8" reverse
+    blame-palette = "#1e1e2e #181825 #313244 #45475a"
+
+[diff]
+    colorMoved = default
+
+[merge]
+    conflictStyle = zdiff3
