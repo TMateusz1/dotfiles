@@ -1,4 +1,4 @@
-# Bootstrap (symlinks + zsh plugins)
+# Bootstrap (symlinks, zsh plugins, desktop apps)
 
 How this repo actually gets applied to a machine, via mise's own native
 `[dotfiles]` and `[bootstrap.repos]` — not a hand-rolled install script.
@@ -12,6 +12,7 @@ mise run bootstrap:dry-run    # preview the dotfile symlinks specifically
 mise run bootstrap:dotfiles   # apply symlinks — see "What gets symlinked" below
 mise run bootstrap:zsh-plugins  # clone/update oh-my-zsh + its 3 custom plugins
 mise run bootstrap:all        # both of the above, in one go
+mise run bootstrap:all-desktop  # GUI/desktop apps — opt-in, see "Desktop apps" below
 ```
 
 The tasks are thin wrappers (`mise tasks ls` for the full list) — nothing
@@ -83,6 +84,43 @@ stance. oh-my-zsh itself has no tagged releases (it's designed to track
 `master` via its own self-update mechanism), so it's pinned to `master`
 rather than a specific commit — the one entry here that's a rolling
 reference rather than a fixed one.
+
+## Desktop apps
+
+```toml
+# mise.desktop.toml
+[bootstrap.packages]
+"brew-cask:kitty" = "latest"
+"brew-cask:font-jetbrains-mono-nerd-font" = "latest"
+```
+
+GUI apps use the same `mise bootstrap` subsystem, via its `brew-cask:`
+package manager — **no separate Homebrew installation required**. Verified
+directly: hid `brew` entirely from `PATH` and ran `mise bootstrap packages
+apply brew-cask:alacritty --dry-run` anyway — it produced a full install
+plan (cask, app bundle, binary links, shell completions) with no `brew`
+binary present at all. mise fetches cask definitions and performs the
+install itself.
+
+**Deliberately isolated from everything else.** `mise.desktop.toml` is
+mise's own "config environment" mechanism — a file loaded *only* when
+`-E desktop` is passed, never by plain `mise install`, `mise bootstrap`, or
+any other task here. Verified directly: `mise bootstrap packages status`
+(no `-E desktop`) reports "nothing configured in `[bootstrap.packages]`" —
+the desktop entries are structurally invisible, not just conventionally
+unused. `bootstrap:all-desktop` is the only task that reaches this file
+(`mise -E desktop bootstrap packages apply`), and it isn't a dependency of
+`bootstrap:all`.
+
+Both package names were confirmed valid by resolving them directly against
+this machine (both already installed via real Homebrew here, unrelated to
+this repo — mise refuses to touch a cask Homebrew already owns, same
+non-clobbering behavior as the dotfiles conflict below).
+
+Only one file for all desktop/GUI apps for now (kitty + a font); split into
+more files only if this grows unwieldy. Not yet extended to Linux
+(`flatpak:`/`flatpak-user:`) or the Mac App Store (`mas:`) — same manager
+system, addable later without restructuring.
 
 ## Verified without touching this machine
 

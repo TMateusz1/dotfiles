@@ -23,6 +23,7 @@ integration these tools need — see [docs/shell.md](./docs/shell.md).
 
 ```text
 mise.toml, mise.lock   # tools/tasks for working on this repo itself
+mise.desktop.toml      # GUI/desktop apps, opt-in only (see docs/bootstrap.md)
 mise/                  # global mise config → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
@@ -49,7 +50,7 @@ docs/                  # notes on what's configured, and why
 | Core tools (tmux, lazygit, k9s)                                          | [docs/core_tools.md](./docs/core_tools.md) |
 | languages (rust, go)                                                     | [docs/langs.md](./docs/langs.md)           |
 | linting / pre-commit (hk)                                                | [docs/linting.md](./docs/linting.md)       |
-| bootstrap (symlinks + zsh plugins)                                       | [docs/bootstrap.md](./docs/bootstrap.md)   |
+| bootstrap (symlinks, zsh plugins, desktop apps)                          | [docs/bootstrap.md](./docs/bootstrap.md)   |
 
 ## Contributing / working on this repo
 

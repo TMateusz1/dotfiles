@@ -48,6 +48,13 @@ run = "mise bootstrap repos apply"
 description = "Run bootstrap:dotfiles and bootstrap:zsh-plugins"
 depends = ["bootstrap:dotfiles", "bootstrap:zsh-plugins"]
 
+# Desktop/GUI apps live in mise.desktop.toml, loaded only via `-E desktop` —
+# never by plain `mise install`/`mise bootstrap`/`mise run`. This is the
+# only task that reaches it.
+[tasks."bootstrap:all-desktop"]
+description = "Install GUI/desktop apps (kitty, fonts, ...) from mise.desktop.toml — opt-in, not part of bootstrap:all"
+run = "mise -E desktop bootstrap packages apply"
+
 [dotfiles]
 "~/.zshrc" = "shell/.zshrc"
 "~/.tmux.conf" = "tmux/.tmux.conf"
