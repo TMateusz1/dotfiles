@@ -32,6 +32,41 @@ checksum = "sha256:71b2fef860abe467217a538ff31de02f5258807c0129f771846f87bd029aa
 url = "https://github.com/BurntSushi/ripgrep/releases/download/15.2.0/ripgrep-15.2.0-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/BurntSushi/ripgrep/releases/assets/478119643"
 
+[[tools."aqua:ClementTsang/bottom"]]
+version = "0.14.9"
+backend = "aqua:ClementTsang/bottom"
+specifiers = ["0.14.9"]
+
+[tools."aqua:ClementTsang/bottom"."platforms.linux-arm64"]
+checksum = "sha256:a6a0a0dda426b31b2c72e15a26c7e97c2224aafdd66f60632e34ee464a64ec8f"
+url = "https://github.com/ClementTsang/bottom/releases/download/0.14.9/bottom_aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/ClementTsang/bottom/releases/assets/531978123"
+provenance = "github-attestations"
+
+[tools."aqua:ClementTsang/bottom"."platforms.linux-x64"]
+checksum = "sha256:e0c325829e8bdcea25a8a7651da05dbb6f1fc109ac5d2f0187867d3d5d9c0df8"
+url = "https://github.com/ClementTsang/bottom/releases/download/0.14.9/bottom_x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/ClementTsang/bottom/releases/assets/531978159"
+provenance = "github-attestations"
+
+[tools."aqua:ClementTsang/bottom"."platforms.linux-x64-musl"]
+checksum = "sha256:b4bee5b193e7d3f6e090ac14f0ca15acec2e7fe4ef64988e0bfc492e16c28c9a"
+url = "https://github.com/ClementTsang/bottom/releases/download/0.14.9/bottom_x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/ClementTsang/bottom/releases/assets/531978168"
+provenance = "github-attestations"
+
+[tools."aqua:ClementTsang/bottom"."platforms.macos-arm64"]
+checksum = "sha256:28358e19a3d62b3778fc0d1778b0028a682059145c9ac38ac5076bf124d77714"
+url = "https://github.com/ClementTsang/bottom/releases/download/0.14.9/bottom_aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/ClementTsang/bottom/releases/assets/531978112"
+provenance = "github-attestations"
+
+[tools."aqua:ClementTsang/bottom"."platforms.windows-x64"]
+checksum = "sha256:01660721b0fdc72b191f2b27b78dc9a3087aeb7b3fad4a890c53870089d6b500"
+url = "https://github.com/ClementTsang/bottom/releases/download/0.14.9/bottom_x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/ClementTsang/bottom/releases/assets/531978148"
+provenance = "github-attestations"
+
 [[tools."aqua:ajeetdsouza/zoxide"]]
 version = "0.10.0"
 backend = "aqua:ajeetdsouza/zoxide"
@@ -97,6 +132,41 @@ url = "https://github.com/atuinsh/atuin/releases/download/v18.20.1/atuin-x86_64-
 url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/531543850"
 provenance = "github-attestations"
 
+[[tools."aqua:charmbracelet/glow"]]
+version = "3.0.0"
+backend = "aqua:charmbracelet/glow"
+specifiers = ["3.0.0"]
+
+[tools."aqua:charmbracelet/glow"."platforms.linux-arm64"]
+checksum = "sha256:810c39f4691feb75e675a5f5f54b9fa091354e7599d9cf9c9fc9b97e47a99759"
+url = "https://github.com/charmbracelet/glow/releases/download/v3.0.0/glow_3.0.0_Linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/glow/releases/assets/510466976"
+provenance = "cosign"
+
+[tools."aqua:charmbracelet/glow"."platforms.linux-x64"]
+checksum = "sha256:13e05e4b2acc18d2aee44291aefe6325b077ec321b631a0cfa780e8e3bc33f78"
+url = "https://github.com/charmbracelet/glow/releases/download/v3.0.0/glow_3.0.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/glow/releases/assets/510466923"
+provenance = "cosign"
+
+[tools."aqua:charmbracelet/glow"."platforms.linux-x64-musl"]
+checksum = "sha256:13e05e4b2acc18d2aee44291aefe6325b077ec321b631a0cfa780e8e3bc33f78"
+url = "https://github.com/charmbracelet/glow/releases/download/v3.0.0/glow_3.0.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/glow/releases/assets/510466923"
+provenance = "cosign"
+
+[tools."aqua:charmbracelet/glow"."platforms.macos-arm64"]
+checksum = "sha256:4b8a9a32412c0525e4c239e65171706fc5beb6d423608d99fe16788d47b345d3"
+url = "https://github.com/charmbracelet/glow/releases/download/v3.0.0/glow_3.0.0_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/glow/releases/assets/510466964"
+provenance = "cosign"
+
+[tools."aqua:charmbracelet/glow"."platforms.windows-x64"]
+checksum = "sha256:d8907e07436ecbb6738bc0e3bbf8aa6159e351f95082e9db3c3fc4200086f809"
+url = "https://github.com/charmbracelet/glow/releases/download/v3.0.0/glow_3.0.0_Windows_x86_64.zip"
+url_api = "https://api.github.com/repos/charmbracelet/glow/releases/assets/510466927"
+provenance = "cosign"
+
 [[tools."aqua:dandavison/delta"]]
 version = "0.19.2"
 backend = "aqua:dandavison/delta"
@@ -156,31 +226,6 @@ url_api = "https://api.github.com/repos/derailed/k9s/releases/assets/440224326"
 checksum = "sha256:bba299f1877913979831543a008f2e104995d2ea4ac8f23d7f49c0444857d973"
 url = "https://github.com/derailed/k9s/releases/download/v0.51.0/k9s_Windows_amd64.zip"
 url_api = "https://api.github.com/repos/derailed/k9s/releases/assets/440224317"
-
-[[tools."aqua:eza-community/eza"]]
-version = "0.23.5"
-backend = "aqua:eza-community/eza"
-specifiers = ["0.23.5"]
-
-[tools."aqua:eza-community/eza"."platforms.linux-arm64"]
-checksum = "sha256:40b87ae8628aa2ff0f0d2dc24ab52f689631366385c3da630bae745671fd71ec"
-url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228867"
-
-[tools."aqua:eza-community/eza"."platforms.linux-x64"]
-checksum = "sha256:35c70c5c43c29108075e58b893234c67ef585f0b53a7eaf8e9e7d4eec9f339b4"
-url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228887"
-
-[tools."aqua:eza-community/eza"."platforms.linux-x64-musl"]
-checksum = "sha256:e06eebab74b73d6b7d51a796a353824b001bea82df077706382e100815d28904"
-url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza_x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228890"
-
-[tools."aqua:eza-community/eza"."platforms.windows-x64"]
-checksum = "sha256:bbef561f5cfc8e778649b65e69c9c6e4c836c0fbe83ee3d0a5128091d797ed8a"
-url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza.exe_x86_64-pc-windows-gnu.tar.gz"
-url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228877"
 
 [[tools."aqua:golangci/golangci-lint"]]
 version = "2.13.2"
@@ -366,7 +411,7 @@ url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/522028022"
 provenance = "cosign"
 
 [tools."aqua:mikefarah/yq"."platforms.macos-arm64"]
-checksum = "sha512:a1e235ea619810e2f741f970c26a5139452d509af0a61b3fafcfe2ace5a89304b6ee17cdb3ce3ced7e43b6a744d080e3cb0b83f8022dbb81f590bc6968a8fd9e"
+checksum = "sha256:cceb0b8d71ea5294334121f8429f33f92b920e7217d904a2f9f35443968ac424"
 url = "https://github.com/mikefarah/yq/releases/download/v4.53.6/yq_darwin_arm64"
 url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/522028033"
 provenance = "cosign"
@@ -496,6 +541,36 @@ url_api = "https://api.github.com/repos/starship/starship/releases/assets/460374
 checksum = "sha256:690021e22f2bf2c57d5867dc0fababe5e55e714c26942bd909ffddb6c5df42f2"
 url = "https://github.com/starship/starship/releases/download/v1.26.0/starship-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/starship/starship/releases/assets/460374615"
+
+[[tools."aqua:sxyazi/yazi"]]
+version = "26.8.15"
+backend = "aqua:sxyazi/yazi"
+specifiers = ["26.8.15"]
+
+[tools."aqua:sxyazi/yazi"."platforms.linux-arm64"]
+checksum = "sha256:f5a85771f06bb0e8c488136ae0aedaec8d341a7cee995549df391d7d852fe8d1"
+url = "https://github.com/sxyazi/yazi/releases/download/v26.8.15/yazi-aarch64-unknown-linux-gnu.zip"
+url_api = "https://api.github.com/repos/sxyazi/yazi/releases/assets/515472941"
+
+[tools."aqua:sxyazi/yazi"."platforms.linux-x64"]
+checksum = "sha256:cc67eb7991550c2f9407cda52d3f5af0937627aa6884e7de99a04fcf059807e0"
+url = "https://github.com/sxyazi/yazi/releases/download/v26.8.15/yazi-x86_64-unknown-linux-gnu.zip"
+url_api = "https://api.github.com/repos/sxyazi/yazi/releases/assets/515472936"
+
+[tools."aqua:sxyazi/yazi"."platforms.linux-x64-musl"]
+checksum = "sha256:a6702034790afcdbb546b73b288c9b184a751fa3f2f17f0ad4d26fc302fb8d45"
+url = "https://github.com/sxyazi/yazi/releases/download/v26.8.15/yazi-x86_64-unknown-linux-musl.zip"
+url_api = "https://api.github.com/repos/sxyazi/yazi/releases/assets/515472939"
+
+[tools."aqua:sxyazi/yazi"."platforms.macos-arm64"]
+checksum = "sha256:3f54907ea08abe96506f4b22239340ed8923a6aeaeae78f33d59bce57daca4cd"
+url = "https://github.com/sxyazi/yazi/releases/download/v26.8.15/yazi-aarch64-apple-darwin.zip"
+url_api = "https://api.github.com/repos/sxyazi/yazi/releases/assets/515472942"
+
+[tools."aqua:sxyazi/yazi"."platforms.windows-x64"]
+checksum = "sha256:451f6770999fa8f9b08e6c9f94a688c263b6d3007b0944c4407f1ae335eace30"
+url = "https://github.com/sxyazi/yazi/releases/download/v26.8.15/yazi-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/sxyazi/yazi/releases/assets/515472935"
 
 [[tools."aqua:tmux/tmux-builds"]]
 version = "3.7c"

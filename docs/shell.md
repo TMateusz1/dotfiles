@@ -58,6 +58,13 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   `atuin-search` and the separately-bound `Ctrl-F` stays on
   `fzf-history-widget`. Exported (not just assigned) because it's read by
   the dynamically-sourced fzf script, not by this file directly.
+- `alias glow=...` pins `--style` to this repo's vendored Catppuccin
+  theme — glow's own config file has no way to reference it (no path
+  expansion at all in its `style` field) — see
+  [util_tools.md#glow](./util_tools.md#glow).
+- `y()` — yazi's own documented shell wrapper, so quitting yazi `cd`s the
+  shell to wherever it was left — see
+  [core_tools.md#yazi](./core_tools.md#yazi).
 
 ## Validation
 

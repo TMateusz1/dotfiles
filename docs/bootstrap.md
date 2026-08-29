@@ -57,6 +57,9 @@ shorthand.
 "~/.config/lazygit" = "lazygit"
 "~/.config/k9s" = "k9s"
 "~/.config/kitty" = "kitty"
+"~/.config/glow" = "glow"
+"~/.config/bottom" = "bottom"
+"~/.config/yazi" = "yazi"
 "~/.config/mise/config.toml" = "mise/config.toml"
 ```
 

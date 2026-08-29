@@ -84,6 +84,28 @@ if command -v rg >/dev/null 2>&1; then
   export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
 fi
 
+if command -v glow >/dev/null 2>&1; then
+  # glow's own config file has no path-expansion for `style` (no `~`, no env
+  # vars) — see docs/util_tools.md#glow. Wiring the theme through an alias
+  # is the only reliable way to activate it.
+  alias glow="glow --style \"\$XDG_CONFIG_HOME/glow/glamour.json\""
+fi
+
+if command -v yazi >/dev/null 2>&1; then
+  # Standard yazi wrapper (from its own quick-start docs): `cd`s the shell to
+  # wherever yazi was left, since yazi itself is a child process and can't
+  # change its parent shell's directory.
+  y() {
+    local tmp
+    tmp="$(mktemp -t yazi-cwd.XXXXXX)"
+    yazi "$@" --cwd-file="$tmp"
+    local cwd
+    cwd="$(command cat -- "$tmp")"
+    rm -f -- "$tmp"
+    [[ -n "$cwd" && "$cwd" != "$PWD" ]] && { cd -- "$cwd" || return; }
+  }
+fi
+
 if command -v tmux >/dev/null 2>&1; then
   tc() {
     local session="${1:-core}"

@@ -124,6 +124,51 @@ this repo's policy no custom step fills that gap (see
 signal if this file ever breaks, but that check isn't automated going
 forward.
 
+## glow
+
+`glow/` maps to `~/.config/glow/`
+([glow](https://github.com/charmbracelet/glow) follows XDG directly). Its
+primary use is `glow file.md` — render once and exit, like
+[bat](#bat) — though a `--tui`/`-t` flag also opens an interactive
+file-browsing mode if wanted; grouped here rather than in
+[core_tools.md](./core_tools.md) since rendering a file is the documented,
+default use.
+
+**Theme:** `glamour.json` is the official
+[catppuccin/glamour](https://github.com/catppuccin/glamour) Mocha style
+(glow renders markdown through Charm's `glamour` library, also used by
+`gh`/`glab`/`gitea`), vendored as-is — headings use a deliberate rainbow
+scale by design (h1 red through h6 lavender), and links/images already
+land on this repo's blue accent (`#89b4fa`) in the official style, so no
+accent swap was needed here, unlike [bottom](./core_tools.md#bottom).
+
+**No `glow.yml` is shipped, and the theme is wired through a shell alias,
+not the config file.** glow's own config `style` field has no path
+expansion at all — checked directly against the real binary: neither a
+leading `~`, nor `$HOME`, nor `$XDG_CONFIG_HOME` inside `glow.yml`'s
+`style:` value resolves, and there's no `GLOW_STYLE`/`GLAMOUR_STYLE`
+environment variable either (also checked directly). It also fails
+*silently* on a bad or unresolved path — it just renders unstyled, no
+error — so a broken reference here wouldn't even be visible as an error.
+An explicit `--style <path>` flag does work correctly, so `shell/.zshrc`
+aliases `glow` to always pass one:
+
+```sh
+alias glow="glow --style \"\$XDG_CONFIG_HOME/glow/glamour.json\""
+```
+
+No other `glow.yml` settings were worth overriding beyond the theme, so no
+file is shipped for it — same call as [fd](#fd)/[jq](#jq) having nothing to
+add.
+
+**Validation:** no linter exists for glamour's JSON style format beyond
+generic JSON syntax, and this repo doesn't currently lint JSON at all (this
+is its first JSON file) — not worth adding a step for one vendored file.
+Verified against the real `glow` binary directly: a deliberately broken
+JSON style produces a clear "unable to create renderer" error; the
+vendored file renders correctly (confirmed the h1 color matches the
+style's `#f38ba8`). Not checked automatically going forward.
+
 ## jq
 
 No config file here. [jq](https://github.com/jqlang/jq) doesn't have an

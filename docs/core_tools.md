@@ -8,6 +8,41 @@ the **global mise config**, not by their own config files — see
 tooling have their own pages: [git.md](./git.md), [mise.md](./mise.md),
 [linting.md](./linting.md).)
 
+## bottom
+
+`bottom/bottom.toml` maps to `~/.config/bottom/bottom.toml` **only if
+`$XDG_CONFIG_HOME` is set** — same shape of exception as
+[k9s](#k9s)/[starship](./util_tools.md#starship): confirmed directly (a
+sandboxed `HOME`+`XDG_CONFIG_HOME` run of the real `btm` binary resolves to
+`$XDG_CONFIG_HOME/bottom/bottom.toml`), and this repo's `shell/.zshrc`
+exports that variable, so it lands at `~/.config/bottom/` in practice.
+
+**Not btop.** [btop](https://github.com/aristocratos/btop) — the tool
+originally considered — publishes Linux-only release binaries; there's no
+macOS build via any mise-native backend (`aqua`, `ubi`/`github`), and the
+only real macOS install path is Homebrew building it from source, which
+this repo's tool list otherwise avoids requiring. [bottom](https://github.com/ClementTsang/bottom)
+(`btm`) is the substitute: a Rust TUI system/process monitor with real
+`aarch64-apple-darwin` release binaries, verified installable via
+`aqua:ClementTsang/bottom` with no Homebrew involved.
+
+**Theme:** based on the official
+[catppuccin/bottom](https://github.com/catppuccin/bottom) Mocha theme —
+its multi-color semantic assignments (per-core CPU colors, RAM/cache/swap,
+network rx/tx, battery high/medium/low) are kept exactly as upstream, since
+those colors carry real meaning rather than being decorative. Two
+selection-highlight values deviate to this repo's blue accent (`#89b4fa`),
+same call as [k9s](#k9s)'s deviation: `selected_border_color` (official:
+pink `#f5c2e7`) and `selected_text.bg_color` (official: mauve `#cba6f7`).
+
+**Validation:** no established linter exists for bottom's config format,
+and per this repo's policy no custom step fills the gap (see
+[linting.md](./linting.md)). Verified against the real `btm` binary via its
+own `-C <path>` flag (never the default config location, to avoid writing
+into a real config path during testing): a deliberately broken file
+produces a clear TOML parse error with line/column; this file loads
+cleanly into the TUI. Not checked automatically going forward.
+
 ## k9s
 
 `k9s/config.yaml` and `k9s/skins/catppuccin-mocha.yaml` map to
@@ -121,3 +156,45 @@ here to vet for trust beyond tmux itself.
 (nothing comparable to `taplo`/`rumdl` exists for tmux config syntax), and
 per this repo's policy no custom step fills the gap — see
 [linting.md](./linting.md). Not checked automatically going forward.
+
+## yazi
+
+`yazi/` maps to `~/.config/yazi/` **only if `$XDG_CONFIG_HOME` is set** —
+same shape of exception as [k9s](#k9s)/[bottom](#bottom): on macOS without
+it, [yazi](https://yazi-rs.github.io/) defaults to
+`~/Library/Application Support/yazi/` instead. Confirmed directly via
+`ya env` (yazi's own diagnostic subcommand) in a sandboxed environment.
+This repo's `shell/.zshrc` exports `XDG_CONFIG_HOME`, so it lands at
+`~/.config/yazi/` in practice.
+
+**Contents:**
+
+- `theme.toml` — the official
+  [catppuccin/yazi](https://github.com/catppuccin/yazi) Mocha "blue"
+  variant, vendored as-is (yazi's own README instructs renaming whichever
+  flavor/accent file you pick to `theme.toml`).
+- `Catppuccin-mocha.tmTheme` — vendored from
+  [catppuccin/bat](https://github.com/catppuccin/bat)'s `themes/`
+  directory, per catppuccin/yazi's own setup instructions: `theme.toml`'s
+  `syntect_theme` key points at this file for Catppuccin-consistent syntax
+  highlighting in yazi's file preview pane. The path in `theme.toml` is
+  already correct for this repo's deployment model (`~/.config/yazi/...`),
+  since the two files land in the same symlinked directory.
+
+No `yazi.toml`/`keymap.toml` — yazi's built-in defaults weren't worth
+overriding, and per this repo's philosophy nothing is added just to have a
+file present (same call as [fd](./util_tools.md#fd)/[jq](./util_tools.md#jq)
+having no config here).
+
+**Shell integration:** `shell/.zshrc` adds a `y()` function — the wrapper
+from yazi's own quick-start docs. yazi runs as a child process, so it can't
+change its parent shell's working directory itself; `y()` runs yazi with
+`--cwd-file`, then `cd`s the shell to whatever directory yazi wrote there
+on exit.
+
+**Validation:** no established linter exists for yazi's TOML config beyond
+generic syntax (already covered by `taplo`), and no custom step fills that
+gap either. Verified against the real `ya env`/`yazi` binaries directly: a
+deliberately broken `theme.toml` produces a clear TOML parse error with
+line/column from `ya env`; the vendored file loads without one. Not
+checked automatically going forward.

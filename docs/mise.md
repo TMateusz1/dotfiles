@@ -32,9 +32,9 @@ Global (`mise/config.toml`):
 
 - [`delta`](https://github.com/dandavison/delta) — git diff pager, see
   [git.md](./git.md)
-- Util tools — `atuin`, `bat`, `zoxide`, `eza`, `fd`, `fzf`, `jq`, `yq`,
-  `ripgrep`, `starship` — see [util_tools.md](./util_tools.md)
-- Core tools — `tmux`, `lazygit`, `k9s` — see
+- Util tools — `atuin`, `bat`, `zoxide`, `eza`, `fd`, `fzf`, `glow`, `jq`,
+  `yq`, `ripgrep`, `starship` — see [util_tools.md](./util_tools.md)
+- Core tools — `tmux`, `lazygit`, `k9s`, `bottom`, `yazi` — see
   [core_tools.md](./core_tools.md)
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) — see [langs.md](./langs.md)

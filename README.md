@@ -36,23 +36,26 @@ fzf/                   # fzf theme → ~/.config/fzf/ (see docs/util_tools.md#fz
 ripgrep/               # ripgrep config → ~/.config/ripgrep/ (see docs/util_tools.md#ripgrep)
 starship/              # starship prompt → ~/.config/starship.toml (flat, see docs/util_tools.md#starship)
 k9s/                   # k9s config + skin (see docs/core_tools.md#k9s)
+bottom/                # bottom (btm) system monitor → ~/.config/bottom/ (see docs/core_tools.md#bottom)
+yazi/                  # yazi file manager → ~/.config/yazi/ (see docs/core_tools.md#yazi)
+glow/                  # glow markdown renderer → ~/.config/glow/ (see docs/util_tools.md#glow)
 kitty/                 # kitty config + theme → ~/.config/kitty/ (see docs/desktop_tools.md)
 docs/                  # notes on what's configured, and why
 ```
 
 ## Tools configured so far
 
-| Topic                                                                    | Docs                                             |
-| ------------------------------------------------------------------------ | ------------------------------------------------ |
-| mise                                                                     | [docs/mise.md](./docs/mise.md)                   |
-| git (+ delta)                                                            | [docs/git.md](./docs/git.md)                     |
-| shell (zsh)                                                              | [docs/shell.md](./docs/shell.md)                 |
-| Util tools (atuin, bat, zoxide, eza, fd, fzf, jq, yq, ripgrep, starship) | [docs/util_tools.md](./docs/util_tools.md)       |
-| Core tools (tmux, lazygit, k9s)                                          | [docs/core_tools.md](./docs/core_tools.md)       |
-| Desktop tools (kitty)                                                    | [docs/desktop_tools.md](./docs/desktop_tools.md) |
-| languages (rust, go)                                                     | [docs/langs.md](./docs/langs.md)                 |
-| linting / pre-commit (hk)                                                | [docs/linting.md](./docs/linting.md)             |
-| bootstrap (symlinks, zsh plugins, desktop apps)                          | [docs/bootstrap.md](./docs/bootstrap.md)         |
+| Topic                                                                          | Docs                                             |
+| ------------------------------------------------------------------------------ | ------------------------------------------------ |
+| mise                                                                           | [docs/mise.md](./docs/mise.md)                   |
+| git (+ delta)                                                                  | [docs/git.md](./docs/git.md)                     |
+| shell (zsh)                                                                    | [docs/shell.md](./docs/shell.md)                 |
+| Util tools (atuin, bat, zoxide, eza, fd, fzf, glow, jq, yq, ripgrep, starship) | [docs/util_tools.md](./docs/util_tools.md)       |
+| Core tools (tmux, lazygit, k9s, bottom, yazi)                                  | [docs/core_tools.md](./docs/core_tools.md)       |
+| Desktop tools (kitty)                                                          | [docs/desktop_tools.md](./docs/desktop_tools.md) |
+| languages (rust, go)                                                           | [docs/langs.md](./docs/langs.md)                 |
+| linting / pre-commit (hk)                                                      | [docs/linting.md](./docs/linting.md)             |
+| bootstrap (symlinks, zsh plugins, desktop apps)                                | [docs/bootstrap.md](./docs/bootstrap.md)         |
 
 ## Contributing / working on this repo
 
