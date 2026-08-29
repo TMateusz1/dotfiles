@@ -2,5 +2,19 @@
 lockfile = true
 disable_backends = ["asdf", "vfox"]
 
+[env]
+HK_MISE = 1
+
 [tools]
 "aqua:anthropics/claude-code" = "2.1.251"
+"aqua:jdx/hk" = "1.56.1"
+"aqua:tamasfe/taplo" = "0.10.0"
+"aqua:rvben/rumdl" = "0.2.62"
+
+[hooks]
+# keeps the installed git hooks (hk.pkl) in sync whenever tools are (re)installed
+postinstall = "hk install --mise"
+
+[tasks.pre-commit]
+description = "Run hk's pre-commit checks (mirrors the installed git hook)"
+run = "hk run pre-commit"

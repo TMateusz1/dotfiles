@@ -1,0 +1,6 @@
+# rumdl configuration — see https://github.com/rvben/rumdl
+
+[global]
+# hard line-wrapping isn't enforced here: tables, links, and inline code
+# routinely exceed 80 chars and that's fine.
+disable = ["MD013"]

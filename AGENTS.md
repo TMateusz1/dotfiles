@@ -29,7 +29,7 @@ below), even though no linking script exists yet.
 
 ## Repository layout
 
-```
+```text
 mise.toml            # repo-local mise config: tools + tasks for working on this repo itself
 mise.lock             # committed lockfile for the repo-local mise config
 <tool>/               # one directory per dotfile/tool, e.g. nvim/, k9s/, mise/

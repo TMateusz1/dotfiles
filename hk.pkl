@@ -1,0 +1,32 @@
+amends "package://github.com/jdx/hk/releases/download/v1.56.1/hk@1.56.1#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.56.1/hk@1.56.1#/Builtins.pkl"
+
+local linters = new Mapping<String, Step> {
+  // markdown
+  ["rumdl"] = Builtins.rumdl
+  // toml
+  ["taplo"] = Builtins.taplo
+  ["taplo-format"] = Builtins.taplo_format
+  // repo hygiene — enforces the "never commit secrets" rule from AGENTS.md
+  // and catches common accidents, all built into hk (no extra tool installs)
+  ["detect-private-key"] = Builtins.detect_private_key
+  ["check-merge-conflict"] = Builtins.check_merge_conflict
+  ["check-added-large-files"] = Builtins.check_added_large_files
+  ["trailing-whitespace"] = Builtins.trailing_whitespace
+  ["newlines"] = Builtins.newlines
+}
+
+hooks {
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps = linters
+  }
+  ["check"] {
+    steps = linters
+  }
+  ["fix"] {
+    fix = true
+    steps = linters
+  }
+}

@@ -15,7 +15,7 @@ linker can map `<tool>/` → `~/.config/<tool>/` directly.
 
 ## Layout
 
-```
+```text
 mise.toml, mise.lock   # tools/tasks for working on this repo itself
 mise/                  # global mise config → ~/.config/mise/
 git/                   # git config → ~/.config/git/
@@ -30,6 +30,13 @@ docs/                  # per-tool notes (what's configured, and why)
 | mise | [docs/mise.md](./docs/mise.md) |
 | git (+ delta) | [docs/git.md](./docs/git.md) |
 | atuin | [docs/atuin.md](./docs/atuin.md) |
+| linting / pre-commit (hk) | [docs/linting.md](./docs/linting.md) |
+
+## Contributing / working on this repo
+
+`mise install` pulls the repo's own tooling (including
+[hk](https://hk.jdx.dev)) and installs a pre-commit hook automatically — see
+[docs/linting.md](./docs/linting.md).
 
 ## Conventions
 

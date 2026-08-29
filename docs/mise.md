@@ -38,3 +38,21 @@ Global (`mise/config.toml`):
 Repo-local (`mise.toml`):
 
 - [`claude-code`](https://github.com/anthropics/claude-code)
+- [`hk`](https://hk.jdx.dev), [`taplo`](https://github.com/tamasfe/taplo),
+  [`rumdl`](https://github.com/rvben/rumdl) — lint/format tooling, see
+  [linting.md](./linting.md)
+
+## A quirk worth knowing: `mise/config.toml` is also read here
+
+mise resolves config by walking up the directory tree, and `mise/config.toml`
+relative to *any* directory is one of the filenames it recognizes — not only
+`~/.config/mise/config.toml`. That means running mise anywhere in this repo
+picks up **both** `mise.toml` (repo-local tools) *and* `mise/config.toml`
+(the staged global config) as active layers, in addition to your machine's
+real `~/.config/mise/config.toml`. Run `mise config` from the repo root to
+see this for yourself.
+
+In practice this is harmless here — both configs agree on `[settings]`, and
+having `delta`/`atuin` on `PATH` while hacking on this repo isn't a problem —
+but it's worth knowing so a stray tool showing up in `mise config` output
+inside this repo doesn't come as a surprise.
