@@ -34,30 +34,30 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
 - **`taplo`** / **`taplo-format`** — TOML lint and format/fix (`**/*.toml`).
 - **`yamlfmt`** — YAML format check/fix (`**/*.yml`, `**/*.yaml`). Format
   only — no semantic YAML linter is wired in; see
-  [cli_tools.md#lazygit](./cli_tools.md#lazygit) for why. `.yamlfmt` at the
-  repo root sets `retain_line_breaks: true` so intentional blank-line
+  [core_tools.md#lazygit](./core_tools.md#lazygit) for why. `.yamlfmt` at
+  the repo root sets `retain_line_breaks: true` so intentional blank-line
   section separators (e.g. in `lazygit/config.yml`) survive formatting.
 - **`tmux-check`** — not a linter (none exists for tmux config), but a
   custom step that loads `tmux/.tmux.conf` on a throwaway, isolated tmux
   server and reports syntax/unknown-option errors. See
-  [cli_tools.md#tmux](./cli_tools.md#tmux).
+  [core_tools.md#tmux](./core_tools.md#tmux).
 - **`bat-check`** — same idea for `bat/config`: no linter exists for bat's
   args-file format, so this pipes a throwaway line through `bat` with
   `BAT_CONFIG_PATH` pointed at the file, which fails loudly on any
-  unknown/malformed flag. See [cli_tools.md#bat](./cli_tools.md#bat).
+  unknown/malformed flag. See [util_tools.md#bat](./util_tools.md#bat).
 - **`fzf-check`** / **`ripgrep-check`** — same idea again for `fzf/config`
   and `ripgrep/config`. Both tools exit `2` specifically on a bad flag
   (vs. `0`/`1` for a normal found/not-found result), so these checks treat
   exit `2` as failure and everything else as pass — otherwise a legitimate
   "no match" would look like a broken config. See
-  [cli_tools.md#fzf](./cli_tools.md#fzf) /
-  [cli_tools.md#ripgrep](./cli_tools.md#ripgrep).
+  [util_tools.md#fzf](./util_tools.md#fzf) /
+  [util_tools.md#ripgrep](./util_tools.md#ripgrep).
 - **`k9s-check`** — k9s always exits `0`, but reliably logs an `ERROR`
   line on malformed config; this check greps for it via the non-interactive
   `k9s info` command, run against a disposable copy of `k9s/` (k9s
   auto-writes default files into whatever config dir it's pointed at, so
   this never touches the real directory). See
-  [cli_tools.md#k9s](./cli_tools.md#k9s).
+  [core_tools.md#k9s](./core_tools.md#k9s).
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra
