@@ -26,6 +26,8 @@ tmux/                  # tmux config → ~/.tmux.conf (see docs/tmux.md)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
 eza/                   # eza theme → ~/.config/eza/
+fzf/                   # fzf theme (needs shell wiring, see docs/fzf.md)
+ripgrep/               # ripgrep config (needs shell wiring, see docs/ripgrep.md)
 docs/                  # per-tool notes (what's configured, and why)
 ```
 
@@ -41,6 +43,11 @@ docs/                  # per-tool notes (what's configured, and why)
 | bat                       | [docs/bat.md](./docs/bat.md)         |
 | zoxide                    | [docs/zoxide.md](./docs/zoxide.md)   |
 | eza                       | [docs/eza.md](./docs/eza.md)         |
+| fd                        | [docs/fd.md](./docs/fd.md)           |
+| fzf                       | [docs/fzf.md](./docs/fzf.md)         |
+| jq                        | [docs/jq.md](./docs/jq.md)           |
+| yq                        | [docs/yq.md](./docs/yq.md)           |
+| ripgrep                   | [docs/ripgrep.md](./docs/ripgrep.md) |
 | linting / pre-commit (hk) | [docs/linting.md](./docs/linting.md) |
 
 ## Contributing / working on this repo

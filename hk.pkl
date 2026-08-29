@@ -38,6 +38,32 @@ local linters = new Mapping<String, Step> {
     glob = "bat/config"
     check = "printf 'x\\n' | BAT_CONFIG_PATH={{files}} bat --paging=never --color=never -"
   }
+  // Same idea for fzf's and ripgrep's options files: both exit 2 on a
+  // genuinely bad flag/config, vs. 0/1 for a normal "found"/"not found"
+  // result, so checking for exit 2 specifically distinguishes a real
+  // config error from an expected non-match.
+  ["fzf-check"] {
+    glob = "fzf/config"
+    check = """
+      if printf 'x\\n' | FZF_DEFAULT_OPTS_FILE={{files}} fzf --filter=x >/dev/null; then
+        status=0
+      else
+        status=$?
+      fi
+      [ "$status" -ne 2 ]
+      """
+  }
+  ["ripgrep-check"] {
+    glob = "ripgrep/config"
+    check = """
+      if printf '' | RIPGREP_CONFIG_PATH={{files}} rg foo; then
+        status=0
+      else
+        status=$?
+      fi
+      [ "$status" -ne 2 ]
+      """
+  }
 }
 
 hooks {

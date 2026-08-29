@@ -49,6 +49,16 @@ Global (`mise/config.toml`):
   [eza.md](./eza.md#installing-eza-on-macos-required-adding-a-rust-toolchain)),
   but it's a general-purpose language tool in its own right, not scoped to
   that one use.
+- [`fd`](https://github.com/sharkdp/fd) — `find` replacement, see
+  [fd.md](./fd.md)
+- [`fzf`](https://github.com/junegunn/fzf) — fuzzy finder, see
+  [fzf.md](./fzf.md)
+- [`jq`](https://github.com/jqlang/jq) — JSON processor, see
+  [jq.md](./jq.md)
+- [`yq`](https://github.com/mikefarah/yq) — YAML/JSON/XML processor, see
+  [yq.md](./yq.md)
+- [`ripgrep`](https://github.com/BurntSushi/ripgrep) (`rg`) — grep
+  replacement, see [ripgrep.md](./ripgrep.md)
 
 Repo-local (`mise.toml`):
 
@@ -69,10 +79,10 @@ real `~/.config/mise/config.toml`. Run `mise config` from the repo root to
 see this for yourself.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
-having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza` on `PATH` while
-hacking on this repo isn't a problem — but it's worth knowing so a stray
-tool showing up in `mise config` output inside this repo doesn't come as a
-surprise.
+having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
+`yq`/`ripgrep` on `PATH` while hacking on this repo isn't a problem — but
+it's worth knowing so a stray tool showing up in `mise config` output
+inside this repo doesn't come as a surprise.
 
 **Caution when testing changes to `mise/config.toml`:** never run a mise
 command with an explicit `--global` flag (e.g. `mise lock --global`, `mise

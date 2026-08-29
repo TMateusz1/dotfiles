@@ -45,6 +45,12 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   args-file format, so this pipes a throwaway line through `bat` with
   `BAT_CONFIG_PATH` pointed at the file, which fails loudly on any
   unknown/malformed flag. See [bat.md](./bat.md).
+- **`fzf-check`** / **`ripgrep-check`** — same idea again for `fzf/config`
+  and `ripgrep/config`. Both tools exit `2` specifically on a bad flag
+  (vs. `0`/`1` for a normal found/not-found result), so these checks treat
+  exit `2` as failure and everything else as pass — otherwise a legitimate
+  "no match" would look like a broken config. See
+  [fzf.md](./fzf.md#validation) / [ripgrep.md](./ripgrep.md#validation).
 - **`detect-private-key`**, **`check-merge-conflict`**,
   **`check-added-large-files`**, **`trailing-whitespace`**, **`newlines`** —
   general repo hygiene, all built into hk itself (`hk util ...`), no extra
