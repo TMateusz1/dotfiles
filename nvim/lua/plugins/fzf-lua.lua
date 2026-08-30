@@ -1,5 +1,6 @@
 return {
   "ibhagwan/fzf-lua",
+  event = "VeryLazy",
   cmd = "FzfLua",
   keys = {
     { "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Find files" },
@@ -8,5 +9,7 @@ return {
     { "<leader>fb", "<cmd>FzfLua buffers<cr>", desc = "Buffers" },
     { "<leader>fh", "<cmd>FzfLua helptags<cr>", desc = "Help tags" },
   },
-  opts = {},
+  opts = {
+    ui_select = {},
+  },
 }

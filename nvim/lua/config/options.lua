@@ -1,6 +1,7 @@
 local opt = vim.opt
 
 opt.termguicolors = true -- required for the Catppuccin colorscheme's true-color palette
+opt.winborder = "rounded" -- consistent default for plugin and native floating windows
 
 -- Line numbers
 opt.number = true

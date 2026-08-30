@@ -5,6 +5,7 @@ return {
   opts = {
     flavour = "mocha",
     integrations = {
+      gitsigns = true,
       indent_blankline = {
         enabled = true,
         scope_color = "lavender",

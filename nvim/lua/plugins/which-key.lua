@@ -7,6 +7,7 @@ return {
     preset = "modern",
     delay = 250,
     spec = {
+      { "<leader>G", group = "Git" },
       { "<leader>f", group = "Find" },
       { "<leader>x", group = "Close buffers" },
     },

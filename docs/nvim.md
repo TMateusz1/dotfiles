@@ -26,6 +26,7 @@ mise only, Catppuccin theming).
 | ------------------------------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [catppuccin/nvim](https://github.com/catppuccin/nvim)                                                         | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
 | [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                                                       | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
+| [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)                                         | Git gutter + hunk operations       | Shows added/changed/deleted lines and provides preview, stage, reset, blame and diff actions under `<leader>G` — see "Git signs and hunks" below.                                                                                                                                |
 | [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
 | [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)                 | Indent guides + active scope       | Draws subtle guides with virtual text and highlights the current Treesitter scope. Uses Catppuccin's official integration.                                                                                                                                                       |
 | [nvim-mini/mini.ai](https://github.com/nvim-mini/mini.ai)                                                     | Extended text objects              | Adds arguments, function calls, tags and robust pair objects while preserving Neovim's native `an`/`in` Treesitter selection.                                                                                                                                                    |
@@ -34,7 +35,7 @@ mise only, Catppuccin theming).
 | [Wansmer/treesj](https://github.com/Wansmer/treesj)                                                           | Split/join argument layouts        | `<leader>s` toggles the syntax node under the cursor between single-line and multiline forms using Treesitter.                                                                                                                                                                   |
 | [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, devicons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                          |
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
-| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                                                                                         |
+| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Uses the official `catppuccin` theme. Its right section leads with Neovim 0.12's `vim.ui.progress_status()` — see "Native UI" below.                                                                                                                                             |
 | [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
 | [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)                         | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
@@ -58,6 +59,41 @@ themes, and documents (see
 implementation to keep track of. Bound: `<leader>ff` (files in the cwd),
 `<leader>fg` (live grep in the cwd), `<leader>fr` (recent files),
 `<leader>fb` (open buffers), and `<leader>fh` (help tags).
+
+It also registers as the implementation of `vim.ui.select`. Plugin prompts —
+including future LSP code-action choices — therefore use the same fzf interface
+instead of Neovim's numbered command-line menu. This requires fzf-lua to load
+on `VeryLazy`; the external `fzf` process is still only started when a picker
+is actually opened.
+
+## Git signs and hunks
+
+[gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) uses Neovim's
+built-in diff implementation to place Git additions, changes, deletions and
+staged changes in the already-reserved sign column. Its Catppuccin integration
+supplies the colors, and inline word diff and persistent blame text remain off
+to keep normal editing quiet.
+
+`[h` and `]h` move through hunks in the current file. Inside a `vimdiff`
+window they preserve the same intent by delegating to native `[c`/`]c` change
+navigation. Hunk operations are buffer-local and only exist when Gitsigns is
+attached to a Git-backed buffer:
+
+| Key          | Action                                            |
+| ------------ | ------------------------------------------------- |
+| `[h` / `]h`  | Previous / next hunk                              |
+| `<leader>Gp` | Preview the current hunk in a rounded popup       |
+| `<leader>Gs` | Stage an unstaged hunk, or unstage a staged hunk  |
+| `<leader>Gr` | Reset the current hunk                            |
+| `<leader>Gb` | Full blame details for the current line           |
+| `<leader>GB` | Blame the complete buffer in a synchronized split |
+| `<leader>Gd` | Diff the buffer against the Git index             |
+| `<leader>GD` | Diff the buffer against the previous commit       |
+| `ih`         | Select the current hunk as a text object          |
+
+The stage/unstage and reset mappings also work on a Visual selection for
+partial hunks. `<leader>G` is registered as the **Git** group in WhichKey;
+the individual buffer-local entries come from their mapping descriptions.
 
 ## Buffer line
 
@@ -160,9 +196,9 @@ statement-like nodes supported by TreeSJ's language presets. Its upstream
 available after a prefix, so pressing Space and pausing shows the leader map.
 The `modern` preset, rounded border, existing `nvim-web-devicons` dependency and
 Catppuccin's official integration keep it visually consistent with the rest of
-the editor. `<leader>f` is labelled **Find** and `<leader>x` **Close buffers**;
-individual entries come directly from the `desc` already attached to each
-keymap. `<leader>?` shows only mappings local to the current buffer.
+the editor. `<leader>f` is labelled **Find**, `<leader>G` **Git** and
+`<leader>x` **Close buffers**; individual entries come directly from the `desc`
+already attached to each keymap. `<leader>?` shows only mappings local to the current buffer.
 
 MiniClue was considered because Mini AI and Mini Surround are already present.
 WhichKey is a better fit here: it discovers described mappings and their prefix
@@ -451,19 +487,49 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
 
 - **`options.lua`**: `termguicolors` (required for Catppuccin's true-color
   palette to render correctly — a real dependency, not decoration);
+  `winborder = "rounded"` (the stable Neovim-wide default for native and
+  plugin floating windows that do not explicitly override it);
   `number` + `relativenumber` together (the common "hybrid" line-number
   style — absolute on the cursor's own line, relative everywhere else);
   `hlsearch`/`incsearch` plus `ignorecase`/`smartcase` (case-insensitive
   search unless the pattern itself has a capital letter); `cursorline`;
   `expandtab`/`shiftwidth`/`tabstop` at 2 spaces, matching this repo's own
   convention elsewhere; `splitright`/`splitbelow`; `wrap = false`;
-  `scrolloff = 8`; `signcolumn = "yes"` (reserves the gutter now, so
-  turning on LSP diagnostics/git-signs later doesn't shift text).
+  `scrolloff = 8`; `signcolumn = "yes"` (keeps the gutter reserved even
+  with no signs, so Gitsigns marks — and LSP diagnostics later — appear
+  without shifting text sideways).
   It also sets `sessionoptions` — see [Sessions](#sessionoptions) — and the
   clipboard, below.
 - **`keymaps.lua`**: `<Esc>` in normal mode also runs `:nohlsearch`, so a
   search's highlighted matches clear without needing a separate keybind or
   losing Esc's usual behavior.
+
+## Native UI
+
+Neovim 0.12 ships enough UI of its own that three of the four things a plugin
+would usually be added for are already covered.
+
+**Float borders.** `vim.o.winborder = "rounded"` is a global default, so every
+float that doesn't pass its own `border` picks it up — hover and diagnostic
+popups, Gitsigns' hunk preview and blame, LSP floats later. Only which-key
+still sets `border` explicitly, because its own `preset` config would otherwise
+supply one. Nothing else in this config hardcodes a border.
+
+**Progress.** Lualine's right section starts with Neovim's public
+`vim.ui.progress_status()`, trimmed. It summarizes running `Progress` events as
+`42%(1)` — average percentage and count — and returns an empty string when
+nothing is running, which lualine drops without leaving padding or a separator
+behind. That covers what fidget.nvim would be installed for once LSP arrives,
+with no extra plugin.
+
+**Diagnostics.** `vim.diagnostic.status()` is deliberately *not* added: lualine
+already renders a colored `diagnostics` component in `lualine_b`, and both read
+the same counts. Adding it would show every count twice.
+
+**`vim._extui` is not enabled.** The module doesn't exist in the pinned Neovim
+0.12.5 — the experimental TUI replacement now lives at `vim._core.ui2`. The
+leading underscore is upstream saying it is private and unstable, so this config
+does not depend on it. Revisit if and when it gets a public name.
 
 ## Clipboard
 
@@ -584,7 +650,26 @@ was read but not rewritten.
   false, true).desc` returns `"Clear search highlight"`.
 - Fuzzy finder: `<leader>ff`, `<leader>fg` and `<leader>fr` resolve to
   `FzfLua files`, `FzfLua live_grep` and `FzfLua oldfiles`, matching the
-  dashboard's `f`, `g` and `r` actions respectively.
+  dashboard's `f`, `g` and `r` actions respectively. `vim.ui.select` is
+  registered to fzf-lua rather than the built-in numbered prompt.
+- Gitsigns, in a scratch repo with two known hunks at lines 2 and 7: the
+  buffer attaches (`b:gitsigns_status_dict` is set) and both lines get signs.
+  From line 1, `]h` lands on 2 then 7 and `[h` returns to 2. `stage_hunk`
+  puts `f.txt | 2 +-` in `git diff --cached`; running it again on the same
+  hunk empties the index, confirming one key toggles both ways. `reset_hunk`
+  restores the original line text, `vih` selects exactly the hunk's line
+  range, and `preview_hunk` opens a float whose `border` is the rounded
+  box-drawing set inherited from `winborder`. Against this repo (which has
+  real history) `diffthis()` and `diffthis("~")` each open two `diff` windows,
+  and `blame_line({ full = true })` renders the commit that last touched the
+  line, with `blame()` opening a `gitsigns-blame` split.
+- Native UI: `vim.o.winborder` is `"rounded"`. Firing a synthetic `Progress`
+  autocmd puts ` 42%(1) ` in the rendered lualine statusline — so the `%%`
+  the runtime returns survives into a single literal `%` — while an idle
+  statusline is byte-identical to one without the component. `lualine_b` still
+  holds `branch, diff, diagnostics`, and `vim.diagnostic.status()` is not
+  added on top of it. `require("vim._extui")` fails on 0.12.5; only the
+  private `vim._core.ui2` exists, and nothing here loads it.
 - Buffer line: `[b` and `]b` cycle in visible order, while
   `<leader><leader>` invokes `BufferLinePick` for letter-based focus. The five
   `<leader>x` mappings resolve to current, others, left, right and pick-close
