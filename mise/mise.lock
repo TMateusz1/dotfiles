@@ -487,6 +487,36 @@ checksum = "sha256:e7ae4253344a600f1116e4b5c7d0d0fcc108abbbf383c3d786a530077b4d4
 url = "https://github.com/mvdan/gofumpt/releases/download/v0.11.0/gofumpt_v0.11.0_windows_amd64.exe"
 url_api = "https://api.github.com/repos/mvdan/gofumpt/releases/assets/491232806"
 
+[[tools."aqua:neovim/neovim"]]
+version = "0.12.5"
+backend = "aqua:neovim/neovim"
+specifiers = ["0.12.5"]
+
+[tools."aqua:neovim/neovim"."platforms.linux-arm64"]
+checksum = "sha256:1aa5ca085249580ae0f91eb14f27ec0919773ff2d99a163d03f3d6c21ac29725"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.5/nvim-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/neovim/neovim/releases/assets/526503739"
+
+[tools."aqua:neovim/neovim"."platforms.linux-x64"]
+checksum = "sha256:bce0f56eda1f1b1db6eee8f4133d7a38813ea07933837dd1777411ca384c6875"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.5/nvim-linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/neovim/neovim/releases/assets/526503737"
+
+[tools."aqua:neovim/neovim"."platforms.linux-x64-musl"]
+checksum = "sha256:bce0f56eda1f1b1db6eee8f4133d7a38813ea07933837dd1777411ca384c6875"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.5/nvim-linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/neovim/neovim/releases/assets/526503737"
+
+[tools."aqua:neovim/neovim"."platforms.macos-arm64"]
+checksum = "sha256:65fb000099e47ca1b762584c484cc833f40e30851a0ec450d4174e16317c1f9b"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.5/nvim-macos-arm64.tar.gz"
+url_api = "https://api.github.com/repos/neovim/neovim/releases/assets/526503741"
+
+[tools."aqua:neovim/neovim"."platforms.windows-x64"]
+checksum = "sha256:de8625ba8cf65ebf40eb80a388ba1ec8e9c15b30218821e2c639119b05920de1"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.5/nvim-win64.zip"
+url_api = "https://api.github.com/repos/neovim/neovim/releases/assets/526503770"
+
 [[tools."aqua:sharkdp/bat"]]
 version = "0.26.1"
 backend = "aqua:sharkdp/bat"

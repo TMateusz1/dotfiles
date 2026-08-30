@@ -29,3 +29,4 @@ disable_backends = ["asdf", "vfox"]
 "aqua:sxyazi/yazi" = "26.8.15"
 "aqua:cli/cli" = "2.98.0"
 "gitlab:gitlab-org/cli" = "1.115.0"
+"aqua:neovim/neovim" = "0.12.5"
