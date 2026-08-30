@@ -33,6 +33,7 @@ mise only, Catppuccin theming).
 | [nvim-mini/mini.surround](https://github.com/nvim-mini/mini.surround)                                         | Surround editing                   | Adds coherent `sa`/`sd`/`sr` operations with dot-repeat, counts and Catppuccin highlighting.                                                                                                                                                                                     |
 | [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | Syntax-aware function navigation   | Supplies maintained `@function.outer` queries for `[f` and `]f`; configured against its `main` branch API.                                                                                                                                                                       |
 | [Wansmer/treesj](https://github.com/Wansmer/treesj)                                                           | Split/join argument layouts        | `<leader>s` toggles the syntax node under the cursor between single-line and multiline forms using Treesitter.                                                                                                                                                                   |
+| [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs)                                             | Auto-pairs                         | Inserts the closing bracket/quote, steps over one already there, and counts the quotes before the cursor so closing an open string does not double it — see "Pairs" below.                                                                                                       |
 | [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, devicons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                          |
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
 | [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Uses the official `catppuccin` theme. Its right section leads with Neovim 0.12's `vim.ui.progress_status()` — see "Native UI" below.                                                                                                                                             |
@@ -147,7 +148,9 @@ parser; ordinary indentation guides still work without one.
 
 The standalone [mini.ai](https://github.com/nvim-mini/mini.ai) and
 [mini.surround](https://github.com/nvim-mini/mini.surround) modules are grouped
-in `lua/plugins/minis.lua`; the full `mini.nvim` suite is not installed.
+in `lua/plugins/minis.lua`; the full `mini.nvim` suite is not installed. Each is
+a separate plugin with its own lockfile pin, so nothing is pulled in that isn't
+actually used.
 mini.ai extends normal operator/Visual text objects with arguments (`a`),
 function calls (`f`), tags (`t`), balanced quotes/brackets and an interactive
 object (`?`). For example, `daa` deletes an argument and `vif` selects inside a
@@ -183,6 +186,69 @@ layout. `[f` jumps to the previous function start and `]f` to the next, in
 Normal, Visual and operator-pending modes; every jump is added to the jumplist.
 The mappings use the official `nvim-treesitter-textobjects` companion because
 mini.ai's `f` is specifically a function-*call* text object, not a definition.
+
+## Pairs
+
+[nvim-autopairs](https://github.com/windwp/nvim-autopairs) on stock defaults
+(`opts = {}`). Typing an opening bracket inserts its closing half; typing a
+closing one that is already to the right of the cursor steps over it rather than
+inserting a second. `▮` marks the cursor:
+
+| You type | Buffer holds | You get     |                            |
+| -------- | ------------ | ----------- | -------------------------- |
+| `(`      | `▮`          | `(▮)`       | the pair is inserted       |
+| `)`      | `(▮)`        | `()▮`       | steps over the closer      |
+| `"`      | `▮`          | `"▮"`       | opens a pair               |
+| `"`      | `"▮"`        | `""▮`       | steps over                 |
+| `"`      | `"qafasf▮`   | `"qafasf"▮` | **closes the open string** |
+
+That last row is the one worth understanding, because it is where a
+neighbour-only auto-pairer gets it wrong. With the cursor at the end of
+`"qafasf` there is no quote to the right to step over, so a plugin that looks
+only at adjacent characters concludes you are starting a *new* string and helpfully
+adds a pair — leaving `"qafasf""`. nvim-autopairs instead runs
+`cond.not_add_quote_inside_quote()`, which calls `utils.is_in_quotes()` to count
+the quotes on the line before the cursor. An odd count means the cursor is
+already inside an open string, so the quote you typed is a closing one and no
+pair is added. The same reasoning covers `'` and `` ` ``.
+
+Two more mappings come free:
+
+- **`<BS>`** between the halves of an empty pair deletes *both*. `(` then
+  backspace leaves an empty line, not a stray `)`.
+- **`<CR>`** between `{` and `}` puts the closer on its own line with an
+  indented blank line between — the usual block-opening behavior. Parens and
+  brackets do the same.
+
+Nothing pairs after a `\`, and `'` does not pair after a word character, so
+typing `don't` gives `don't` rather than a doubled apostrophe — the case that
+makes naive auto-pairing unusable in prose and comments. Brackets still pair
+normally inside a string, so `"abc` plus `(` gives `"abc()`.
+
+**One known rough edge**, kept deliberately: pressing `<CR>` with the cursor
+between the two halves of a *just-opened, still-empty* quote pair splits it
+across three lines, the way it would for a brace. Quotes are the one pair where
+that is wrong. It needs the exact sequence "type a quote, immediately press
+Enter, having typed nothing between", and the result is visibly broken rather
+than silently wrong, so it is not worth patching the plugin's rule table — which
+is version-sensitive surgery — to avoid. Enter from inside an already-written
+string (`x = "foo▮"`) is unaffected and just breaks the line normally.
+
+`check_ts` is left off, its own default. It does work with this setup —
+nvim-autopairs reads Treesitter through the native `vim.treesitter.*` API, not
+the `nvim-treesitter.ts_utils` module that the `main`-branch rewrite pinned here
+no longer ships, which was worth confirming rather than assuming. But the quote
+handling above is what this was added for and needs no syntax tree, and enabling
+`check_ts` would additionally stop brackets pairing inside strings, which is not
+wanted.
+
+**Why not mini.pairs.** It was the first choice, for consistency with the two
+mini modules already here, and it is wrong for this. Its quote action is
+`closeopen`, which decides purely from the neighbouring character — exactly the
+`"qafasf""` failure above, and not something its `neigh_pattern` option can
+express, since that also sees only one character on each side. Family
+consistency is a good tiebreaker between plugins that both work; it is not a
+reason to keep one that doesn't.
 
 ## Split/join arguments
 
@@ -731,6 +797,20 @@ was read but not rewritten.
 - Mini editing: `aN`/`iN` and `aL`/`iL` provide Mini AI's extended object
   searches without replacing native `an`/`in`; Mini Surround owns the
   `sa`/`sd`/`sr` family and uses Catppuccin's `MiniSurround` highlight.
+- Pairs: fifteen cases driven as real typed keystrokes into a scratch buffer,
+  comparing the resulting buffer text against an expected string. The reported
+  failure is fixed and stays fixed: `"qafasf` plus `"` yields `"qafasf"`, and
+  the same holds for `'abc` and a backtick-opened string. The cases that must
+  not regress all pass too — an empty line plus `"` opens a pair, `"hi"` plus
+  `"` opens another (even count, so a new string), `"` before `"` steps over,
+  `(` opens, `()` steps over, `({[` gives `({[]})`, `don` plus `'` does not
+  pair, `<BS>` after `(` clears the line, `{`+`<CR>` gives `{`, an indented
+  blank line and `}`, and `(` inside an unterminated string still pairs.
+  The single deliberate difference from mini.pairs is recorded above: `"`
+  immediately followed by `<CR>` splits the empty quote pair across three
+  lines. Checked separately that `<CR>` from inside a written string
+  (`x = "foo▮"`) is an ordinary line break, and that `{▮}` and `(▮)` still
+  produce the indented three-line split.
 - Function navigation: `[f` and `]f` resolve through Treesitter's
   `@function.outer` query and move to previous/next definitions in all three
   motion-capable modes, with jumplist entries enabled.
