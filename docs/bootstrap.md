@@ -162,26 +162,26 @@ for kitty's own config.
 
 ## Current state on this machine
 
-Applied. `mise run bootstrap:status` is the authoritative view; as of the
-last check every target above is a live symlink into this repo except three,
-all reported as `differs`:
+Fully applied — `mise run bootstrap:status` reports every declared target
+as `applied`, i.e. a live symlink into this repo. That command is the
+authoritative view; prefer it over trusting this paragraph.
 
-| Target                        | Why it differs                                                                                                         |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `~/.config/nvim`              | still a symlink into an older, unrelated repo (`~/dev/dotfiles2/nvim`) — see [nvim.md](./nvim.md#declared-not-applied) |
-| `~/.config/mise/mise.lock`    | a real file mise generated itself, before this repo declared the lockfile entry (see below)                            |
-| `~/.config/glow/glamour.json` | a real file, left behind by the earlier whole-directory `glow` symlink                                                 |
+Three targets needed `--force` on the way there, each because it was
+*occupied* by a real file rather than absent:
 
-All three are occupied targets rather than declaration conflicts, so
-`mise bootstrap dotfiles apply --force` resolves them. Nothing here does
-that on its own initiative.
+| Target                        | What was in the way                                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `~/.config/nvim`              | a symlink into an older, unrelated repo (`~/dev/dotfiles2/nvim`) — that repo still exists but nothing here references it |
+| `~/.config/mise/mise.lock`    | a lockfile mise generated itself before this repo declared the entry, since drifted (see below)                          |
+| `~/.config/glow/glamour.json` | a real file left behind by the earlier whole-directory `glow` symlink                                                    |
 
-The `mise.lock` one is worth understanding before forcing it: the machine's
-existing `~/.config/mise/mise.lock` is *not* a copy of this repo's. It had
-drifted — missing `gh`, `neovim` and `glab`, and still carrying entries
-from the older repo — which is precisely the failure mode that declaring
-the lockfile prevents. Forcing replaces that drifted file with the
-committed one.
+The `mise.lock` case is the instructive one: the machine's own lockfile was
+*not* a copy of this repo's — it was missing `gh`, `neovim` and `glab` and
+still carried entries from the older repo. That drift is precisely the
+failure mode the `[dotfiles]` entry exists to prevent.
+
+An occupied target is a different problem from a conflicting *declaration*
+(next section), and `--force` only resolves the former.
 
 ### A conflict that had to be cleared first (resolved)
 

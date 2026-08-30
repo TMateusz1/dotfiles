@@ -10,10 +10,9 @@ follows.
 ## Status
 
 Symlinking is implemented via mise's own `[dotfiles]`/`[bootstrap.repos]`
-(see [docs/bootstrap.md](./docs/bootstrap.md)) and **applied on this
-machine** — every target below is a live symlink into this repo, with one
-exception: `~/.config/nvim` still points at an older, unrelated dotfiles
-repo and hasn't been migrated (see [docs/nvim.md](./docs/nvim.md)).
+(see [docs/bootstrap.md](./docs/bootstrap.md)) and **fully applied on this
+machine** — every declared target is a live symlink into this repo
+(`mise run bootstrap:status` reports them all as `applied`).
 
 Each tool directory is named so that `<tool>/` → normally
 `~/.config/<tool>/`, except where a tool's own target path forces an

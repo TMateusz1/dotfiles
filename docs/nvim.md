@@ -30,6 +30,7 @@ mise only, Catppuccin theming).
 | [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)         | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)   | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
 | [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
+| [rmagatti/auto-session](https://github.com/rmagatti/auto-session)                     | Per-directory session persistence  | Restores buffers, window layout and buffer-local options on reopen. Almost entirely defaults — see "Sessions" below.                                                                                                                                                             |
 
 Per AGENTS.md's stated goal (a genuinely modern, IDE-like setup — LSP,
 treesitter, completion, git integration), more rows will land here
@@ -125,11 +126,75 @@ whose grammar isn't installed here (`tex` → `latex`, for one), and
 `vim.treesitter.start` *raises* for those — without the guard, opening a
 `.tex` file prints a parse error. Verified both directions.
 
+## Sessions
+
+Sessions are keyed by working directory: quit inside a project, come back to
+it later, and the buffers, window layout and buffer-local options are back.
+The session file is named after the absolute path of the cwd, under
+`stdpath("data")/sessions/`.
+
+Nearly everything here is auto-session's own defaults — `auto_save`,
+`auto_restore` and `args_allow_single_directory` are all already on, and
+`lazy_support` makes it wait for lazy.nvim before restoring. The only option
+this config sets is `suppressed_dirs`, so that running Neovim in `~`, `/`,
+`/tmp` or `~/Downloads` doesn't quietly start accumulating sessions for
+directories that aren't projects.
+
+`close_unsupported_windows` (a default) is what keeps this working with
+[neo-tree](#file-explorer-neo-tree): a tree window can't be meaningfully
+serialised, so it's closed before the session is written rather than being
+restored as a broken buffer. The other half of that pairing lives in
+neo-tree's own spec, which skips loading entirely when a session exists.
+
+### What each launch does
+
+| Command                   | Result                                                               |
+| ------------------------- | -------------------------------------------------------------------- |
+| `nvim .` — session exists | restores the session; **no** neo-tree                                |
+| `nvim .` — no session     | opens neo-tree on an empty editor                                    |
+| `nvim`                    | restores the session for the cwd, nothing else                       |
+| `nvim file.go`            | no restore and no save — a file argument means "just edit this file" |
+
+That last row is auto-session's `args_allow_files_auto_save = false`
+default, deliberately kept: opening a single file to make a quick edit
+shouldn't overwrite the session you built up in that project.
+
+Browsing a directory without opening anything doesn't create a session
+either: `auto_delete_empty_sessions` (also a default) discards a session
+whose buffers were all empty or unnamed. So a directory you only looked at
+still greets you with the tree next time, which is the intent.
+
+### `sessionoptions`
+
+`lua/config/options.lua` sets `sessionoptions` to Neovim's default list plus
+`winpos` and **`localoptions`**. `localoptions` is the one that matters for
+"settings come back too" — without it a restore brings back the buffer list
+and window layout but drops per-buffer state. Verified by setting
+`shiftwidth=7` on one buffer, quitting, and finding it still 7 after the
+restore while a sibling buffer stayed at 2.
+
 ## File explorer: neo-tree
 
 `<leader>e` toggles the tree (opens *and* focuses it if closed, closes it
 if open — `:Neotree toggle`'s own default behavior, needs no extra logic).
 Positioned `left`, per `filesystem.window.position`.
+
+**`nvim .` opens neo-tree, not netrw — unless a session is waiting.**
+`hijack_netrw_behavior = "open_default"` is what replaces netrw
+(upstream's default, but set explicitly here since the `init` hook depends
+on it). A hijack only works once the plugin has loaded, though, and
+neo-tree is otherwise lazy-loaded on `:Neotree`/`<leader>e` — so opening a
+directory would still have landed in netrw. The `init` hook covers that
+case: a single argument that is a directory loads neo-tree eagerly. Every
+other launch keeps it lazy.
+
+That hook also asks auto-session whether a session already exists for the
+cwd (`session_exists_for_cwd()`), and skips loading neo-tree if so — see
+[Sessions](#sessions). **The decision has to happen there, before neo-tree
+loads.** Letting the tree open and closing it afterwards from a
+`post_restore_cmds` hook was tried and does not work: neo-tree re-opens
+itself from `argv` once startup settles, so the window comes straight back
+(observed going 2 → 3 windows again ~300 ms after a successful close).
 
 Three custom `filesystem.window.mappings`, since the defaults don't match
 the requested behavior:
@@ -166,6 +231,7 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   convention elsewhere; `splitright`/`splitbelow`; `wrap = false`;
   `scrolloff = 8`; `signcolumn = "yes"` (reserves the gutter now, so
   turning on LSP diagnostics/git-signs later doesn't shift text).
+  It also sets `sessionoptions` — see [Sessions](#sessionoptions).
 - **`keymaps.lua`**: `<Esc>` in normal mode also runs `:nohlsearch`, so a
   search's highlighted matches clear without needing a separate keybind or
   losing Esc's usual behavior.
@@ -236,24 +302,32 @@ touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
   came back active with an empty `v:errmsg`. The negative case matters as
   much: a `.tex` buffer (language known, grammar not installed) and a
   buffer with no filetype at all both stay off *and* silent.
+- Sessions: driven through a real save/restore cycle. Note auto-session
+  **disables itself under `--headless`** (it checks `nvim_list_uis()`), so
+  the usual headless harness silently proves nothing here; the test ran
+  Neovim with `--embed` so a UI is registered. Opened two files in a split
+  with `shiftwidth=7` on one of them, quit, and reopened: the split layout,
+  both buffers, `shiftwidth=7` vs. `2`, both filetypes and live treesitter
+  highlighting all came back. All four launch shapes in the table above were
+  then checked: `nvim .` with a session restores the split with **no** tree;
+  `nvim .` in a fresh directory opens the tree; plain `nvim` restores
+  without a tree; `nvim main.go` opens just that file. The session file is
+  named for the absolute cwd, and a directory that was only browsed produced
+  no session file at all.
 - `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`
   and `maparg("<C-h>", "n")` to the plugin's own
   `:<C-U>TmuxNavigateLeft<CR>`, confirming the arrow-key mappings register
   alongside vim-tmux-navigator's `<C-h/j/k/l>` defaults rather than
   replacing them.
 
-## Declared, not applied
+## Applied
 
 `mise.toml`'s `[dotfiles]` table declares `"~/.config/nvim" = "nvim"` like
-every other tool here, but on this machine that target has **not** been
-migrated: `~/.config/nvim` is still a symlink into an older, unrelated
-dotfiles repo (`~/dev/dotfiles2/nvim`, with its own `lazy-lock.json`,
-plugins and sessions). It is the one outstanding target — everything else
-this repo declares is already applied (see
-[bootstrap.md](./bootstrap.md#current-state-on-this-machine)).
+every other tool here, and it is live: `~/.config/nvim` symlinks to this
+repo's `nvim/`. The previous setup it replaced still exists untouched in
+`~/dev/dotfiles2/nvim`, which is no longer referenced by anything here.
 
-Switching it over means `mise bootstrap dotfiles apply --force`, since the
-target is occupied. That replaces the old setup with this one, so it's a
-deliberate action left for you to take when ready — nothing here does it
-automatically. The old config stays where it is, in `~/dev/dotfiles2`,
-either way.
+One consequence worth knowing: `nvim/lazy-lock.json` is inside the repo, so
+lazy.nvim rewrites a *tracked* file whenever plugins are installed or
+updated. That's intended — it's the lockfile, and it should be committed —
+but it does mean `:Lazy update` shows up as a working-tree change.

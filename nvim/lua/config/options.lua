@@ -28,3 +28,20 @@ opt.splitbelow = true
 opt.wrap = false
 opt.scrolloff = 8
 opt.signcolumn = "yes"
+
+-- What a saved session restores (see lua/plugins/auto-session.lua). This is
+-- Neovim's default list plus `winpos` and `localoptions`; `localoptions` is
+-- the one that carries per-buffer settings across a restart, without it only
+-- the buffer list and window layout come back.
+opt.sessionoptions = {
+  "blank",
+  "buffers",
+  "curdir",
+  "folds",
+  "help",
+  "tabpages",
+  "winsize",
+  "winpos",
+  "terminal",
+  "localoptions",
+}
