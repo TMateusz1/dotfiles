@@ -26,6 +26,7 @@ mise only, Catppuccin theming).
 | ------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [catppuccin/nvim](https://github.com/catppuccin/nvim)                                 | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
 | [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                               | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
+| [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                 | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
 | [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)             | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                                                                                         |
 | [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)         | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)   | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
@@ -49,7 +50,37 @@ themes, and documents (see
 [util_tools.md#fzf](./util_tools.md#fzf)) — no second fuzzy-matching
 implementation to keep track of. Bound: `<leader>ff` (files in the cwd),
 `<leader>fg` (live grep in the cwd), `<leader>fr` (recent files),
-`<leader>fb` (buffers), and `<leader>fh` (help tags).
+`<leader>fb` (open buffers), and `<leader>fh` (help tags).
+
+## Buffer line
+
+[bufferline.nvim](https://github.com/akinsho/bufferline.nvim) shows listed
+buffers across the top of the editor. It loads on `VeryLazy`, after the
+colorscheme, and uses Catppuccin's dedicated bufferline theme rather than a
+hand-written palette. A `neo-tree` offset labels and aligns the file-explorer
+sidebar with the buffer line.
+
+Buffer navigation follows the usual bracket direction: `[b` selects the
+previous displayed buffer and `]b` selects the next. For non-sequential
+selection, `<leader><leader>` overlays a pick letter on every displayed
+Bufferline entry; pressing a letter focuses that buffer. This mirrors
+`<leader>xp`, which uses the same picker to close an entry instead.
+
+`<leader>x` is the buffer-close namespace:
+
+| Key          | Action                                    |
+| ------------ | ----------------------------------------- |
+| `<leader>xx` | Close the current buffer                  |
+| `<leader>xX` | Close every buffer except the current one |
+| `<leader>xh` | Close buffers left of the current buffer  |
+| `<leader>xl` | Close buffers right of the current buffer |
+| `<leader>xp` | Mark a displayed buffer, then close it    |
+
+All five routes use the same close function, as do Bufferline's close icon
+and right-click action. Clean buffers close immediately. A modified buffer
+uses Neovim's native `:confirm bdelete`, which offers Save, Discard and Cancel;
+nothing force-deletes unsaved work. Left and right mean Bufferline's visible
+ordering, not numeric buffer IDs.
 
 ## Treesitter
 
@@ -453,6 +484,11 @@ was read but not rewritten.
 - Fuzzy finder: `<leader>ff`, `<leader>fg` and `<leader>fr` resolve to
   `FzfLua files`, `FzfLua live_grep` and `FzfLua oldfiles`, matching the
   dashboard's `f`, `g` and `r` actions respectively.
+- Buffer line: `[b` and `]b` cycle in visible order, while
+  `<leader><leader>` invokes `BufferLinePick` for letter-based focus. The five
+  `<leader>x` mappings resolve to current, others, left, right and pick-close
+  operations; the configured close callback is shared by keyboard and mouse
+  actions and runs `:confirm bdelete` rather than a forced deletion.
 - Colorscheme: `vim.g.colors_name` is `"catppuccin-mocha"` and
   `require("catppuccin").options.flavour` is `"mocha"` — together these
   confirm `opts` actually reached `setup()` (see "Theme" above). Checked
