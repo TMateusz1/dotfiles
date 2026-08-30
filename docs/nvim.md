@@ -325,10 +325,82 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   convention elsewhere; `splitright`/`splitbelow`; `wrap = false`;
   `scrolloff = 8`; `signcolumn = "yes"` (reserves the gutter now, so
   turning on LSP diagnostics/git-signs later doesn't shift text).
-  It also sets `sessionoptions` — see [Sessions](#sessionoptions).
+  It also sets `sessionoptions` — see [Sessions](#sessionoptions) — and the
+  clipboard, below.
 - **`keymaps.lua`**: `<Esc>` in normal mode also runs `:nohlsearch`, so a
   search's highlighted matches clear without needing a separate keybind or
   losing Esc's usual behavior.
+
+## Clipboard
+
+`clipboard = "unnamedplus"`, so plain `y` and `p` are the system clipboard —
+no `"+y` prefix, no extra keymaps. The part that takes thought is *which*
+clipboard tool backs that register when Neovim is at the far end of
+`laptop → ssh → tmux → nvim`:
+
+| Where Neovim runs | Provider | How it reaches the local clipboard                                        |
+| ----------------- | -------- | ------------------------------------------------------------------------- |
+| locally           | `pbcopy` | macOS clipboard directly (`wl-copy`/`xclip` on a Linux desktop)           |
+| over SSH, in tmux | `tmux`   | tmux's paste buffer, which tmux syncs with the terminal over OSC 52       |
+| over SSH, no tmux | `osc52`  | Neovim writes/reads the clipboard through the terminal itself over OSC 52 |
+
+```lua
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+  vim.g.clipboard = vim.env.TMUX and "tmux" or "osc52"
+end
+```
+
+All three are **Neovim's own built-in providers**, selected by name; local
+runs are left to auto-detection, which already gets them right.
+
+### Why this is three lines and not a clipboard module
+
+Neovim 0.12's built-in `tmux` provider *is* the hand-rolled approach that was
+carried around in earlier configs, upstreamed verbatim — copy is
+`tmux load-buffer -w -`, paste is
+`tmux refresh-client -l && sleep 0.05 && tmux save-buffer -`. There is
+nothing left to write: `refresh-client -l` asks the outer terminal for its
+clipboard and stores the reply in a tmux buffer, `save-buffer -` reads it
+back.
+
+That routing is also what makes the remote case *reliable*, not just short.
+The classic OSC 52 failure — pasting base64 gibberish instead of the text —
+happens when a terminal's reply to a clipboard query arrives after the
+editor stopped listening and lands in the buffer as ordinary input. On the
+tmux path no reply ever reaches Neovim: tmux consumes the escape sequence
+and Neovim only ever reads a tmux buffer over a pipe. The direct `osc52`
+path can still hit it in principle, but that path is now upstream's
+implementation rather than a local copy of it.
+
+### Why the providers are named instead of auto-detected
+
+Auto-detection would pick the `tmux` provider on its own. It would *not*
+pick OSC 52: that fallback is skipped whenever `'clipboard'` is non-empty
+(upstream's reasoning, in `provider/clipboard.vim`, is that it "can be slow
+and cause a lot of user prompts"), and `'clipboard'` is exactly what
+`unnamedplus` sets. Opting in by name is the documented way around that.
+Naming both also pins the choice on remote hosts where the detection order
+might land elsewhere first — e.g. an `xclip` that talks to a forwarded
+`$DISPLAY` rather than to the machine actually in front of you.
+
+The assignment runs in `options.lua`, before lazy.nvim starts: the clipboard
+provider is resolved once, on first use, and reads `g:clipboard` at that
+moment — set it later and it is silently ignored (`:h faq-runtime`).
+
+### What has to be true outside Neovim
+
+- **tmux** ([core_tools.md](./core_tools.md#tmux)) — `set -s set-clipboard on`,
+  `allow-passthrough on`, the `Ms` terminal-override and the `clipboard`
+  terminal-feature. All four are already in `tmux/.tmux.conf`.
+- **kitty** ([desktop_tools.md](./desktop_tools.md#kitty)) —
+  `clipboard_control` includes `read-clipboard`/`read-primary`, already set.
+  Without the read permissions a terminal answers copy requests but not
+  paste requests, which is the usual reason remote `y` works and `p` doesn't.
+
+One consequence of `unnamedplus` worth knowing: deletes and changes (`d`,
+`c`, `x`) write to the system clipboard too, since they go through the same
+unnamed register. That's standard `unnamedplus` behavior, not something this
+config adds.
 
 ## Plugin manager: lazy.nvim
 
@@ -424,6 +496,12 @@ touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
   come back with real mocha colors (blue, peach, lavender, green, yellow),
   and `require("catppuccin").options.integrations.alpha` is `true` without
   `colorscheme.lua` mentioning it.
+- Clipboard: `provider#clipboard#Executable()` — the name Neovim resolves for
+  the register it will actually use — was checked in all three environments,
+  with `provider#clipboard#Error()` empty each time: `pbcopy` locally,
+  `tmux` with `SSH_TTY` + `TMUX` set, `OSC 52` with `SSH_TTY` and `TMUX`
+  unset. Locally the round trip was run for real: `setreg("+", …)` inside
+  Neovim, then `pbpaste` outside it returned the same string.
 - `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`
   and `maparg("<C-h>", "n")` to the plugin's own
   `:<C-U>TmuxNavigateLeft<CR>`, confirming the arrow-key mappings register
