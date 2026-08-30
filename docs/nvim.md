@@ -22,13 +22,57 @@ mise only, Catppuccin theming).
 
 ## Plugins
 
-| Plugin                                                | Purpose             | Notes                                                             |
-| ----------------------------------------------------- | ------------------- | ----------------------------------------------------------------- |
-| [catppuccin/nvim](https://github.com/catppuccin/nvim) | Colorscheme (Mocha) | Official Catppuccin port; no accent override — see "Theme" below. |
+| Plugin                                                                              | Purpose                            | Notes                                                                                                                                                                                                        |
+| ----------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [catppuccin/nvim](https://github.com/catppuccin/nvim)                               | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                            |
+| [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                             | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config. |
+| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)           | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                     |
+| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)       | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                    |
+| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) | Seamless tmux/nvim pane navigation | Pairs with `tmux/.tmux.conf`'s own smart pane-switching (see [core_tools.md#tmux](./core_tools.md#tmux)) — that config already forwards `C-hjkl`/`C-arrows` to whichever app owns the pane.                  |
 
 Per AGENTS.md's stated goal (a genuinely modern, IDE-like setup — LSP,
-treesitter, completion, fuzzy finding, git integration), more rows will
-land here incrementally; nothing in this config designs ahead for those.
+treesitter, completion, git integration), more rows will land here
+incrementally; nothing in this config designs ahead for those.
+
+## Fuzzy finder: fzf-lua, not Telescope or snacks.picker
+
+Considered against Telescope (mature but no longer the speed/feature
+leader without a compiled native extension) and `snacks.picker` (part of
+the [snacks.nvim](https://github.com/folke/snacks.nvim) bundle — deliberately
+not adopted; this config stays on single-purpose plugins rather than a
+multi-module library). fzf-lua wins on a repo-specific point neither
+alternative has: it drives the actual `fzf` binary this repo already pins,
+themes, and documents (see
+[util_tools.md#fzf](./util_tools.md#fzf)) — no second fuzzy-matching
+implementation to keep track of. Bound: `<leader>ff` (files), `<leader>fg`
+(live grep), `<leader>fb` (buffers), `<leader>fh` (help tags).
+
+## File explorer: neo-tree
+
+`<leader>e` toggles the tree (opens *and* focuses it if closed, closes it
+if open — `:Neotree toggle`'s own default behavior, needs no extra logic).
+Positioned `left`, per `filesystem.window.position`.
+
+Three custom `filesystem.window.mappings`, since the defaults don't match
+the requested behavior:
+
+- **`<CR>`** — opens the file *and* closes the tree, but only for an actual
+  file. A custom function (not a built-in command string) checks
+  `node.type ~= "directory"` before closing, so pressing Enter on a
+  directory still just expands/collapses it, as normal — confirmed
+  directly against the real plugin (see "Validation" below).
+- **`<C-v>`** — `open_vsplit`, a built-in command; opens the file in a
+  vertical split and leaves the tree open (built-in commands never
+  auto-close).
+- **`<C-s>`** — `open_split`, same as above but horizontal.
+
+**One thing to know about `<C-s>`:** some shells/terminals treat it as a
+flow-control character (XOFF, historically used to pause terminal output)
+if `stty ixon` is active. Neovim's own raw-mode terminal handling generally
+takes over once you're inside it, and this wasn't an issue in testing, but
+if `<C-s>` ever appears to "freeze" a real terminal (most often outside
+Neovim, e.g. a plain shell), that's `stty -ixon` to look into, not a bug in
+this config.
 
 ## Base config (`lua/config/`)
 
@@ -51,10 +95,10 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
 ## Plugin manager: lazy.nvim
 
 The de facto modern standard, not an arbitrary pick — lockfile-based
-reproducibility (`lazy-lock.json`, generated once plugins are installed,
-not shipped here yet since none have been installed against this config),
-lazy-loading, and the officially documented bootstrap snippet used above
-verbatim rather than a hand-rolled installer.
+reproducibility (`lazy-lock.json`, committed here, pins every plugin to an
+exact commit, machine-generated and re-written by lazy.nvim itself, not
+hand-edited), lazy-loading, and the officially documented bootstrap
+snippet used above verbatim rather than a hand-rolled installer.
 
 ## Theme
 
@@ -68,15 +112,28 @@ setting the way those ports do; its colors are fixed per flavour.
 ## Validation
 
 Verified against the real, installed `nvim` binary (0.12.5, via mise),
-fully sandboxed: `XDG_DATA_HOME`/`XDG_CONFIG_HOME`/`XDG_STATE_HOME`/
+always fully sandboxed: `XDG_DATA_HOME`/`XDG_CONFIG_HOME`/`XDG_STATE_HOME`/
 `XDG_CACHE_HOME`/`HOME` all pointed at a scratch directory, so nothing
-touched the real `~/.config/nvim` or `~/.local/share/nvim`. `nvim --headless
-"+qa"` loaded this config cleanly; lazy.nvim bootstrapped itself and
-cloned catppuccin/nvim for real. Confirmed directly, all against the real
-binary: `vim.g.colors_name` is `"catppuccin"`; `vim.wo.relativenumber`,
-`vim.o.hlsearch`, and `vim.wo.cursorline` are all `true`; and
-`vim.fn.maparg("<Esc>", "n", false, true).desc` returns `"Clear search
-highlight"`, confirming the keymap is actually registered.
+touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
+
+- `nvim --headless "+Lazy! sync" "+qa"` installed every plugin for real
+  (confirmed each one's fetch/checkout tasks finished with no errors) and
+  produced the committed `lazy-lock.json`.
+- Base config: `vim.g.colors_name` is `"catppuccin"`; `vim.wo.relativenumber`,
+  `vim.o.hlsearch`, and `vim.wo.cursorline` are all `true`; and
+  `vim.fn.maparg("<Esc>", "n", false, true).desc` returns `"Clear search
+  highlight"`.
+- neo-tree's custom keymaps: driven interactively via `nvim --headless
+  --listen <socket>` plus `--remote-send`/`--remote-expr` (real keystrokes
+  and real window/buffer queries, not a simulation) against a scratch test
+  project. Confirmed: opening the tree and pressing `<CR>` on a file opens
+  it *and* drops the window count back to 1 (tree closed); reopening the
+  tree and pressing `<C-v>` opens a vertical split while the tree remains
+  open (window count 3: tree + 2 file windows); `<C-s>` behaves the same
+  for a horizontal split (window count 4).
+- `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`,
+  confirming the arrow-key mappings registered correctly alongside
+  vim-tmux-navigator's own default `<C-h/j/k/l>` bindings.
 
 ## Declared, not applied
 

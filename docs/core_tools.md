@@ -145,7 +145,11 @@ autoread), OSC52 clipboard passthrough for remote copy/paste. Vi-style copy
 mode, mouse on, 100k-line scrollback, `escape-time 10` (fast enough not to
 fight Neovim's `<Esc>`). Smart pane navigation (`C-h/j/k/l`) that forwards
 to Neovim/fzf when one of those is running in the current pane, otherwise
-moves between tmux panes. `prefix g` opens a [lazygit](#lazygit) popup in
+moves between tmux panes (the tmux side of this also already forwards the
+arrow-key equivalents, `C-Left/Down/Up/Right` — see
+[nvim.md](./nvim.md#plugins) for the Neovim-side counterpart,
+vim-tmux-navigator, that makes this actually seamless once inside Neovim's
+own splits). `prefix g` opens a [lazygit](#lazygit) popup in
 the current pane's directory. Statusline hand-rolled in Catppuccin Mocha
 (blue accent, matching [git.md](./git.md) and
 [atuin](./util_tools.md#atuin)) — no plugin manager, no third-party
