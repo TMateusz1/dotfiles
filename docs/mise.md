@@ -49,6 +49,9 @@ Global (`mise/config.toml`):
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) — see [langs.md](./langs.md)
 - `neovim` — editor, see [nvim.md](./nvim.md)
+- `tree-sitter` — the CLI nvim-treesitter needs to compile parsers; a hard
+  runtime dependency of the Neovim config, deliberately the aqua build
+  rather than npm — see [nvim.md](./nvim.md#the-tree-sitter-cli-is-a-hard-dependency)
 
 Desktop (`mise.desktop.toml`, opt-in only — see [bootstrap.md](./bootstrap.md)):
 
@@ -84,7 +87,8 @@ see this for yourself.
 In practice this is harmless here — both configs agree on `[settings]`, and
 having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
 `yq`/`ripgrep`/`starship`/`k9s`/`glow`/`bottom`/`yazi`/`gh`/`glab`/`neovim`/
-`rust`/`go` on `PATH` while hacking on this repo isn't a problem — but it's
+`tree-sitter`/`rust`/`go` on `PATH` while hacking on this repo isn't a
+problem — but it's
 worth knowing so a stray tool showing up in `mise config` output inside
 this repo doesn't come as a surprise.
 

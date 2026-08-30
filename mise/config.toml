@@ -30,3 +30,6 @@ disable_backends = ["asdf", "vfox"]
 "aqua:cli/cli" = "2.98.0"
 "gitlab:gitlab-org/cli" = "1.115.0"
 "aqua:neovim/neovim" = "0.12.5"
+# Required by nvim-treesitter's main branch to compile parsers — and it must
+# not be the npm build (see docs/nvim.md). This aqua entry is a static binary.
+"aqua:tree-sitter/tree-sitter" = "0.26.13"

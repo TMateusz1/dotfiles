@@ -22,13 +22,14 @@ mise only, Catppuccin theming).
 
 ## Plugins
 
-| Plugin                                                                              | Purpose                            | Notes                                                                                                                                                                                                                                                                            |
-| ----------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [catppuccin/nvim](https://github.com/catppuccin/nvim)                               | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
-| [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                             | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
-| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)           | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                                                                                         |
-| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)       | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
-| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
+| Plugin                                                                                | Purpose                            | Notes                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [catppuccin/nvim](https://github.com/catppuccin/nvim)                                 | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
+| [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                               | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
+| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)             | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                                                                                         |
+| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)         | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
+| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)   | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
+| [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
 
 Per AGENTS.md's stated goal (a genuinely modern, IDE-like setup — LSP,
 treesitter, completion, git integration), more rows will land here
@@ -46,6 +47,83 @@ themes, and documents (see
 [util_tools.md#fzf](./util_tools.md#fzf)) — no second fuzzy-matching
 implementation to keep track of. Bound: `<leader>ff` (files), `<leader>fg`
 (live grep), `<leader>fb` (buffers), `<leader>fh` (help tags).
+
+## Treesitter
+
+Uses nvim-treesitter's **`main` branch**, which is a full rewrite and now
+upstream's default branch. This matters when reading anything written about
+treesitter elsewhere: the familiar `master`-branch API — `ensure_installed`,
+`highlight = { enable = true }`, `require('nvim-treesitter.configs').setup` —
+**does not exist here**. Upstream's own README calls it "a different plugin
+you need to set up from scratch". `main` requires Neovim 0.12+, which the
+version pinned in the global mise config satisfies.
+
+### The tree-sitter CLI is a hard dependency
+
+`main` compiles every parser locally, so it needs the `tree-sitter` CLI
+(≥ 0.26.1) on `PATH` at runtime — it is not optional and not bundled. It's
+pinned in the **global** mise config as `aqua:tree-sitter/tree-sitter`,
+which also satisfies upstream's explicit instruction to install it "via
+your package manager, **not npm**" — that lines up with this repo's general
+preference for static binaries over npm dependency trees (see
+[linting.md](./linting.md#why-rumdl-not-markdownlint) for the same
+reasoning applied to a linter).
+
+This is *not* a violation of [AGENTS.md](../AGENTS.md)'s "Neovim never
+installs binaries" rule — see the carve-out there. The rule exists to keep
+LSP/formatter/linter *executables* under mise's control; treesitter
+grammars are per-language build artifacts of a CLI that mise itself pins.
+
+### Parsers
+
+38 are declared, in one list in `lua/plugins/treesitter.lua`:
+
+| Group           | Parsers                                                                                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Go              | `go`, `gomod`, `gosum`, `gowork`, `gotmpl`                                                                                                     |
+| Rust            | `rust`                                                                                                                                         |
+| JavaScript / TS | `javascript`, `jsdoc`, `typescript`, `tsx`                                                                                                     |
+| Shell           | `bash`                                                                                                                                         |
+| Python          | `python`, `robot`                                                                                                                              |
+| Data / config   | `toml`, `json`, `yaml`, `xml`, `ini`, `csv`, `sql`, `dockerfile`, `make`, `markdown`, `markdown_inline`, `regex`, `ssh_config`, `editorconfig` |
+| git             | `diff`, `gitattributes`, `gitcommit`, `gitignore`, `git_config`, `git_rebase`                                                                  |
+| Neovim itself   | `lua`, `luadoc`, `vim`, `vimdoc`, `query`                                                                                                      |
+
+Robot Framework works with no extra wiring: Neovim already resolves both
+`.robot` and `.resource` to filetype `robot` (verified), so the parser is
+picked up automatically. Worth knowing that upstream classes `robot` as a
+**tier 3** parser — no listed maintainer, unlike the tier 1/2 grammars
+behind everything else here — so it's the most likely one to lag behind
+Robot Framework syntax changes.
+
+### Why highlighting is enabled by capability, not by a filetype list
+
+Upstream's documented pattern is a `FileType` autocommand with an explicit
+`pattern = { ... }` list. This config instead resolves the language for
+whatever filetype loads and starts treesitter if a parser exists:
+
+```lua
+local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+if lang then pcall(vim.treesitter.start, args.buf, lang) end
+```
+
+The reason is that **filetype names and parser names are frequently not the
+same**, so an explicit list written from the parser names above would
+silently miss files. Confirmed directly, three of the requested languages
+are exactly this case:
+
+| File   | Filetype          | Parser |
+| ------ | ----------------- | ------ |
+| `.sh`  | `sh`              | `bash` |
+| `.tsx` | `typescriptreact` | `tsx`  |
+| `.ini` | `dosini`          | `ini`  |
+
+Deriving the language at runtime keeps the parser list the single source of
+truth and makes those aliases work for free. The `pcall` is load-bearing
+rather than defensive habit: Neovim maps plenty of filetypes to a language
+whose grammar isn't installed here (`tex` → `latex`, for one), and
+`vim.treesitter.start` *raises* for those — without the guard, opening a
+`.tex` file prints a parse error. Verified both directions.
 
 ## File explorer: neo-tree
 
@@ -149,6 +227,15 @@ touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
   tree and pressing `<C-v>` opens a vertical split while the tree remains
   open (window count 3: tree + 2 file windows); `<C-s>` behaves the same
   for a horizontal split (window count 4).
+- Treesitter: all 38 parsers installed and compiled for real via the
+  `tree-sitter` CLI, then every target filetype opened as an actual buffer
+  and checked for `vim.treesitter.highlighter.active` — `go`, `gomod`,
+  `rust`, `javascript`, `typescript`, `typescriptreact`, `sh`, `python`,
+  `robot` (both `.robot` and `.resource`), `toml`, `json`, `yaml`, `xml`,
+  `dosini`, `dockerfile`, `make`, `markdown`, `sql`, `csv` and `lua` all
+  came back active with an empty `v:errmsg`. The negative case matters as
+  much: a `.tex` buffer (language known, grammar not installed) and a
+  buffer with no filetype at all both stay off *and* silent.
 - `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`
   and `maparg("<C-h>", "n")` to the plugin's own
   `:<C-U>TmuxNavigateLeft<CR>`, confirming the arrow-key mappings register

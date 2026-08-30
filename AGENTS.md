@@ -170,6 +170,12 @@ Rule specific to the **global** config:
   mise (global config or a per-project mise config) or installed manually by
   the user. Neovim config only *configures* LSP clients (e.g. via
   `nvim-lspconfig` / native `vim.lsp.config`), it never installs them.
+  - **Treesitter parsers are the one carve-out**, and only because they
+    aren't executables in the sense the rule is about: nvim-treesitter
+    compiles per-language grammars locally from source. The rule still
+    binds where it counts — the `tree-sitter` CLI that does the compiling
+    is pinned in the global mise config like any other tool, never fetched
+    by Neovim, and never from npm. See [docs/nvim.md](./docs/nvim.md#treesitter).
 - Trusted, actively maintained plugins only (see "General config
   philosophy" above) — favor small, focused, well-known plugins over
   mega-plugins or obscure ones, and only add a plugin when a real gap
