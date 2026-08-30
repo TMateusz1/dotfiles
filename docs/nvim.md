@@ -47,8 +47,9 @@ multi-module library). fzf-lua wins on a repo-specific point neither
 alternative has: it drives the actual `fzf` binary this repo already pins,
 themes, and documents (see
 [util_tools.md#fzf](./util_tools.md#fzf)) — no second fuzzy-matching
-implementation to keep track of. Bound: `<leader>ff` (files), `<leader>fg`
-(live grep), `<leader>fb` (buffers), `<leader>fh` (help tags).
+implementation to keep track of. Bound: `<leader>ff` (files in the cwd),
+`<leader>fg` (live grep in the cwd), `<leader>fr` (recent files),
+`<leader>fb` (buffers), and `<leader>fh` (help tags).
 
 ## Treesitter
 
@@ -136,11 +137,12 @@ The session file is named after the absolute path of the cwd, under
 
 Most of this is auto-session's own defaults — `auto_save` and
 `args_allow_single_directory` are already on, and `lazy_support` makes it
-wait for lazy.nvim before restoring. Two options are set here:
-`suppressed_dirs`, so that running Neovim in `~`, `/`, `/tmp` or
-`~/Downloads` doesn't quietly start accumulating sessions for directories
-that aren't projects; and `auto_restore`, which is where the
-[dashboard](#dashboard) enters the picture.
+wait for lazy.nvim before restoring. Three options are set here:
+`suppressed_dirs` keeps `~`, `/`, `/tmp` and `~/Downloads` from quietly
+accumulating sessions; `auto_restore` leaves a bare `nvim` on the
+[dashboard](#dashboard); and a `no_restore_cmds` hook opens neo-tree after a
+directory argument fails to restore a session. See
+[File explorer](#file-explorer-neo-tree).
 
 ### Restoring is automatic for `nvim .`, a choice for `nvim`
 
@@ -174,8 +176,9 @@ dashboard can't clear the session that was already on disk.
 `close_unsupported_windows` (a default) is what keeps this working with
 [neo-tree](#file-explorer-neo-tree): a tree window can't be meaningfully
 serialised, so it's closed before the session is written rather than being
-restored as a broken buffer. The other half of that pairing lives in
-neo-tree's own spec, which skips loading entirely when a session exists.
+restored as a broken buffer. On startup, the `no_restore_cmds` hook is the
+other half of that pairing: it opens neo-tree only after auto-session has
+confirmed that no session was restored.
 
 ### What each launch does
 
@@ -184,6 +187,7 @@ neo-tree's own spec, which skips loading entirely when a session exists.
 | `nvim`                    | the [dashboard](#dashboard), always — restoring is one keypress away (`s`) |
 | `nvim .` — session exists | restores the session; **no** neo-tree, **no** dashboard                    |
 | `nvim .` — no session     | opens neo-tree on an empty editor                                          |
+| `nvim <directory>`        | the same session-or-neo-tree decision for the supplied directory           |
 | `nvim file.go`            | no restore and no save — a file argument means "just edit this file"       |
 
 That last row is auto-session's `args_allow_files_auto_save = false`
@@ -223,10 +227,12 @@ Nothing else opens it — give Neovim any argument and it stays out of the way
 | `l` | Lazy            | `Lazy`                      |
 | `q` | Quit            | `qa`                        |
 
-They deliberately reuse what the config already binds elsewhere — `f`/`r`/
-`g` are the same fzf-lua pickers as `<leader>ff`/`<leader>fh`/`<leader>fg`,
-and `e` is `<leader>e`'s tree — so the dashboard is a shortcut to this
-setup, not a second set of habits. `s` is the counterpart to
+`f` and `g` operate in the current working directory; `r` reads Neovim's
+recent-file history. They deliberately reuse what the config already binds
+elsewhere — `f`/`r`/`g` are the same fzf-lua pickers as
+`<leader>ff`/`<leader>fr`/`<leader>fg`, and `e` is `<leader>e`'s tree — so
+the dashboard is a shortcut to this setup, not a second set of habits. `s`
+is the counterpart to
 [auto-session's suppressed auto-restore](#restoring-is-automatic-for-nvim--a-choice-for-nvim);
 `c` points at `stdpath("config")`, which is this repo's `nvim/`.
 
@@ -274,21 +280,17 @@ if open — `:Neotree toggle`'s own default behavior, needs no extra logic).
 Positioned `left`, per `filesystem.window.position`.
 
 **`nvim .` opens neo-tree, not netrw — unless a session is waiting.**
-`hijack_netrw_behavior = "open_default"` is what replaces netrw
-(upstream's default, but set explicitly here since the `init` hook depends
-on it). A hijack only works once the plugin has loaded, though, and
-neo-tree is otherwise lazy-loaded on `:Neotree`/`<leader>e` — so opening a
-directory would still have landed in netrw. The `init` hook covers that
-case: a single argument that is a directory loads neo-tree eagerly. Every
-other launch keeps it lazy.
+Neo-tree is otherwise lazy-loaded on `:Neotree`/`<leader>e`. For a startup
+directory argument, auto-session owns the decision: it first tries to
+restore a session for that argument, then its `no_restore_cmds` hook opens
+neo-tree only when no session was found. This also handles `nvim
+path/to/project` correctly when the shell's cwd differs from the argument.
 
-That hook also asks auto-session whether a session already exists for the
-cwd (`session_exists_for_cwd()`), and skips loading neo-tree if so — see
-[Sessions](#sessions). **The decision has to happen there, before neo-tree
-loads.** Letting the tree open and closing it afterwards from a
-`post_restore_cmds` hook was tried and does not work: neo-tree re-opens
-itself from `argv` once startup settles, so the window comes straight back
-(observed going 2 → 3 windows again ~300 ms after a successful close).
+The directory-argument flag is captured while lazy.nvim reads the
+auto-session spec, before startup plugins can rewrite the argument list.
+The hook receives `is_startup` and ignores later no-restore events, so a cwd
+change during an editing session cannot unexpectedly open the tree. A bare
+`nvim` has no directory argument and therefore remains on the dashboard.
 
 Three custom `filesystem.window.mappings`, since the defaults don't match
 the requested behavior:
@@ -435,10 +437,12 @@ highlights).
 
 ## Validation
 
-Verified against the real, installed `nvim` binary (0.12.5, via mise),
-always fully sandboxed: `XDG_DATA_HOME`/`XDG_CONFIG_HOME`/`XDG_STATE_HOME`/
-`XDG_CACHE_HOME`/`HOME` all pointed at a scratch directory, so nothing
-touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
+Verified against the real, installed `nvim` binary (0.12.5, via mise). The
+installation, parser and save/restore-cycle checks used scratch
+`XDG_DATA_HOME`/`XDG_CONFIG_HOME`/`XDG_STATE_HOME`/`XDG_CACHE_HOME`/`HOME`
+directories. Startup routing was also exercised through the live config and
+an existing session with `VimLeavePre` disabled before exit, so the session
+was read but not rewritten.
 
 - `nvim --headless "+Lazy! sync" "+qa"` installed every plugin for real
   (confirmed each one's fetch/checkout tasks finished with no errors) and
@@ -446,6 +450,9 @@ touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
 - Base config: `vim.wo.relativenumber`, `vim.o.hlsearch`, and
   `vim.wo.cursorline` are all `true`; and `vim.fn.maparg("<Esc>", "n",
   false, true).desc` returns `"Clear search highlight"`.
+- Fuzzy finder: `<leader>ff`, `<leader>fg` and `<leader>fr` resolve to
+  `FzfLua files`, `FzfLua live_grep` and `FzfLua oldfiles`, matching the
+  dashboard's `f`, `g` and `r` actions respectively.
 - Colorscheme: `vim.g.colors_name` is `"catppuccin-mocha"` and
   `require("catppuccin").options.flavour` is `"mocha"` — together these
   confirm `opts` actually reached `setup()` (see "Theme" above). Checked
@@ -474,13 +481,14 @@ touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
   Neovim with `--embed` so a UI is registered. Opened two files in a split
   with `shiftwidth=7` on one of them, quit, and reopened: the split layout,
   both buffers, `shiftwidth=7` vs. `2`, both filetypes and live treesitter
-  highlighting all came back. All four launch shapes in the table above were
-  then checked: `nvim .` with a session restores the split with **no** tree;
-  `nvim .` in a fresh directory opens the tree; plain `nvim` restored
-  without a tree (that launch now shows the [dashboard](#dashboard) instead
-  — see the next bullet); `nvim main.go` opens just that file. The session
-  file is named for the absolute cwd, and a directory that was only browsed
-  produced no session file at all.
+  highlighting all came back. The launch shapes in the table above were then
+  checked: `nvim .` with a session restores the split with **no** tree;
+  `nvim .` in a fresh directory opens the tree; bare `nvim` opens the
+  [dashboard](#dashboard) without restoring or opening the tree; and `nvim
+  main.go` opens just that file. A directory argument different from the
+  shell's cwd was also checked: its own session restored with no tree. The
+  session file is named for the absolute cwd, and a directory that was only
+  browsed produced no session file at all.
 - Dashboard: a real `nvim` in a scratch project, queried from inside a
   `VimEnter` autocommand. Plain `nvim` lands on `filetype=alpha`,
   `buftype=nofile`, one window, empty `v:errmsg`, with the banner, the cwd
