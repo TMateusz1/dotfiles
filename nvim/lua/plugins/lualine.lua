@@ -3,7 +3,11 @@ return {
   event = "VeryLazy",
   opts = {
     options = {
-      theme = "catppuccin",
+      -- Not "catppuccin": that theme file was renamed to `catppuccin-nvim`
+      -- upstream (see docs/nvim.md). It also reads the flavour of the applied
+      -- colorscheme, so `flavour` in colorscheme.lua stays the single source of
+      -- truth — unlike `catppuccin-mocha`, which hardcodes it a second time.
+      theme = "catppuccin-nvim",
     },
     sections = {
       -- Default lualine_x, with Neovim's own progress summary in front of it.

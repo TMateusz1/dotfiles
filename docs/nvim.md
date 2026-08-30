@@ -36,7 +36,7 @@ mise only, Catppuccin theming).
 | [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs)                                             | Auto-pairs                         | Inserts the closing bracket/quote, steps over one already there, and counts the quotes before the cursor so closing an open string does not double it — see "Pairs" below.                                                                                                       |
 | [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, devicons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                          |
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
-| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Uses the official `catppuccin` theme. Its right section leads with Neovim 0.12's `vim.ui.progress_status()` — see "Native UI" below.                                                                                                                                             |
+| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Theme is `catppuccin-nvim`, **not** `catppuccin` — see "Theme" below. Its right section leads with Neovim 0.12's `vim.ui.progress_status()` — see "Native UI" below.                                                                                                             |
 | [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `=` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                         |
 | [mikavilpas/yazi.nvim](https://github.com/mikavilpas/yazi.nvim)                                               | Yazi file manager in a float       | `<leader>e`/`<leader>E` open the real `yazi` binary already pinned in the global mise config — see "File explorers" below.                                                                                                                                                       |
 | [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)                                     | Animated cursor trail              | Pure-Lua cursor smear drawn with virtual text; no terminal support required. Defaults kept — see "Cursor" below.                                                                                                                                                                 |
@@ -749,6 +749,36 @@ did. Using `config = function(_, opts) require("catppuccin").setup(opts)
 `flavour` is set (integrations, `transparent_background`, custom
 highlights).
 
+### The lualine theme is named `catppuccin-nvim`, not `catppuccin`
+
+`options.theme = "catppuccin"` in `lualine.lua` produces a startup notice and a
+statusline that silently isn't Catppuccin at all:
+
+```text
+### options.theme
+Theme `catppuccin` not found, falling back to `auto`.
+```
+
+The name is simply gone. Catppuccin's commit `384f304`, *"fix!: move special
+integrations to `catppuccin-nvim`"*, renamed `lua/lualine/themes/catppuccin.lua`
+to `catppuccin-nvim.lua` (it did the same to the barbecue theme). The `!` marks
+it as breaking, and it breaks quietly: lualine falls back to `auto`, which
+generates a passable palette from the active highlight groups, so the statusline
+still looks plausible and nothing errors.
+
+Note this rename hit *only* the lualine and barbecue theme files.
+`catppuccin.special.bufferline`, which `bufferline.lua` calls for its
+highlights, was not part of that commit and still resolves.
+
+Of the names that do exist, `catppuccin-nvim` is the right one. It is a
+one-line shim — `return require "catppuccin.utils.lualine"()` — that takes no
+flavour argument and therefore resolves `require("catppuccin").flavour`, which
+catppuccin sets in `M.load()` when a colorscheme is applied. So the statusline
+follows whatever `colorscheme.lua` applied, and `flavour` there stays the single
+source of truth. The per-flavour files (`catppuccin-mocha` and friends) pass
+their flavour in explicitly, which would hardcode the choice a second place and
+let the two drift apart.
+
 ## Validation
 
 Verified against the real, installed `nvim` binary (0.12.5, via mise). The
@@ -821,6 +851,17 @@ was read but not rewritten.
   and uses Catppuccin's `WhichKey*` highlight groups.
 - Undo tree: `<leader>U` opens the real history and diff buffers on the right,
   focuses the history tree, and closes both on the second press.
+- Lualine theme: with `theme = "catppuccin"` lualine records the
+  "Theme `catppuccin` not found, falling back to `auto`" notice; with
+  `catppuccin-nvim` its notice list is empty. The colors are real Catppuccin
+  Mocha rather than `auto`'s generated approximation, checked against the
+  palette: `lualine_a_normal` resolves to bg `#89b4fb` (mocha `blue`) on fg
+  `#181826` (`mantle`), `lualine_a_insert` to `#a6e3a2` (`green`) and
+  `lualine_a_visual` to `#cba6f8` (`mauve`). The flavour really is followed
+  rather than coincidentally matching: after `:colorscheme catppuccin-latte`
+  the same theme returns `#1e66f6`, latte's `blue`. Note that
+  `catppuccin.setup{ flavour = ... }` alone does *not* move it — `M.flavour` is
+  assigned in `M.load()`, so the colorscheme has to actually be applied.
 - Colorscheme: `vim.g.colors_name` is `"catppuccin-mocha"` and
   `require("catppuccin").options.flavour` is `"mocha"` — together these
   confirm `opts` actually reached `setup()` (see "Theme" above). Checked
