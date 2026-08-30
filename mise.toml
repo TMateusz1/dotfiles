@@ -1,5 +1,6 @@
 [settings]
 lockfile = true
+lockfile_platforms = ["macos-arm64", "linux-arm64", "linux-x64"]
 disable_backends = ["asdf", "vfox"]
 # Relative dotfile sources below resolve against this file's own directory
 # (the repo root), not against dotfiles.root — so dotfiles.root is
@@ -10,6 +11,8 @@ dotfiles.default_mode = "symlink"
 HK_MISE = 1
 
 [tools]
+"node" = "24"
+"npm:@openai/codex" = { version = "latest", depends = ["node"] }
 "aqua:anthropics/claude-code" = "2.1.251"
 "aqua:jdx/hk" = "1.56.1"
 "aqua:tamasfe/taplo" = "0.10.0"

@@ -12,17 +12,7 @@ checksum = "sha256:0ef2ebf0b7e5a652b65c4cb96c6d9ffb3981a98547de3c764465bbf54a8d7
 url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-linux-aarch64.zip"
 url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421900973"
 
-[tools."aqua:JohnnyMorganz/StyLua"."platforms.linux-arm64-musl"]
-checksum = "sha256:b948df6b4bae41af9a70948174372f96a3c14d44e3e017288701539f3db8fb75"
-url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-linux-aarch64-musl.zip"
-url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421900982"
-
 [tools."aqua:JohnnyMorganz/StyLua"."platforms.linux-x64"]
-checksum = "sha256:ca6f1cf52eaf69e6632b81acef9c197aa24b85eb30d2455a35e7dbe28ae77c72"
-url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-linux-x86_64-musl.zip"
-url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421901066"
-
-[tools."aqua:JohnnyMorganz/StyLua"."platforms.linux-x64-musl"]
 checksum = "sha256:ca6f1cf52eaf69e6632b81acef9c197aa24b85eb30d2455a35e7dbe28ae77c72"
 url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-linux-x86_64-musl.zip"
 url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421901066"
@@ -31,16 +21,6 @@ url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421
 checksum = "sha256:92ff0889e16324801bc072692974bb67f8161e62010fc90f96c62a17f81f32c7"
 url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-macos-aarch64.zip"
 url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421901102"
-
-[tools."aqua:JohnnyMorganz/StyLua"."platforms.macos-x64"]
-checksum = "sha256:53c50a1605d0a6345d160a1a5a21db40bcf2bf9cd23c17f7c277a63a1bff3a7f"
-url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-macos-x86_64.zip"
-url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421901085"
-
-[tools."aqua:JohnnyMorganz/StyLua"."platforms.windows-x64"]
-checksum = "sha256:e77d0ea1226b8b389b43f702240091249a96eea25857281f90ea24d0eb9eb969"
-url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-windows-x86_64.zip"
-url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421902292"
 
 [[tools."aqua:anthropics/claude-code"]]
 version = "2.1.251"
@@ -52,35 +32,15 @@ checksum = "sha256:53a4cc28612c6534884019223ee38b9bad5a12814fe8e31d42ea26ff2b169
 url = "https://github.com/anthropics/claude-code/releases/download/v2.1.251/claude-linux-arm64.tar.gz"
 url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/533990601"
 
-[tools."aqua:anthropics/claude-code"."platforms.linux-arm64-musl"]
-checksum = "sha256:de4f08a4a4332dfd3b712e5ad0f5c02f44b8fe2da8cafaeee8b1e26a513642a6"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.251/claude-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/533990602"
-
 [tools."aqua:anthropics/claude-code"."platforms.linux-x64"]
 checksum = "sha256:4fda59f47ab17c0e0c831b3144e3025c050397ba37d574388f52e92e1af81c74"
 url = "https://github.com/anthropics/claude-code/releases/download/v2.1.251/claude-linux-x64.tar.gz"
 url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/533990718"
 
-[tools."aqua:anthropics/claude-code"."platforms.linux-x64-musl"]
-checksum = "sha256:4466b58d9de65221f305270b16c94cfb02eb2ae56353a97fda0ad28ec0c775e6"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.251/claude-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/533990603"
-
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
 checksum = "sha256:02e1e8f41406ae4f4a6b85f25ce6653bf586478dfe64e4d56e0a21624756141d"
 url = "https://github.com/anthropics/claude-code/releases/download/v2.1.251/claude-darwin-arm64.tar.gz"
 url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/533990605"
-
-[tools."aqua:anthropics/claude-code"."platforms.macos-x64"]
-checksum = "sha256:da2b0b631cd3af3053d18aa27c5cfc5626a4ffdb0f92d1b63bca7b85a5edfe80"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.251/claude-darwin-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/533990604"
-
-[tools."aqua:anthropics/claude-code"."platforms.windows-x64"]
-checksum = "sha256:22e6a1ee55a866750b5a842912ea1d8a90644868456062ca2a31bccc379c960a"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.251/claude-win32-x64.zip"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/533990740"
 
 [[tools."aqua:google/yamlfmt"]]
 version = "0.21.0"
@@ -92,17 +52,7 @@ checksum = "sha256:5b2689c963b177271330c5ce8ca7396751107e5a826be46f03d2cb9b6f0c7
 url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Linux_arm64.tar.gz"
 url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650208"
 
-[tools."aqua:google/yamlfmt"."platforms.linux-arm64-musl"]
-checksum = "sha256:5b2689c963b177271330c5ce8ca7396751107e5a826be46f03d2cb9b6f0c7784"
-url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650208"
-
 [tools."aqua:google/yamlfmt"."platforms.linux-x64"]
-checksum = "sha256:1f300d9257b232bb3b541d7fb1b0e6b3c121bcbab381c86cd38cb8722be8a566"
-url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Linux_x86_64.tar.gz"
-url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650203"
-
-[tools."aqua:google/yamlfmt"."platforms.linux-x64-musl"]
 checksum = "sha256:1f300d9257b232bb3b541d7fb1b0e6b3c121bcbab381c86cd38cb8722be8a566"
 url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Linux_x86_64.tar.gz"
 url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650203"
@@ -111,16 +61,6 @@ url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650203
 checksum = "sha256:4b417ecb94339d57e4c122ecc948c1a00fe328b5853266de9806e652a92858fa"
 url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Darwin_arm64.tar.gz"
 url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650209"
-
-[tools."aqua:google/yamlfmt"."platforms.macos-x64"]
-checksum = "sha256:060e943bcb8583c456810eb1ff4721b4f46c4a0c1a4432449d5dc3bbfe29a22b"
-url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Darwin_x86_64.tar.gz"
-url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650207"
-
-[tools."aqua:google/yamlfmt"."platforms.windows-x64"]
-checksum = "sha256:07f80ce5d741eb4b0a9380ac78a19c7cb5bd44e2a9a47a5a04839e3ba54dd463"
-url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Windows_x86_64.tar.gz"
-url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650206"
 
 [[tools."aqua:jdx/hk"]]
 version = "1.56.1"
@@ -132,30 +72,15 @@ checksum = "sha256:cd671706a273dac35b012fd585a0fba1b0c0f340558dccfd4c9a4b976a794
 url = "https://github.com/jdx/hk/releases/download/v1.56.1/hk-aarch64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/jdx/hk/releases/assets/525632120"
 
-[tools."aqua:jdx/hk"."platforms.linux-arm64-musl"]
-checksum = "sha256:5feac3cfcdae33227197d0104832b91a5d293733320632c3c19f864866a6c8ce"
-url = "https://github.com/jdx/hk/releases/download/v1.56.1/hk-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/hk/releases/assets/525632119"
-
 [tools."aqua:jdx/hk"."platforms.linux-x64"]
 checksum = "sha256:67157431e36bb523213d8361a9f59b6eb718f80ae8534827849552b3c6c92a04"
 url = "https://github.com/jdx/hk/releases/download/v1.56.1/hk-x86_64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/jdx/hk/releases/assets/525632131"
 
-[tools."aqua:jdx/hk"."platforms.linux-x64-musl"]
-checksum = "sha256:e7435c1aec98f60d98712da3231541987ac67c017c001f767c0f37bd517cfe43"
-url = "https://github.com/jdx/hk/releases/download/v1.56.1/hk-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/hk/releases/assets/525632133"
-
 [tools."aqua:jdx/hk"."platforms.macos-arm64"]
 checksum = "sha256:f8400a1427e66f1b968e58568115a2138b5d0fe88e0561b97d3822648b7e35ea"
 url = "https://github.com/jdx/hk/releases/download/v1.56.1/hk-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/jdx/hk/releases/assets/525632123"
-
-[tools."aqua:jdx/hk"."platforms.windows-x64"]
-checksum = "sha256:4ccf353e484997dd4975361b6433f3b2661f5db614f2b382cddcac7eaa74a604"
-url = "https://github.com/jdx/hk/releases/download/v1.56.1/hk-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/jdx/hk/releases/assets/525632118"
 
 [[tools."aqua:koalaman/shellcheck"]]
 version = "0.11.0"
@@ -167,17 +92,7 @@ checksum = "sha256:12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.aarch64.tar.xz"
 url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056934"
 
-[tools."aqua:koalaman/shellcheck"."platforms.linux-arm64-musl"]
-checksum = "sha256:12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14588"
-url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.aarch64.tar.xz"
-url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056934"
-
 [tools."aqua:koalaman/shellcheck"."platforms.linux-x64"]
-checksum = "sha256:8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198"
-url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz"
-url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056942"
-
-[tools."aqua:koalaman/shellcheck"."platforms.linux-x64-musl"]
 checksum = "sha256:8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz"
 url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056942"
@@ -186,16 +101,6 @@ url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/2790
 checksum = "sha256:56affdd8de5527894dca6dc3d7e0a99a873b0f004d7aabc30ae407d3f48b0a79"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.darwin.aarch64.tar.xz"
 url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056932"
-
-[tools."aqua:koalaman/shellcheck"."platforms.macos-x64"]
-checksum = "sha256:3c89db4edcab7cf1c27bff178882e0f6f27f7afdf54e859fa041fca10febe4c6"
-url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.darwin.x86_64.tar.xz"
-url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056930"
-
-[tools."aqua:koalaman/shellcheck"."platforms.windows-x64"]
-checksum = "sha256:8a4e35ab0b331c85d73567b12f2a444df187f483e5079ceffa6bda1faa2e740e"
-url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.zip"
-url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056944"
 
 [[tools."aqua:rvben/rumdl"]]
 version = "0.2.62"
@@ -208,40 +113,16 @@ url = "https://github.com/rvben/rumdl/releases/download/v0.2.62/rumdl-v0.2.62-aa
 url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/532322363"
 provenance = "github-attestations"
 
-[tools."aqua:rvben/rumdl"."platforms.linux-arm64-musl"]
-checksum = "sha256:79ec0b4771b1026dd337b942fc6f05655dd30503434f0412adf7b2feed402c44"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.62/rumdl-v0.2.62-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/532322353"
-provenance = "github-attestations"
-
 [tools."aqua:rvben/rumdl"."platforms.linux-x64"]
 checksum = "sha256:12058de9ab5e0078a468d11bd1a8c5b79f69768a15c06832cebde715075ed893"
 url = "https://github.com/rvben/rumdl/releases/download/v0.2.62/rumdl-v0.2.62-x86_64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/532322356"
 provenance = "github-attestations"
 
-[tools."aqua:rvben/rumdl"."platforms.linux-x64-musl"]
-checksum = "sha256:f2581ed4b9cccff9288ee395777911f194368b28e0e0258070e94b7859a30b7e"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.62/rumdl-v0.2.62-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/532322358"
-provenance = "github-attestations"
-
 [tools."aqua:rvben/rumdl"."platforms.macos-arm64"]
 checksum = "sha256:3fd051ccb75e790635a7eb19585b4060c4c78bd3e7362daa98fa55dc46626b41"
 url = "https://github.com/rvben/rumdl/releases/download/v0.2.62/rumdl-v0.2.62-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/532322359"
-provenance = "github-attestations"
-
-[tools."aqua:rvben/rumdl"."platforms.macos-x64"]
-checksum = "sha256:3cb4e17fda2703860f75a5ee1d1c08ee0bab045713b3b30edb5e60c192a93e3c"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.62/rumdl-v0.2.62-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/532322361"
-provenance = "github-attestations"
-
-[tools."aqua:rvben/rumdl"."platforms.windows-x64"]
-checksum = "sha256:0e5521e7f5427dcb023372fd938101626a3cbda85bd06efa322ac109b58ccb5b"
-url = "https://github.com/rvben/rumdl/releases/download/v0.2.62/rumdl-v0.2.62-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/rvben/rumdl/releases/assets/532322368"
 provenance = "github-attestations"
 
 [[tools."aqua:tamasfe/taplo"]]
@@ -253,27 +134,32 @@ specifiers = ["0.10.0"]
 url = "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-aarch64.gz"
 url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257322597"
 
-[tools."aqua:tamasfe/taplo"."platforms.linux-arm64-musl"]
-url = "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-aarch64.gz"
-url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257322597"
-
 [tools."aqua:tamasfe/taplo"."platforms.linux-x64"]
 url = "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-x86_64.gz"
 url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257322600"
 
-[tools."aqua:tamasfe/taplo"."platforms.linux-x64-musl"]
-url = "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-x86_64.gz"
-url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257322600"
-
 [tools."aqua:tamasfe/taplo"."platforms.macos-arm64"]
-checksum = "blake3:353ecb1ed7d279dec5e2fd388d292ef97db08a651405fa664ffec1b2896c05f0"
 url = "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-darwin-aarch64.gz"
 url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257323110"
 
-[tools."aqua:tamasfe/taplo"."platforms.macos-x64"]
-url = "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-darwin-x86_64.gz"
-url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257323116"
+[[tools.node]]
+version = "24.20.0"
+backend = "core:node"
+specifiers = ["24"]
 
-[tools."aqua:tamasfe/taplo"."platforms.windows-x64"]
-url = "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-windows-x86_64.zip"
-url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257323062"
+[tools.node."platforms.linux-arm64"]
+checksum = "sha256:3515603e2487879a39bc75716f1a2affd027500c64ba50e845cf72cb33219013"
+url = "https://nodejs.org/dist/v24.20.0/node-v24.20.0-linux-arm64.tar.gz"
+
+[tools.node."platforms.linux-x64"]
+checksum = "sha256:855d581f8a4eb1a8117e3426de25fe02770592febcfb31369aee1ffbfee9e8ec"
+url = "https://nodejs.org/dist/v24.20.0/node-v24.20.0-linux-x64.tar.gz"
+
+[tools.node."platforms.macos-arm64"]
+checksum = "sha256:40e5607e5ecb3db9192723776da2d75d966260fc74a7a9e731c1bd67dda96bc8"
+url = "https://nodejs.org/dist/v24.20.0/node-v24.20.0-darwin-arm64.tar.gz"
+
+[[tools."npm:@openai/codex"]]
+version = "0.151.0"
+backend = "npm:@openai/codex"
+specifiers = ["latest"]
