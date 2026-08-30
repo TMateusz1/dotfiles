@@ -22,18 +22,21 @@ mise only, Catppuccin theming).
 
 ## Plugins
 
-| Plugin                                                                                        | Purpose                            | Notes                                                                                                                                                                                                                                                                            |
-| --------------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [catppuccin/nvim](https://github.com/catppuccin/nvim)                                         | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
-| [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                                       | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
-| [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
-| [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim) | Indent guides + active scope       | Draws subtle guides with virtual text and highlights the current Treesitter scope. Uses Catppuccin's official integration.                                                                                                                                                       |
-| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                     | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                                                                                         |
-| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                 | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
-| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
-| [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)         | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
-| [rmagatti/auto-session](https://github.com/rmagatti/auto-session)                             | Per-directory session persistence  | Restores buffers, window layout and buffer-local options on reopen. Almost entirely defaults — see "Sessions" below.                                                                                                                                                             |
-| [goolord/alpha-nvim](https://github.com/goolord/alpha-nvim)                                   | Start screen / dashboard           | Shown by a bare `nvim`; skipped whenever Neovim gets an argument. Its `dashboard` theme, re-skinned onto catppuccin's `Alpha*` highlight groups — see "Dashboard" below.                                                                                                         |
+| Plugin                                                                                                        | Purpose                            | Notes                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [catppuccin/nvim](https://github.com/catppuccin/nvim)                                                         | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
+| [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                                                       | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
+| [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
+| [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)                 | Indent guides + active scope       | Draws subtle guides with virtual text and highlights the current Treesitter scope. Uses Catppuccin's official integration.                                                                                                                                                       |
+| [nvim-mini/mini.ai](https://github.com/nvim-mini/mini.ai)                                                     | Extended text objects              | Adds arguments, function calls, tags and robust pair objects while preserving Neovim's native `an`/`in` Treesitter selection.                                                                                                                                                    |
+| [nvim-mini/mini.surround](https://github.com/nvim-mini/mini.surround)                                         | Surround editing                   | Adds coherent `sa`/`sd`/`sr` operations with dot-repeat, counts and Catppuccin highlighting.                                                                                                                                                                                     |
+| [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | Syntax-aware function navigation   | Supplies maintained `@function.outer` queries for `[f` and `]f`; configured against its `main` branch API.                                                                                                                                                                       |
+| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                                                                                         |
+| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
+| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
+| [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)                         | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
+| [rmagatti/auto-session](https://github.com/rmagatti/auto-session)                                             | Per-directory session persistence  | Restores buffers, window layout and buffer-local options on reopen. Almost entirely defaults — see "Sessions" below.                                                                                                                                                             |
+| [goolord/alpha-nvim](https://github.com/goolord/alpha-nvim)                                                   | Start screen / dashboard           | Shown by a bare `nvim`; skipped whenever Neovim gets an argument. Its `dashboard` theme, re-skinned onto catppuccin's `Alpha*` highlight groups — see "Dashboard" below.                                                                                                         |
 
 Per AGENTS.md's stated goal (a genuinely modern, IDE-like setup — LSP,
 treesitter, completion, git integration), more rows will land here
@@ -97,6 +100,47 @@ It loads only when a real file is read or created. Dashboard, fzf-lua, help,
 lazy.nvim and neo-tree buffers are excluded, as are terminal, prompt, quickfix
 and other non-file buffer types. The scope indicator depends on a Treesitter
 parser; ordinary indentation guides still work without one.
+
+## Text objects and surrounds
+
+The standalone [mini.ai](https://github.com/nvim-mini/mini.ai) and
+[mini.surround](https://github.com/nvim-mini/mini.surround) modules are grouped
+in `lua/plugins/minis.lua`; the full `mini.nvim` suite is not installed.
+mini.ai extends normal operator/Visual text objects with arguments (`a`),
+function calls (`f`), tags (`t`), balanced quotes/brackets and an interactive
+object (`?`). For example, `daa` deletes an argument and `vif` selects inside a
+function call. The argument object includes comma-adjacent whitespace, so
+deleting an item leaves a clean argument list rather than a leading space.
+
+Mini AI's extended-search variants use uppercase suffixes so Neovim's native
+`an`/`in` Treesitter incremental selection remains available:
+
+| Key       | Action                              |
+| --------- | ----------------------------------- |
+| `aN`/`iN` | Around/inside the next text object  |
+| `aL`/`iL` | Around/inside the previous object   |
+| `g[`/`g]` | Move to the left/right object edge  |
+
+mini.surround keeps its concise defaults:
+
+| Key           | Action                                           |
+| ------------- | ------------------------------------------------ |
+| `sa`          | Add a surrounding around a motion or selection   |
+| `sd`          | Delete a surrounding                             |
+| `sr`          | Replace a surrounding                            |
+| `sf`/`sF`     | Find a surrounding to the right/left             |
+| `sh`          | Highlight the surrounding under the cursor       |
+| `{action}l/n` | Apply an action to the previous/next surrounding |
+
+These mappings deliberately claim the `s` prefix; use `cl` for Neovim's
+single-character substitute operation. Surround edits support counts and
+dot-repeat.
+
+Function-definition navigation is Treesitter-aware rather than based on brace
+layout. `[f` jumps to the previous function start and `]f` to the next, in
+Normal, Visual and operator-pending modes; every jump is added to the jumplist.
+The mappings use the official `nvim-treesitter-textobjects` companion because
+mini.ai's `f` is specifically a function-*call* text object, not a definition.
 
 ## Treesitter
 
@@ -508,6 +552,12 @@ was read but not rewritten.
 - Indent guides: `ibl` loads for real file buffers, uses Catppuccin's
   `IblIndent`/`IblScope` highlights, and stays disabled in dashboard,
   neo-tree, fzf-lua and other utility buffers.
+- Mini editing: `aN`/`iN` and `aL`/`iL` provide Mini AI's extended object
+  searches without replacing native `an`/`in`; Mini Surround owns the
+  `sa`/`sd`/`sr` family and uses Catppuccin's `MiniSurround` highlight.
+- Function navigation: `[f` and `]f` resolve through Treesitter's
+  `@function.outer` query and move to previous/next definitions in all three
+  motion-capable modes, with jumplist entries enabled.
 - Colorscheme: `vim.g.colors_name` is `"catppuccin-mocha"` and
   `require("catppuccin").options.flavour` is `"mocha"` — together these
   confirm `opts` actually reached `setup()` (see "Theme" above). Checked

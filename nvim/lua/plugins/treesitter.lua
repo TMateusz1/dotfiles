@@ -68,8 +68,25 @@ return {
   branch = "main",
   lazy = false,
   build = ":TSUpdate",
+  dependencies = {
+    {
+      "nvim-treesitter/nvim-treesitter-textobjects",
+      branch = "main",
+    },
+  },
   config = function()
     require("nvim-treesitter").setup()
+    require("nvim-treesitter-textobjects").setup({
+      move = { set_jumps = true },
+    })
+
+    local move = require("nvim-treesitter-textobjects.move")
+    vim.keymap.set({ "n", "x", "o" }, "[f", function()
+      move.goto_previous_start("@function.outer", "textobjects")
+    end, { desc = "Previous function" })
+    vim.keymap.set({ "n", "x", "o" }, "]f", function()
+      move.goto_next_start("@function.outer", "textobjects")
+    end, { desc = "Next function" })
 
     -- Asynchronous, and a no-op for parsers already present.
     require("nvim-treesitter").install(parsers)
