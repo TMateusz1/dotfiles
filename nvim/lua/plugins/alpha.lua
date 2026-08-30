@@ -33,7 +33,7 @@ return {
       dashboard.button("r", "  Recent files", "<cmd>FzfLua oldfiles<cr>"),
       dashboard.button("g", "  Live grep", "<cmd>FzfLua live_grep<cr>"),
       dashboard.button("n", "  New file", "<cmd>ene<bar>startinsert<cr>"),
-      dashboard.button("e", "  File explorer", "<cmd>Neotree toggle<cr>"),
+      dashboard.button("e", "  File explorer", "<cmd>Yazi cwd<cr>"),
       dashboard.button("s", "  Restore session", "<cmd>SessionRestore<cr>"),
       dashboard.button("c", "  Config", "<cmd>FzfLua files cwd=" .. vim.fn.stdpath("config") .. "<cr>"),
       dashboard.button("l", "󰒲  Lazy", "<cmd>Lazy<cr>"),

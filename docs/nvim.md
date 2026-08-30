@@ -36,7 +36,9 @@ mise only, Catppuccin theming).
 | [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, devicons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                          |
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
 | [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Uses the official `catppuccin` theme. Its right section leads with Neovim 0.12's `vim.ui.progress_status()` — see "Native UI" below.                                                                                                                                             |
-| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
+| [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `=` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                         |
+| [mikavilpas/yazi.nvim](https://github.com/mikavilpas/yazi.nvim)                                               | Yazi file manager in a float       | `<leader>e`/`<leader>E` open the real `yazi` binary already pinned in the global mise config — see "File explorers" below.                                                                                                                                                       |
+| [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)                                     | Animated cursor trail              | Pure-Lua cursor smear drawn with virtual text; no terminal support required. Defaults kept — see "Cursor" below.                                                                                                                                                                 |
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
 | [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)                         | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
 | [rmagatti/auto-session](https://github.com/rmagatti/auto-session)                                             | Per-directory session persistence  | Restores buffers, window layout and buffer-local options on reopen. Almost entirely defaults — see "Sessions" below.                                                                                                                                                             |
@@ -100,8 +102,9 @@ the individual buffer-local entries come from their mapping descriptions.
 [bufferline.nvim](https://github.com/akinsho/bufferline.nvim) shows listed
 buffers across the top of the editor. It loads on `VeryLazy`, after the
 colorscheme, and uses Catppuccin's dedicated bufferline theme rather than a
-hand-written palette. A `neo-tree` offset labels and aligns the file-explorer
-sidebar with the buffer line.
+hand-written palette. No `offsets` are configured: neither file explorer is a
+sidebar — oil is an ordinary buffer and yazi is a float — so there is no window
+for the buffer line to align around.
 
 Buffer navigation follows the usual bracket direction: `[b` selects the
 previous displayed buffer and `]b` selects the next. For non-sequential
@@ -136,7 +139,7 @@ muted `surface0` and the active scope with Mocha `lavender`. Scope start/end
 underlines are disabled so the result stays clean rather than boxing in code.
 
 It loads only when a real file is read or created. Dashboard, fzf-lua, help,
-lazy.nvim and neo-tree buffers are excluded, as are terminal, prompt, quickfix
+lazy.nvim and oil buffers are excluded, as are terminal, prompt, quickfix
 and other non-file buffer types. The scope indicator depends on a Treesitter
 parser; ordinary indentation guides still work without one.
 
@@ -307,10 +310,16 @@ Most of this is auto-session's own defaults — `auto_save` and
 `args_allow_single_directory` are already on, and `lazy_support` makes it
 wait for lazy.nvim before restoring. Three options are set here:
 `suppressed_dirs` keeps `~`, `/`, `/tmp` and `~/Downloads` from quietly
-accumulating sessions; `auto_restore` leaves a bare `nvim` on the
-[dashboard](#dashboard); and a `no_restore_cmds` hook opens neo-tree after a
-directory argument fails to restore a session. See
-[File explorer](#file-explorer-neo-tree).
+accumulating sessions, and `auto_restore` leaves a bare `nvim` on the
+[dashboard](#dashboard).
+
+This spec used to carry a third option — a `no_restore_cmds` hook that opened
+neo-tree when a directory argument found no session, plus the argv inspection
+that fed it. Both are gone. Oil replaces netrw, so Neovim has *already* put a
+directory listing in the buffer by the time auto-session runs; if a session
+restores it replaces that buffer, and if none does the listing simply stays.
+The behavior that needed a hook is now the fall-through case. See
+[File explorers](#file-explorers-oil-and-yazi).
 
 ### Restoring is automatic for `nvim .`, a choice for `nvim`
 
@@ -341,21 +350,20 @@ saves nothing and — importantly — **deletes nothing**. auto-session's
 when a session was actually loaded or saved this run, so an untouched
 dashboard can't clear the session that was already on disk.
 
-`close_unsupported_windows` (a default) is what keeps this working with
-[neo-tree](#file-explorer-neo-tree): a tree window can't be meaningfully
-serialised, so it's closed before the session is written rather than being
-restored as a broken buffer. On startup, the `no_restore_cmds` hook is the
-other half of that pairing: it opens neo-tree only after auto-session has
-confirmed that no session was restored.
+`close_unsupported_windows` (a default) mattered more when a neo-tree sidebar
+was in the layout, since a tree window can't be meaningfully serialised. It is
+still left on, but neither current explorer needs it: an oil buffer has a real
+path and round-trips through a session like any other buffer, and yazi's float
+is closed before you ever quit.
 
 ### What each launch does
 
 | Command                   | Result                                                                     |
 | ------------------------- | -------------------------------------------------------------------------- |
 | `nvim`                    | the [dashboard](#dashboard), always — restoring is one keypress away (`s`) |
-| `nvim .` — session exists | restores the session; **no** neo-tree, **no** dashboard                    |
-| `nvim .` — no session     | opens neo-tree on an empty editor                                          |
-| `nvim <directory>`        | the same session-or-neo-tree decision for the supplied directory           |
+| `nvim .` — session exists | restores the session, replacing oil's directory buffer; **no** dashboard   |
+| `nvim .` — no session     | leaves oil's listing of that directory on screen                           |
+| `nvim <directory>`        | the same session-or-oil outcome for the supplied directory                 |
 | `nvim file.go`            | no restore and no save — a file argument means "just edit this file"       |
 
 That last row is auto-session's `args_allow_files_auto_save = false`
@@ -389,7 +397,7 @@ Nothing else opens it — give Neovim any argument and it stays out of the way
 | `r` | Recent files    | `FzfLua oldfiles`           |
 | `g` | Live grep       | `FzfLua live_grep`          |
 | `n` | New file        | `ene` + `startinsert`       |
-| `e` | File explorer   | `Neotree toggle`            |
+| `e` | File explorer   | `Yazi cwd`                  |
 | `s` | Restore session | `SessionRestore`            |
 | `c` | Config          | `FzfLua files cwd=<config>` |
 | `l` | Lazy            | `Lazy`                      |
@@ -441,45 +449,87 @@ runs, a `vim.schedule` — and the buffer redrawn. `AlphaRedraw` is a no-op
 when no dashboard is showing, so the `nvim .`/`nvim file.go` launches don't
 have to be special-cased.
 
-## File explorer: neo-tree
+## File explorers: oil and yazi
 
-`<leader>e` toggles the tree (opens *and* focuses it if closed, closes it
-if open — `:Neotree toggle`'s own default behavior, needs no extra logic).
-Positioned `left`, per `filesystem.window.position`.
+Two explorers, because they answer different questions. Oil is for *editing the
+filesystem*; yazi is for *looking around it*.
 
-**`nvim .` opens neo-tree, not netrw — unless a session is waiting.**
-Neo-tree is otherwise lazy-loaded on `:Neotree`/`<leader>e`. For a startup
-directory argument, auto-session owns the decision: it first tries to
-restore a session for that argument, then its `no_restore_cmds` hook opens
-neo-tree only when no session was found. This also handles `nvim
-path/to/project` correctly when the shell's cwd differs from the argument.
+| Key          | Opens                                                  |
+| ------------ | ------------------------------------------------------ |
+| `-`          | oil on the parent of the current file, in that window  |
+| `=`          | oil on the same directory, in a floating window        |
+| `<leader>e`  | yazi, floating, focused on the current file            |
+| `<leader>E`  | yazi, floating, at the current working directory       |
 
-The directory-argument flag is captured while lazy.nvim reads the
-auto-session spec, before startup plugins can rewrite the argument list.
-The hook receives `is_startup` and ignores later no-restore events, so a cwd
-change during an editing session cannot unexpectedly open the tree. A bare
-`nvim` has no directory argument and therefore remains on the dashboard.
+### oil.nvim — the directory is a buffer
 
-Three custom `filesystem.window.mappings`, since the defaults don't match
-the requested behavior:
+Oil shows a directory as normal, editable text. Renaming a file is `cw`,
+deleting one is `dd`, creating one is `o` and a new name — then `:w` applies the
+whole set as real filesystem operations. Because it is an ordinary buffer, `-`
+goes "up" repeatedly, `<C-o>` walks back down the jumplist, and the cursor lands
+on the file you came *from* rather than at the top of the listing.
 
-- **`<CR>`** — opens the file *and* closes the tree, but only for an actual
-  file. A custom function (not a built-in command string) checks
-  `node.type ~= "directory"` before closing, so pressing Enter on a
-  directory still just expands/collapses it, as normal — confirmed
-  directly against the real plugin (see "Validation" below).
-- **`<C-v>`** — `open_vsplit`, a built-in command; opens the file in a
-  vertical split and leaves the tree open (built-in commands never
-  auto-close).
-- **`<C-s>`** — `open_split`, same as above but horizontal.
+`default_file_explorer = true` takes netrw's place, which is what makes `nvim .`
+and `nvim path/to/dir` open a listing at all — and, as described under
+[Sessions](#sessions), is why auto-session no longer needs a hook to open
+something for a directory argument. That hijack has to be in place before the
+first directory buffer exists, so oil is the one plugin here deliberately loaded
+with `lazy = false`; its own README warns against lazy-loading it for exactly
+this reason.
 
-**One thing to know about `<C-s>`:** some shells/terminals treat it as a
-flow-control character (XOFF, historically used to pause terminal output)
-if `stty ixon` is active. Neovim's own raw-mode terminal handling generally
-takes over once you're inside it, and this wasn't an issue in testing, but
-if `<C-s>` ever appears to "freeze" a real terminal (most often outside
-Neovim, e.g. a plain shell), that's `stty -ixon` to look into, not a bug in
-this config.
+`view_options.show_hidden = true` — a file explorer that hides dotfiles is not
+much use in a dotfiles repo. `delete_to_trash = true` sends deletions to the
+macOS Trash instead of unlinking them, via oil's own `adapters/trash/mac.lua`;
+this is a native adapter, not a shell out to a `trash` binary that would have to
+be installed separately.
+
+**`=` costs you the indent operator, and that is a real trade.** Normal-mode `=`
+is now oil's, so `==`, `=ap` and `gg=G` no longer reindent. Only normal mode is
+mapped, so the visual-mode form still works: `V=` for a line, `vap=` for a
+paragraph, `ggVG=` for a buffer — verified, not assumed. If that trade turns out
+to be the wrong one, the fix is one line in `oil.lua`.
+
+### yazi.nvim — the real yazi, in a float
+
+`<leader>e` opens [yazi](./core_tools.md#yazi) itself in a floating terminal,
+already positioned on the current file; `<leader>E` opens it at the cwd instead.
+Everything yazi does — previews, image rendering, its own keymaps, plugins and
+Catppuccin theme — comes along, because this is the actual binary and not a
+reimplementation. Selecting a file opens it in Neovim; selecting several opens
+them all.
+
+The binary is the one already pinned in the global mise config
+(`aqua:sxyazi/yazi`), so nothing new is installed for this. `plenary.nvim` is a
+genuine dependency here — `yazi/utils.lua` and `yazi/renameable_buffer.lua`
+require `plenary.path` directly — and it stayed in the lockfile for that reason
+after neo-tree, its previous consumer, was removed.
+
+`open_for_directories` is left `false`. Yazi *can* take netrw's place too, but
+two plugins fighting over directory buffers is a bug waiting to happen, and oil
+is the better fit for that job since it produces a real buffer rather than a
+terminal. Directories belong to oil; yazi is only ever something you open on
+purpose.
+
+### Why neo-tree was dropped
+
+The sidebar tree it provided was the least-used of the three ideas and the most
+entangled: it needed a bufferline `offsets` entry to align, an
+indent-blankline exclusion, an auto-session `no_restore_cmds` hook plus argv
+capture to handle `nvim .`, three custom window mappings to make `<CR>` behave,
+and `nui.nvim` and `plenary.nvim` as dependencies. Oil and yazi together cover
+more ground and deleted every one of those integration points except the
+plenary dependency, which yazi still needs.
+
+## Cursor
+
+[smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim) animates a
+short trail between the cursor's old and new positions. It is included on
+defaults — the plugin draws the smear with virtual text and Neovim's own
+highlight groups, so it needs no terminal features and picks up Catppuccin's
+colors without configuration.
+
+It is loaded on `VeryLazy`, so it costs nothing at startup and nothing at all
+until the first cursor move after the UI is up.
 
 ## Base config (`lua/config/`)
 
@@ -677,7 +727,7 @@ was read but not rewritten.
   actions and runs `:confirm bdelete` rather than a forced deletion.
 - Indent guides: `ibl` loads for real file buffers, uses Catppuccin's
   `IblIndent`/`IblScope` highlights, and stays disabled in dashboard,
-  neo-tree, fzf-lua and other utility buffers.
+  oil, fzf-lua and other utility buffers.
 - Mini editing: `aN`/`iN` and `aL`/`iL` provide Mini AI's extended object
   searches without replacing native `an`/`in`; Mini Surround owns the
   `sa`/`sd`/`sr` family and uses Catppuccin's `MiniSurround` highlight.
@@ -696,14 +746,19 @@ was read but not rewritten.
   confirm `opts` actually reached `setup()` (see "Theme" above). Checked
   the negative case too: with `flavour = "latte"` the `Normal` background
   really does change, so the option is genuinely wired, not just present.
-- neo-tree's custom keymaps: driven interactively via `nvim --headless
-  --listen <socket>` plus `--remote-send`/`--remote-expr` (real keystrokes
-  and real window/buffer queries, not a simulation) against a scratch test
-  project. Confirmed: opening the tree and pressing `<CR>` on a file opens
-  it *and* drops the window count back to 1 (tree closed); reopening the
-  tree and pressing `<C-v>` opens a vertical split while the tree remains
-  open (window count 3: tree + 2 file windows); `<C-s>` behaves the same
-  for a horizontal split (window count 4).
+- File explorers, against a scratch project holding `a.txt`, `b.txt` and
+  `sub/`. From `a.txt`, pressing `-` yields a `filetype=oil` buffer whose
+  `get_current_dir()` is the project, listing `../`, `sub/`, `a.txt` and
+  `b.txt` — with the cursor already on `a.txt`, the file it came from.
+  Pressing `=` opens a float whose border is the rounded set inherited from
+  `winborder`. `nvim .` with no session leaves exactly that listing on
+  screen, which is the behavior the deleted `no_restore_cmds` hook used to
+  provide. Normal-mode `=` resolves to oil while `maparg("=", "x")` is
+  empty, and `V=` still reindents a line — so the operator survives in
+  visual mode. `:Yazi` and `:Oil` both exist, yazi resolves
+  `open_for_directories` to `false`, and smear-cursor loads with
+  `enabled = true`. `neo-tree.nvim` and `nui.nvim` are gone from both the
+  lockfile and lazy's plugin list, with no plugin reporting an error.
 - Treesitter: all 38 parsers installed and compiled for real via the
   `tree-sitter` CLI, then every target filetype opened as an actual buffer
   and checked for `vim.treesitter.highlighter.active` — `go`, `gomod`,
@@ -714,8 +769,14 @@ was read but not rewritten.
   much: a `.tex` buffer (language known, grammar not installed) and a
   buffer with no filetype at all both stay off *and* silent.
 - Sessions: driven through a real save/restore cycle. Note auto-session
-  **disables itself under `--headless`** (it checks `nvim_list_uis()`), so
-  the usual headless harness silently proves nothing here; the test ran
+  **disables itself under `--headless`** (`in_headless_mode()` gates the
+  auto-restore path on `nvim_list_uis()`), so the usual headless harness
+  silently proves nothing here — a headless `nvim .` shows oil's listing
+  even when a session exists, which is the harness's limit and not the
+  routing's. Driving `:AutoSession restore` explicitly from that same
+  headless launch does exercise the ordering that matters, and it resolves
+  correctly: the single oil window is replaced by the session's two file
+  windows. The full cycle the test ran
   Neovim with `--embed` so a UI is registered. Opened two files in a split
   with `shiftwidth=7` on one of them, quit, and reopened: the split layout,
   both buffers, `shiftwidth=7` vs. `2`, both filetypes and live treesitter
@@ -735,8 +796,8 @@ was read but not rewritten.
   .auto_restore` is `false` for that launch and `true` for both `nvim .` and
   `nvim main.go` — the flag the whole "dashboard vs. restore" split hangs
   on. The other two launches land where they should and never on the
-  dashboard: `nvim .` on `filetype=neo-tree` with two windows, `nvim
-  main.go` on the `go` buffer alone. Theming was checked by resolving the
+  dashboard: `nvim .` on `filetype=oil`, `nvim main.go` on the `go` buffer
+  alone. Theming was checked by resolving the
   groups rather than trusting the integration: `AlphaHeader`,
   `AlphaHeaderLabel`, `AlphaButtons`, `AlphaShortcut` and `AlphaFooter` all
   come back with real mocha colors (blue, peach, lavender, green, yellow),
