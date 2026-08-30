@@ -10,6 +10,7 @@ return {
         scope_color = "lavender",
       },
       mini = { enabled = true },
+      which_key = true,
     },
   },
   -- `config` (not `init`): lazy.nvim runs `init` *before* the plugin loads, so

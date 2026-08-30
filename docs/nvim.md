@@ -31,6 +31,9 @@ mise only, Catppuccin theming).
 | [nvim-mini/mini.ai](https://github.com/nvim-mini/mini.ai)                                                     | Extended text objects              | Adds arguments, function calls, tags and robust pair objects while preserving Neovim's native `an`/`in` Treesitter selection.                                                                                                                                                    |
 | [nvim-mini/mini.surround](https://github.com/nvim-mini/mini.surround)                                         | Surround editing                   | Adds coherent `sa`/`sd`/`sr` operations with dot-repeat, counts and Catppuccin highlighting.                                                                                                                                                                                     |
 | [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | Syntax-aware function navigation   | Supplies maintained `@function.outer` queries for `[f` and `]f`; configured against its `main` branch API.                                                                                                                                                                       |
+| [Wansmer/treesj](https://github.com/Wansmer/treesj)                                                           | Split/join argument layouts        | `<leader>s` toggles the syntax node under the cursor between single-line and multiline forms using Treesitter.                                                                                                                                                                   |
+| [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, devicons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                          |
+| [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
 | [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                                                                                         |
 | [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
@@ -141,6 +144,44 @@ layout. `[f` jumps to the previous function start and `]f` to the next, in
 Normal, Visual and operator-pending modes; every jump is added to the jumplist.
 The mappings use the official `nvim-treesitter-textobjects` companion because
 mini.ai's `f` is specifically a function-*call* text object, not a definition.
+
+## Split/join arguments
+
+[TreeSJ](https://github.com/Wansmer/treesj) uses the active Treesitter syntax
+tree to find a supported node around the cursor. `<leader>s` toggles that node:
+a one-line argument list becomes multiline, while a multiline list joins back
+onto one line. The same action also works on nearby list-, dictionary- and
+statement-like nodes supported by TreeSJ's language presets. Its upstream
+`m`/`j`/`s` defaults are disabled so it only owns the requested leader mapping.
+
+## Keymap guide
+
+[which-key.nvim](https://github.com/folke/which-key.nvim) displays the mappings
+available after a prefix, so pressing Space and pausing shows the leader map.
+The `modern` preset, rounded border, existing `nvim-web-devicons` dependency and
+Catppuccin's official integration keep it visually consistent with the rest of
+the editor. `<leader>f` is labelled **Find** and `<leader>x` **Close buffers**;
+individual entries come directly from the `desc` already attached to each
+keymap. `<leader>?` shows only mappings local to the current buffer.
+
+MiniClue was considered because Mini AI and Mini Surround are already present.
+WhichKey is a better fit here: it discovers described mappings and their prefix
+groups automatically, while MiniClue requires a separate trigger/clue registry
+whose buffer-local mapping order also needs care. The key guide therefore stays
+accurate as mappings are added without duplicating them in a second config.
+
+## Undo tree
+
+[undotree](https://github.com/mbbill/undotree) exposes Neovim's branching undo
+history: edits made after going back become another branch rather than erasing
+the branch that was previously ahead. `<leader>U` toggles the browser and moves
+focus into it. Both its history tree and live diff are stacked in a 36-column
+sidebar on the right; timestamps are compact and `?` opens its built-in help.
+
+The plugin only visualizes and navigates Neovim's own undo history; it does not
+write the edited file. Persistent undo is deliberately unchanged, so history
+retention still follows Neovim's current `undofile` setting rather than being
+silently broadened by installing a UI.
 
 ## Treesitter
 
@@ -558,6 +599,13 @@ was read but not rewritten.
 - Function navigation: `[f` and `]f` resolve through Treesitter's
   `@function.outer` query and move to previous/next definitions in all three
   motion-capable modes, with jumplist entries enabled.
+- TreeSJ: `<leader>s` splits a one-line Lua argument list and joins the resulting
+  multiline form back again, with no default `m`/`j`/`s` maps installed.
+- Keymap guide: WhichKey loads with its modern preset, detects the existing
+  leader mappings from their descriptions, groups `<leader>f` and `<leader>x`,
+  and uses Catppuccin's `WhichKey*` highlight groups.
+- Undo tree: `<leader>U` opens the real history and diff buffers on the right,
+  focuses the history tree, and closes both on the second press.
 - Colorscheme: `vim.g.colors_name` is `"catppuccin-mocha"` and
   `require("catppuccin").options.flavour` is `"mocha"` — together these
   confirm `opts` actually reached `setup()` (see "Theme" above). Checked

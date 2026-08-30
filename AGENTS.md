@@ -184,6 +184,12 @@ Rule specific to the **global** config:
 - Goal is a genuinely modern, fast, IDE-like editing experience — LSP,
   treesitter, completion, fuzzy finding, git integration — not a
   from-scratch "minimal vimrc" exercise.
+- Keep [which-key.nvim](https://github.com/folke/which-key.nvim) synchronized
+  with every keymap change. Each mapping must have an accurate `desc` so
+  WhichKey discovers and labels it automatically; when a leader-key namespace
+  is added, renamed, or removed, update the group declarations in
+  `nvim/lua/plugins/which-key.lua` in the same change. Do not duplicate the
+  mappings themselves in WhichKey's spec.
 - Theme: Catppuccin (see above), via the official
   [catppuccin/nvim](https://github.com/catppuccin/nvim) plugin.
 
