@@ -2,7 +2,8 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-vim.opt.termguicolors = true -- required for the Catppuccin colorscheme's true-color palette
+require("config.options")
+require("config.keymaps")
 
 -- https://lazy.folke.io/installation
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
