@@ -31,6 +31,7 @@ mise only, Catppuccin theming).
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)   | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
 | [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
 | [rmagatti/auto-session](https://github.com/rmagatti/auto-session)                     | Per-directory session persistence  | Restores buffers, window layout and buffer-local options on reopen. Almost entirely defaults — see "Sessions" below.                                                                                                                                                             |
+| [goolord/alpha-nvim](https://github.com/goolord/alpha-nvim)                           | Start screen / dashboard           | Shown by a bare `nvim`; skipped whenever Neovim gets an argument. Its `dashboard` theme, re-skinned onto catppuccin's `Alpha*` highlight groups — see "Dashboard" below.                                                                                                         |
 
 Per AGENTS.md's stated goal (a genuinely modern, IDE-like setup — LSP,
 treesitter, completion, git integration), more rows will land here
@@ -133,12 +134,42 @@ it later, and the buffers, window layout and buffer-local options are back.
 The session file is named after the absolute path of the cwd, under
 `stdpath("data")/sessions/`.
 
-Nearly everything here is auto-session's own defaults — `auto_save`,
-`auto_restore` and `args_allow_single_directory` are all already on, and
-`lazy_support` makes it wait for lazy.nvim before restoring. The only option
-this config sets is `suppressed_dirs`, so that running Neovim in `~`, `/`,
-`/tmp` or `~/Downloads` doesn't quietly start accumulating sessions for
-directories that aren't projects.
+Most of this is auto-session's own defaults — `auto_save` and
+`args_allow_single_directory` are already on, and `lazy_support` makes it
+wait for lazy.nvim before restoring. Two options are set here:
+`suppressed_dirs`, so that running Neovim in `~`, `/`, `/tmp` or
+`~/Downloads` doesn't quietly start accumulating sessions for directories
+that aren't projects; and `auto_restore`, which is where the
+[dashboard](#dashboard) enters the picture.
+
+### Restoring is automatic for `nvim .`, a choice for `nvim`
+
+```lua
+auto_restore = vim.fn.argc(-1) > 0,
+```
+
+A bare `nvim` should land on the dashboard, and a restored session would
+take that screen away — so the automatic restore is switched off for exactly
+that launch, and offered on the dashboard as `s` instead. `nvim .` is
+unaffected and still restores on its own.
+
+The expression is evaluated when lazy.nvim reads the plugin spec, which is
+during startup and well before the `VimEnter` where auto-session decides
+whether to restore, so the flag is already correct by then. `argc(-1)`
+counts the global argument list rather than the current window's.
+
+It gates the **automatic** restore only (`auto_restore_session` checks it;
+`restore_session` does not), so the dashboard's own `s` button —
+`:SessionRestore` — still works, as does every other explicit session
+command.
+
+Auto-*save* is deliberately left alone, which is what makes the dashboard's
+restore button worth having: press `s`, work, quit, and the session is saved
+as usual. Quitting straight from the dashboard without opening anything
+saves nothing and — importantly — **deletes nothing**. auto-session's
+`auto_delete_empty_sessions` only deletes when `v:this_session` is set, i.e.
+when a session was actually loaded or saved this run, so an untouched
+dashboard can't clear the session that was already on disk.
 
 `close_unsupported_windows` (a default) is what keeps this working with
 [neo-tree](#file-explorer-neo-tree): a tree window can't be meaningfully
@@ -148,12 +179,12 @@ neo-tree's own spec, which skips loading entirely when a session exists.
 
 ### What each launch does
 
-| Command                   | Result                                                               |
-| ------------------------- | -------------------------------------------------------------------- |
-| `nvim .` — session exists | restores the session; **no** neo-tree                                |
-| `nvim .` — no session     | opens neo-tree on an empty editor                                    |
-| `nvim`                    | restores the session for the cwd, nothing else                       |
-| `nvim file.go`            | no restore and no save — a file argument means "just edit this file" |
+| Command                   | Result                                                                     |
+| ------------------------- | -------------------------------------------------------------------------- |
+| `nvim`                    | the [dashboard](#dashboard), always — restoring is one keypress away (`s`) |
+| `nvim .` — session exists | restores the session; **no** neo-tree, **no** dashboard                    |
+| `nvim .` — no session     | opens neo-tree on an empty editor                                          |
+| `nvim file.go`            | no restore and no save — a file argument means "just edit this file"       |
 
 That last row is auto-session's `args_allow_files_auto_save = false`
 default, deliberately kept: opening a single file to make a quick edit
@@ -172,6 +203,69 @@ still greets you with the tree next time, which is the intent.
 and window layout but drops per-buffer state. Verified by setting
 `shiftwidth=7` on one buffer, quitting, and finding it still 7 after the
 restore while a sibling buffer stayed at 2.
+
+## Dashboard
+
+A bare `nvim` opens [alpha-nvim](https://github.com/goolord/alpha-nvim)'s
+start screen: a "NEOVIM" banner, the current directory, and nine buttons.
+Nothing else opens it — give Neovim any argument and it stays out of the way
+(see [What each launch does](#what-each-launch-does)).
+
+| Key | Action          | Runs                        |
+| --- | --------------- | --------------------------- |
+| `f` | Find file       | `FzfLua files`              |
+| `r` | Recent files    | `FzfLua oldfiles`           |
+| `g` | Live grep       | `FzfLua live_grep`          |
+| `n` | New file        | `ene` + `startinsert`       |
+| `e` | File explorer   | `Neotree toggle`            |
+| `s` | Restore session | `SessionRestore`            |
+| `c` | Config          | `FzfLua files cwd=<config>` |
+| `l` | Lazy            | `Lazy`                      |
+| `q` | Quit            | `qa`                        |
+
+They deliberately reuse what the config already binds elsewhere — `f`/`r`/
+`g` are the same fzf-lua pickers as `<leader>ff`/`<leader>fh`/`<leader>fg`,
+and `e` is `<leader>e`'s tree — so the dashboard is a shortcut to this
+setup, not a second set of habits. `s` is the counterpart to
+[auto-session's suppressed auto-restore](#restoring-is-automatic-for-nvim--a-choice-for-nvim);
+`c` points at `stdpath("config")`, which is this repo's `nvim/`.
+
+The current directory is shown under the banner because it is the thing that
+decides what `s` will restore — sessions are keyed by cwd.
+
+### Why alpha-nvim
+
+Its own `dashboard` theme covers the whole layout, so the config here is a
+header, a button list and a footer rather than a layout engine. The
+alternatives: `snacks.dashboard` loses for the same reason `snacks.picker`
+did (a multi-module library where a single-purpose plugin will do — see
+[Fuzzy finder](#fuzzy-finder-fzf-lua-not-telescope-or-snackspicker)),
+`mini.starter` is the same trade in a smaller package, and
+`dashboard-nvim` is the closest match but noticeably less actively
+maintained. alpha also has an official Catppuccin integration, which
+`mini.starter` only gets via catppuccin's blanket `mini` support.
+
+### Theming: the `Alpha*` groups have to be asked for
+
+catppuccin ships an `alpha` integration and enables it by itself
+(`auto_integrations` detects the installed plugin, so `colorscheme.lua`
+needs no new option), defining `AlphaHeader`, `AlphaHeaderLabel`,
+`AlphaButtons`, `AlphaShortcut` and `AlphaFooter`. The dashboard theme
+doesn't use any of them — its defaults are the generic `Type`, `Keyword` and
+`Number` — so every section here names its group explicitly. Without that
+the dashboard still renders, just in unrelated colors, which is an easy
+thing to mistake for "catppuccin doesn't support this".
+
+### The footer, and why it isn't set inline
+
+The footer reports lazy.nvim's plugin count and startup time, which don't
+exist yet while the dashboard is being built: lazy computes `startuptime` on
+`UIEnter`, and `UIEnter` is not ordered against the `VimEnter` that draws
+the dashboard. So the footer is filled in from whichever comes second — an
+`UIEnter` autocommand, or, if a UI is already attached by the time the spec
+runs, a `vim.schedule` — and the buffer redrawn. `AlphaRedraw` is a no-op
+when no dashboard is showing, so the `nvim .`/`nvim file.go` launches don't
+have to be special-cased.
 
 ## File explorer: neo-tree
 
@@ -310,10 +404,26 @@ touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
   both buffers, `shiftwidth=7` vs. `2`, both filetypes and live treesitter
   highlighting all came back. All four launch shapes in the table above were
   then checked: `nvim .` with a session restores the split with **no** tree;
-  `nvim .` in a fresh directory opens the tree; plain `nvim` restores
-  without a tree; `nvim main.go` opens just that file. The session file is
-  named for the absolute cwd, and a directory that was only browsed produced
-  no session file at all.
+  `nvim .` in a fresh directory opens the tree; plain `nvim` restored
+  without a tree (that launch now shows the [dashboard](#dashboard) instead
+  — see the next bullet); `nvim main.go` opens just that file. The session
+  file is named for the absolute cwd, and a directory that was only browsed
+  produced no session file at all.
+- Dashboard: a real `nvim` in a scratch project, queried from inside a
+  `VimEnter` autocommand. Plain `nvim` lands on `filetype=alpha`,
+  `buftype=nofile`, one window, empty `v:errmsg`, with the banner, the cwd
+  line and all nine buttons in the buffer, and all nine shortcut keys mapped
+  to the commands in the table above. `require("auto-session.config")
+  .auto_restore` is `false` for that launch and `true` for both `nvim .` and
+  `nvim main.go` — the flag the whole "dashboard vs. restore" split hangs
+  on. The other two launches land where they should and never on the
+  dashboard: `nvim .` on `filetype=neo-tree` with two windows, `nvim
+  main.go` on the `go` buffer alone. Theming was checked by resolving the
+  groups rather than trusting the integration: `AlphaHeader`,
+  `AlphaHeaderLabel`, `AlphaButtons`, `AlphaShortcut` and `AlphaFooter` all
+  come back with real mocha colors (blue, peach, lavender, green, yellow),
+  and `require("catppuccin").options.integrations.alpha` is `true` without
+  `colorscheme.lua` mentioning it.
 - `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`
   and `maparg("<C-h>", "n")` to the plugin's own
   `:<C-U>TmuxNavigateLeft<CR>`, confirming the arrow-key mappings register

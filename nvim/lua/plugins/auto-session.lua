@@ -9,5 +9,12 @@ return {
     -- no sense — otherwise every `nvim` in $HOME or a temp dir leaves one
     -- behind. `~/Downloads` and `/` are auto-session's own suggestions.
     suppressed_dirs = { "~/", "~/Downloads", "/", "/tmp" },
+
+    -- Auto-restore only when Neovim was given an argument — in practice
+    -- `nvim .`. A bare `nvim` lands on the dashboard instead, which offers
+    -- restoring as an explicit choice (`s`). This is read at spec load, well
+    -- before VimEnter decides whether to restore. It gates the *automatic*
+    -- restore only — `:SessionRestore` and auto-save are unaffected.
+    auto_restore = vim.fn.argc(-1) > 0,
   },
 }
