@@ -61,7 +61,16 @@ shorthand.
 "~/.config/bottom" = "bottom"
 "~/.config/yazi" = "yazi"
 "~/.config/mise/config.toml" = "mise/config.toml"
+"~/.config/nvim" = "nvim"
 ```
+
+**`~/.config/nvim` is declared but has a real pre-existing target on this
+machine**, unrelated to this repo's own `nvim/` (see [nvim.md](./nvim.md))
+— a different situation from the real `~/.config/mise/config.toml`
+conflict above: here it's an existing *directory*, not a conflicting
+*declaration*, so `mise bootstrap dotfiles apply --force` would replace
+it directly, rather than needing another config edited first. Not applied
+by this repo on its own initiative; that's a call for you to make.
 
 Directory entries (`git`, `atuin`, `bat`, ...) symlink the *whole*
 directory in one line — e.g. `"~/.config/git" = "git"` brings

@@ -18,6 +18,8 @@ local linters = new Mapping<String, Step> {
   // exists yet (the Rust option, ryl, self-describes as still maturing); see
   // docs/linting.md.
   ["yamlfmt"] = Builtins.yamlfmt
+  // lua (nvim/)
+  ["stylua"] = Builtins.stylua
   // repo hygiene — enforces the "never commit secrets" rule from AGENTS.md
   // and catches common accidents, all built into hk (no extra tool installs)
   ["detect-private-key"] = Builtins.detect_private_key

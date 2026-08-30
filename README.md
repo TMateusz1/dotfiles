@@ -40,6 +40,7 @@ bottom/                # bottom (btm) system monitor → ~/.config/bottom/ (see 
 yazi/                  # yazi file manager → ~/.config/yazi/ (see docs/core_tools.md#yazi)
 glow/                  # glow markdown renderer → ~/.config/glow/ (see docs/util_tools.md#glow)
 kitty/                 # kitty config + theme → ~/.config/kitty/ (see docs/desktop_tools.md)
+nvim/                  # neovim config → ~/.config/nvim/ (see docs/nvim.md)
 docs/                  # notes on what's configured, and why
 ```
 
@@ -53,6 +54,7 @@ docs/                  # notes on what's configured, and why
 | Util tools (atuin, bat, zoxide, eza, fd, fzf, gh, glab, glow, jq, yq, ripgrep, starship) | [docs/util_tools.md](./docs/util_tools.md)       |
 | Core tools (tmux, lazygit, k9s, bottom, yazi)                                            | [docs/core_tools.md](./docs/core_tools.md)       |
 | Desktop tools (kitty)                                                                    | [docs/desktop_tools.md](./docs/desktop_tools.md) |
+| Neovim (lazy.nvim, Catppuccin)                                                           | [docs/nvim.md](./docs/nvim.md)                   |
 | languages (rust, go)                                                                     | [docs/langs.md](./docs/langs.md)                 |
 | linting / pre-commit (hk)                                                                | [docs/linting.md](./docs/linting.md)             |
 | bootstrap (symlinks, zsh plugins, desktop apps)                                          | [docs/bootstrap.md](./docs/bootstrap.md)         |

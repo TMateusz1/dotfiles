@@ -16,9 +16,8 @@ postinstall = "hk install --mise"
 ```
 
 So simply running `mise install` in the repo (which you need anyway, to get
-`hk`/`taplo`/`rumdl`/`yamlfmt`/`shellcheck` themselves) installs the
-`pre-commit` git
-hook too. No separate setup step.
+`hk`/`taplo`/`rumdl`/`yamlfmt`/`shellcheck`/`stylua` themselves) installs
+the `pre-commit` git hook too. No separate setup step.
 
 ## What's checked
 
@@ -38,6 +37,9 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   [core_tools.md#lazygit](./core_tools.md#lazygit) for why. `.yamlfmt` at
   the repo root sets `retain_line_breaks: true` so intentional blank-line
   section separators (e.g. in `lazygit/config.yml`) survive formatting.
+- **`stylua`** — Lua format check/fix (`nvim/`). `.stylua.toml` sets
+  2-space indentation (stylua's own default is tabs) to match the rest of
+  this repo's config files.
 - **`zshrc-check`** — `shellcheck --shell=bash` (shellcheck has no zsh
   dialect, but `bash` mode was verified to produce zero false positives
   against this file's zsh-specific syntax while still catching a real

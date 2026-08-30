@@ -39,6 +39,7 @@ Global (`mise/config.toml`):
   [core_tools.md](./core_tools.md)
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) — see [langs.md](./langs.md)
+- `neovim` — editor, see [nvim.md](./nvim.md)
 
 Desktop (`mise.desktop.toml`, opt-in only — see [bootstrap.md](./bootstrap.md)):
 
@@ -51,7 +52,8 @@ Repo-local (`mise.toml`):
 - [`hk`](https://hk.jdx.dev), [`taplo`](https://github.com/tamasfe/taplo),
   [`rumdl`](https://github.com/rvben/rumdl),
   [`yamlfmt`](https://github.com/google/yamlfmt),
-  [`shellcheck`](https://github.com/koalaman/shellcheck) — lint/format
+  [`shellcheck`](https://github.com/koalaman/shellcheck),
+  [`stylua`](https://github.com/JohnnyMorganz/StyLua) — lint/format
   tooling, see [linting.md](./linting.md)
 
 The repo-root `mise.toml` also declares `[dotfiles]` and
@@ -72,10 +74,10 @@ see this for yourself.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
 having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
-`yq`/`ripgrep`/`starship`/`k9s`/`rust`/`go` on `PATH` while hacking on this
-repo isn't a problem — but it's worth knowing so a stray tool showing up in
-`mise
-config` output inside this repo doesn't come as a surprise.
+`yq`/`ripgrep`/`starship`/`k9s`/`glow`/`bottom`/`yazi`/`gh`/`glab`/`neovim`/
+`rust`/`go` on `PATH` while hacking on this repo isn't a problem — but it's
+worth knowing so a stray tool showing up in `mise config` output inside
+this repo doesn't come as a surprise.
 
 **Caution when testing changes to `mise/config.toml`:** never run a mise
 command with an explicit `--global` flag (e.g. `mise lock --global`, `mise
@@ -83,6 +85,15 @@ use --global`) from inside this repo without first setting
 `MISE_GLOBAL_CONFIG_FILE` to point at `mise/config.toml`. Without that
 override, `--global` targets the machine's *real* `~/.config/mise/config.toml`,
 not this repo's staged copy — an easy way to accidentally write a lockfile
-or tool pin outside the repo. Plain `mise install`/`mise x --` (no
-`--global`) are fine — they resolve against the ambient project-tier configs
-described above without touching the real global config file.
+or tool pin outside the repo.
+
+**A second, subtler version of the same risk: even a plain `mise install
+<tool>@version`** for a tool not declared in *any* config (an ad-hoc
+install used to poke at a real binary before adding it properly) can still
+write a new entry into the machine's real `~/.config/mise/mise.lock` —
+confirmed directly, no `--global` flag or env override involved. Since the
+real global config is one of the active layers described above, and it has
+`lockfile = true` set, mise locks against it too. Prefer installing a tool
+to inspect it with `mise install aqua:owner/repo@version` from **outside**
+any directory mise would resolve real global config against, or expect to
+check the real lockfile afterward for stray entries.

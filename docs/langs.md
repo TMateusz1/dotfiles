@@ -28,14 +28,13 @@ rule) and skipping eza were the alternatives considered.
 
 - **`gopls`** (via `go:golang.org/x/tools/gopls`) — the Go language server.
   No standalone config file: gopls is configured through LSP client
-  initialization options, not a file of its own. This repo doesn't have an
-  `nvim/` config yet, so there's nothing to wire it into — deferred, same
-  as the shell-integration gaps noted in [util_tools.md](./util_tools.md).
-  Per [AGENTS.md](../AGENTS.md)'s Neovim conventions, LSP server *binaries*
-  come from mise (here), and Neovim only ever configures the client — never
-  installs the server itself.
+  initialization options, not a file of its own. Not yet wired into
+  [nvim/](./nvim.md) — no LSP client config exists there yet either (see
+  [nvim.md](./nvim.md)). Per [AGENTS.md](../AGENTS.md)'s Neovim conventions,
+  LSP server *binaries* come from mise (here), and Neovim only ever
+  configures the client — never installs the server itself.
 - **`goimports`** (via `go:golang.org/x/tools/cmd/goimports`) — import
-  formatter, CLI-flags only, no config file. Same "wire into nvim later"
+  formatter, CLI-flags only, no config file. Same "not yet wired into nvim"
   situation as gopls.
 - **`golangci-lint`** (via `aqua:golangci/golangci-lint`) — Go meta-linter.
   Checked directly (`golangci-lint config path` against this repo): its

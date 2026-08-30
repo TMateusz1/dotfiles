@@ -16,6 +16,7 @@ HK_MISE = 1
 "aqua:rvben/rumdl" = "0.2.62"
 "aqua:google/yamlfmt" = "0.21.0"
 "aqua:koalaman/shellcheck" = "0.11.0"
+"aqua:JohnnyMorganz/StyLua" = "2.5.2"
 
 [hooks]
 # keeps the installed git hooks (hk.pkl) in sync whenever tools are (re)installed
@@ -72,6 +73,7 @@ run = "mise -E desktop bootstrap packages apply"
 "~/.config/bottom" = "bottom"
 "~/.config/yazi" = "yazi"
 "~/.config/mise/config.toml" = "mise/config.toml"
+"~/.config/nvim" = "nvim"
 
 [bootstrap.repos]
 # oh-my-zsh has no tagged releases (it's designed to track master via its
