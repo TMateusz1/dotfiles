@@ -3,10 +3,10 @@
 This repo uses [mise](https://mise.jdx.dev) as the tool manager, in two
 separate roles — don't confuse them:
 
-| Config     | Path                                  | Purpose                                                                                                                                    |
-| ---------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Repo-local | `mise.toml` / `mise.lock` (repo root) | Tools/tasks needed to work *on this dotfiles repo itself*                                                                                  |
-| Global     | `mise/config.toml` / `mise/mise.lock` | The user's global mise config, symlinked to `~/.config/mise/config.toml` — governs tool versions available in every project on the machine |
+| Config     | Path                                  | Purpose                                                                                                                                                         |
+| ---------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repo-local | `mise.toml` / `mise.lock` (repo root) | Tools/tasks needed to work *on this dotfiles repo itself*                                                                                                       |
+| Global     | `mise/config.toml` / `mise/mise.lock` | The user's global mise config — governs tool versions available in every project on the machine. **Both** files are symlinked into `~/.config/mise/`; see below |
 
 Both configs set:
 
@@ -19,6 +19,15 @@ disable_backends = ["asdf", "vfox"]
 - `lockfile = true` — every tool install is pinned by a committed `mise.lock`
   (exact version + per-platform checksum), so setup is reproducible across
   machines.
+
+  **A lockfile only counts if it actually reaches the machine.** For the
+  global config that takes two `[dotfiles]` entries — `config.toml` *and*
+  `mise.lock` — because mise looks for the lockfile next to the config it
+  belongs to. With only `config.toml` symlinked, mise finds no lockfile at
+  `~/.config/mise/`, creates its own, and maintains it independently of
+  the one committed here: same tool list, unpinned, and free to drift.
+  Both entries are declared in `mise.toml`; see
+  [bootstrap.md](./bootstrap.md#what-gets-symlinked).
 - `disable_backends = ["asdf", "vfox"]` — tools are resolved through mise's
   own backends (aqua, cargo, ubi, etc.) only; no asdf/vfox plugin resolution.
 

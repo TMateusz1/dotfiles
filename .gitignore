@@ -18,3 +18,10 @@ mise.*.local.toml
 
 # linter caches
 .rumdl_cache/
+
+# Tool-written state. A tool whose config directory is symlinked here writes
+# *into this repo*, so anything it generates itself must be ignored rather
+# than committed. glow auto-creates glow.yml on any run (verified) — it is
+# deliberately not managed by this repo, and `mise.toml` symlinks only
+# glow/glamour.json for that reason. See docs/util_tools.md#glow.
+glow/glow.yml

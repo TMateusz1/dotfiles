@@ -35,13 +35,15 @@ selection-highlight values deviate to this repo's blue accent (`#89b4fa`),
 same call as [k9s](#k9s)'s deviation: `selected_border_color` (official:
 pink `#f5c2e7`) and `selected_text.bg_color` (official: mauve `#cba6f7`).
 
-**Validation:** no established linter exists for bottom's config format,
-and per this repo's policy no custom step fills the gap (see
-[linting.md](./linting.md)). Verified against the real `btm` binary via its
-own `-C <path>` flag (never the default config location, to avoid writing
-into a real config path during testing): a deliberately broken file
-produces a clear TOML parse error with line/column; this file loads
-cleanly into the TUI. Not checked automatically going forward.
+**Validation:** TOML *syntax* is covered by `taplo` via `hk.pkl`'s
+catch-all `**/*.toml` glob, same as [yazi](#yazi)'s theme — but nothing
+validates bottom's *schema* (whether a key or colour field is one bottom
+actually recognises), and per this repo's policy no custom step fills that
+gap (see [linting.md](./linting.md)). Verified against the real `btm`
+binary via its own `-C <path>` flag (never the default config location, to
+avoid writing into a real config path during testing): a deliberately
+broken file produces a clear TOML parse error with line/column; this file
+loads cleanly into the TUI. Not checked automatically going forward.
 
 ## k9s
 
@@ -145,11 +147,12 @@ autoread), OSC52 clipboard passthrough for remote copy/paste. Vi-style copy
 mode, mouse on, 100k-line scrollback, `escape-time 10` (fast enough not to
 fight Neovim's `<Esc>`). Smart pane navigation (`C-h/j/k/l`) that forwards
 to Neovim/fzf when one of those is running in the current pane, otherwise
-moves between tmux panes (the tmux side of this also already forwards the
-arrow-key equivalents, `C-Left/Down/Up/Right` — see
-[nvim.md](./nvim.md#plugins) for the Neovim-side counterpart,
-vim-tmux-navigator, that makes this actually seamless once inside Neovim's
-own splits). `prefix g` opens a [lazygit](#lazygit) popup in
+moves between tmux panes. The same treatment covers the arrow-key
+equivalents (`C-Left/Down/Up/Right`) and `C-\` (jump to the previously used
+pane), so all three spellings behave identically whether or not Neovim owns
+the pane — see [nvim.md](./nvim.md#plugins) for the Neovim-side
+counterpart, vim-tmux-navigator, which binds the matching keys inside
+Neovim's own splits. `prefix g` opens a [lazygit](#lazygit) popup in
 the current pane's directory. Statusline hand-rolled in Catppuccin Mocha
 (blue accent, matching [git.md](./git.md) and
 [atuin](./util_tools.md#atuin)) — no plugin manager, no third-party

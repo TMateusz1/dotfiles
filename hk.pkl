@@ -2,12 +2,14 @@ amends "package://github.com/jdx/hk/releases/download/v1.56.1/hk@1.56.1#/Config.
 import "package://github.com/jdx/hk/releases/download/v1.56.1/hk@1.56.1#/Builtins.pkl"
 
 // Only wire up a step here when a real, established tool exists for the
-// format (rumdl, taplo, yamlfmt, shellcheck, ...) or it's one of hk's own
-// built-in hygiene utilities below. Several config formats in this repo
-// (tmux.conf, bat's/fzf's/ripgrep's args files, k9s's YAML schema, kitty's
-// config) have no real linter — those were hand-verified against the real
+// format (rumdl, taplo, yamlfmt, shellcheck, stylua, ...) or it's one of hk's
+// own built-in hygiene utilities below. Formats with no real linter —
+// tmux.conf, bat's/fzf's/ripgrep's args files, k9s's YAML *schema*, kitty's
+// config, and glamour's JSON style — were hand-verified against the real
 // binary when each was set up (see their docs/ entries), not wired into a
-// bespoke custom step here. See docs/linting.md.
+// bespoke custom step here. JSON has no step at all (glow/glamour.json and
+// nvim/lazy-lock.json are both vendored or machine-generated, never
+// hand-edited). See docs/linting.md.
 local linters = new Mapping<String, Step> {
   // markdown
   ["rumdl"] = Builtins.rumdl

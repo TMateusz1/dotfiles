@@ -22,13 +22,13 @@ mise only, Catppuccin theming).
 
 ## Plugins
 
-| Plugin                                                                              | Purpose                            | Notes                                                                                                                                                                                                        |
-| ----------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [catppuccin/nvim](https://github.com/catppuccin/nvim)                               | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                            |
-| [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                             | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config. |
-| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)           | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                     |
-| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)       | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                    |
-| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) | Seamless tmux/nvim pane navigation | Pairs with `tmux/.tmux.conf`'s own smart pane-switching (see [core_tools.md#tmux](./core_tools.md#tmux)) — that config already forwards `C-hjkl`/`C-arrows` to whichever app owns the pane.                  |
+| Plugin                                                                              | Purpose                            | Notes                                                                                                                                                                                                                                                                            |
+| ----------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [catppuccin/nvim](https://github.com/catppuccin/nvim)                               | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
+| [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                             | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
+| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)           | Statusline                         | Ships an official `catppuccin` theme table — used as-is.                                                                                                                                                                                                                         |
+| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)       | File explorer (left sidebar)       | `branch = "v3.x"`. Custom open/split keymaps — see "File explorer" below.                                                                                                                                                                                                        |
+| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
 
 Per AGENTS.md's stated goal (a genuinely modern, IDE-like setup — LSP,
 treesitter, completion, git integration), more rows will land here
@@ -109,6 +109,20 @@ override, unlike [bottom](./core_tools.md#bottom)/[k9s](./core_tools.md#k9s)
 elsewhere in this repo — catppuccin/nvim doesn't expose a single "accent"
 setting the way those ports do; its colors are fixed per flavour.
 
+**The colorscheme is applied from `config`, not `init` — and that
+distinction is load-bearing.** lazy.nvim runs `init` during startup
+*before* the plugin is loaded, so calling `vim.cmd.colorscheme("catppuccin")`
+there applies the scheme before lazy's `opts` handler ever reaches
+`catppuccin.setup()`. Every option in `opts` is then silently discarded.
+It's an easy mistake to miss because the visible result looks correct:
+mocha is catppuccin's own default for a dark background, so `flavour`
+appears to work while doing nothing. The tell is `vim.g.colors_name` —
+`"catppuccin"` means `setup()` never ran, `"catppuccin-mocha"` means it
+did. Using `config = function(_, opts) require("catppuccin").setup(opts)
+… end` is what makes `opts` real, and matters as soon as anything beyond
+`flavour` is set (integrations, `transparent_background`, custom
+highlights).
+
 ## Validation
 
 Verified against the real, installed `nvim` binary (0.12.5, via mise),
@@ -119,10 +133,14 @@ touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
 - `nvim --headless "+Lazy! sync" "+qa"` installed every plugin for real
   (confirmed each one's fetch/checkout tasks finished with no errors) and
   produced the committed `lazy-lock.json`.
-- Base config: `vim.g.colors_name` is `"catppuccin"`; `vim.wo.relativenumber`,
-  `vim.o.hlsearch`, and `vim.wo.cursorline` are all `true`; and
-  `vim.fn.maparg("<Esc>", "n", false, true).desc` returns `"Clear search
-  highlight"`.
+- Base config: `vim.wo.relativenumber`, `vim.o.hlsearch`, and
+  `vim.wo.cursorline` are all `true`; and `vim.fn.maparg("<Esc>", "n",
+  false, true).desc` returns `"Clear search highlight"`.
+- Colorscheme: `vim.g.colors_name` is `"catppuccin-mocha"` and
+  `require("catppuccin").options.flavour` is `"mocha"` — together these
+  confirm `opts` actually reached `setup()` (see "Theme" above). Checked
+  the negative case too: with `flavour = "latte"` the `Normal` background
+  really does change, so the option is genuinely wired, not just present.
 - neo-tree's custom keymaps: driven interactively via `nvim --headless
   --listen <socket>` plus `--remote-send`/`--remote-expr` (real keystrokes
   and real window/buffer queries, not a simulation) against a scratch test
@@ -131,18 +149,24 @@ touched the real `~/.config/nvim` or `~/.local/share/nvim` at any point.
   tree and pressing `<C-v>` opens a vertical split while the tree remains
   open (window count 3: tree + 2 file windows); `<C-s>` behaves the same
   for a horizontal split (window count 4).
-- `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`,
-  confirming the arrow-key mappings registered correctly alongside
-  vim-tmux-navigator's own default `<C-h/j/k/l>` bindings.
+- `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`
+  and `maparg("<C-h>", "n")` to the plugin's own
+  `:<C-U>TmuxNavigateLeft<CR>`, confirming the arrow-key mappings register
+  alongside vim-tmux-navigator's `<C-h/j/k/l>` defaults rather than
+  replacing them.
 
 ## Declared, not applied
 
-This machine already has a separate, pre-existing Neovim setup at the real
-`~/.config/nvim` (its own `lazy-lock.json`, plugins, sessions — unrelated
-to this repo). `mise.toml`'s `[dotfiles]` table now has
-`"~/.config/nvim" = "nvim"`, same as every other tool here, but — same as
-the rest of this repo (see [bootstrap.md](./bootstrap.md)) — nothing gets
-applied automatically. Running `mise bootstrap dotfiles apply` would
-replace that existing setup with this one; that's a deliberate action left
-for you to take explicitly, when ready, not something done as part of
-adding this config.
+`mise.toml`'s `[dotfiles]` table declares `"~/.config/nvim" = "nvim"` like
+every other tool here, but on this machine that target has **not** been
+migrated: `~/.config/nvim` is still a symlink into an older, unrelated
+dotfiles repo (`~/dev/dotfiles2/nvim`, with its own `lazy-lock.json`,
+plugins and sessions). It is the one outstanding target — everything else
+this repo declares is already applied (see
+[bootstrap.md](./bootstrap.md#current-state-on-this-machine)).
+
+Switching it over means `mise bootstrap dotfiles apply --force`, since the
+target is occupied. That replaces the old setup with this one, so it's a
+deliberate action left for you to take when ready — nothing here does it
+automatically. The old config stays where it is, in `~/dev/dotfiles2`,
+either way.

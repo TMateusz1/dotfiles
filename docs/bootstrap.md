@@ -57,20 +57,13 @@ shorthand.
 "~/.config/lazygit" = "lazygit"
 "~/.config/k9s" = "k9s"
 "~/.config/kitty" = "kitty"
-"~/.config/glow" = "glow"
 "~/.config/bottom" = "bottom"
 "~/.config/yazi" = "yazi"
-"~/.config/mise/config.toml" = "mise/config.toml"
 "~/.config/nvim" = "nvim"
+"~/.config/glow/glamour.json" = "glow/glamour.json"
+"~/.config/mise/config.toml" = "mise/config.toml"
+"~/.config/mise/mise.lock" = "mise/mise.lock"
 ```
-
-**`~/.config/nvim` is declared but has a real pre-existing target on this
-machine**, unrelated to this repo's own `nvim/` (see [nvim.md](./nvim.md))
-— a different situation from the real `~/.config/mise/config.toml`
-conflict above: here it's an existing *directory*, not a conflicting
-*declaration*, so `mise bootstrap dotfiles apply --force` would replace
-it directly, rather than needing another config edited first. Not applied
-by this repo on its own initiative; that's a call for you to make.
 
 Directory entries (`git`, `atuin`, `bat`, ...) symlink the *whole*
 directory in one line — e.g. `"~/.config/git" = "git"` brings
@@ -78,9 +71,30 @@ directory in one line — e.g. `"~/.config/git" = "git"` brings
 `git/config`'s own `[include]` already wires in delta. Nothing extra is
 needed for delta specifically.
 
+Two cases deliberately use **file** entries instead:
+
+- **glow** — glow auto-creates and rewrites its own `glow.yml` in its
+  config directory (verified: it reappears after deletion on any plain
+  `glow file.md` run). With a directory symlink that write lands inside
+  this git repo, which is exactly how a stray `glow/glow.yml` once got
+  committed here. Only the theme is symlinked; `glow.yml` stays
+  machine-local and is gitignored as a backstop. See
+  [util_tools.md#glow](./util_tools.md#glow).
+- **mise** — the global config is two files, and **both** are needed:
+  without `mise.lock` alongside `config.toml`, the versions and checksums
+  committed in this repo never reach the machine, and mise silently
+  maintains its own unpinned lockfile in `~/.config/mise/` instead. (That
+  had genuinely happened here before this entry existed — the machine's
+  lockfile had drifted, missing `gh`/`neovim`/`glab` and still carrying
+  entries from an older dotfiles repo.) `~/.config/mise/` is not symlinked
+  wholesale because it also holds machine-local state this repo doesn't own.
+
 `fd`, `jq`, `yq`, `zoxide` have no entries — as documented in
 [util_tools.md](./util_tools.md), none of them has a config file to
-symlink.
+symlink. `gh` and `glab` are deliberately excluded too: both keep
+credentials in the same directory (glab, in the very same file) as their
+settings, so neither is safe to symlink into a public repo — see
+[util_tools.md#gh](./util_tools.md#gh).
 
 ## Zsh plugins
 
@@ -128,8 +142,8 @@ unused. `bootstrap:all-desktop` is the only task that reaches this file
 
 Both package names were confirmed valid by resolving them directly against
 this machine (both already installed via real Homebrew here, unrelated to
-this repo — mise refuses to touch a cask Homebrew already owns, same
-non-clobbering behavior as the dotfiles conflict below).
+this repo — mise refuses to touch a cask Homebrew already owns, the same
+non-clobbering stance `[dotfiles]` takes toward an occupied target).
 
 Only one file for all desktop/GUI apps for now (kitty + a font); split into
 more files only if this grows unwieldy. Not yet extended to Linux
@@ -146,43 +160,69 @@ place for an app that isn't installed yet — harmless, just inert until
 kitty is actually installed. See [desktop_tools.md](./desktop_tools.md)
 for kitty's own config.
 
-## Verified without touching this machine
+## Current state on this machine
+
+Applied. `mise run bootstrap:status` is the authoritative view; as of the
+last check every target above is a live symlink into this repo except three,
+all reported as `differs`:
+
+| Target                        | Why it differs                                                                                                         |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `~/.config/nvim`              | still a symlink into an older, unrelated repo (`~/dev/dotfiles2/nvim`) — see [nvim.md](./nvim.md#declared-not-applied) |
+| `~/.config/mise/mise.lock`    | a real file mise generated itself, before this repo declared the lockfile entry (see below)                            |
+| `~/.config/glow/glamour.json` | a real file, left behind by the earlier whole-directory `glow` symlink                                                 |
+
+All three are occupied targets rather than declaration conflicts, so
+`mise bootstrap dotfiles apply --force` resolves them. Nothing here does
+that on its own initiative.
+
+The `mise.lock` one is worth understanding before forcing it: the machine's
+existing `~/.config/mise/mise.lock` is *not* a copy of this repo's. It had
+drifted — missing `gh`, `neovim` and `glab`, and still carrying entries
+from the older repo — which is precisely the failure mode that declaring
+the lockfile prevents. Forcing replaces that drifted file with the
+committed one.
+
+### A conflict that had to be cleared first (resolved)
 
 `mise bootstrap dotfiles status`/`apply` read the **real, live**
-`~/.config/mise/config.toml` for merging — `MISE_GLOBAL_CONFIG_FILE`
-does *not* redirect this away from it, unlike ordinary tool-config
-resolution. So this was validated two ways, neither touching this
-machine's real files:
+`~/.config/mise/config.toml` when merging declarations —
+`MISE_GLOBAL_CONFIG_FILE` does *not* redirect that, unlike ordinary
+tool-config resolution. Before this repo was applied, that file was a
+symlink into `~/dev/dotfiles2` and carried its own `[dotfiles]` table
+declaring nearly every path this repo also declares. mise reports that as
+`conflicting dotfile declarations`, one target at a time, and **`--force`
+does not help**: `--force` only overrides a real file or directory
+occupying a target, whereas two configs declaring the same target is a
+different error that can only be fixed by removing the losing declaration.
+Deleting that old table was the fix. `~/.config/mise/config.toml` now
+symlinks to this repo's `mise/config.toml`, which declares no `[dotfiles]`
+at all — the tables live in the repo-root `mise.toml` instead, so the
+global config can never conflict with itself this way again.
 
-1. Confirmed the schema is well-formed by declaring structurally identical
-   `[dotfiles]`/`[bootstrap.repos]` entries in a fully isolated sandbox
-   (throwaway `HOME`, throwaway sources) and running `mise bootstrap
-   dotfiles status` / `apply --dry-run` / `bootstrap repos status` there —
-   correct source resolution, correct planned `ln -sf` commands, correct
-   repo tracking.
-2. Actually ran `mise bootstrap dotfiles status` against the real
-   machine, read-only, to sanity-check integration — and it surfaced a
-   real conflict (see below), which is exactly the kind of thing this
-   step exists to catch.
+### Leftovers from the old repo — still active, not inert
 
-**Found, not fixed — needs your decision:** this machine's *real* global
-mise config (`~/.config/mise/config.toml`) already has an *entire*
-`[dotfiles]` table of its own — not just one stray entry. It's this
-machine's leftover declaration from an older dotfiles repo
-(`~/dev/dotfiles2`): the file is itself a symlink into that repo (its own
-`"~/.config/mise/config.toml" = "config.toml"` line is self-referencing,
-resolved relative to dotfiles2's `mise/` directory), and it separately
-declares `~/.tmux.conf`, `~/.zshrc`, `~/.config/atuin/config.toml`,
-`~/.config/bat/config`, `~/.config/git/delta.gitconfig`,
-`~/.config/k9s/config.yaml` (+ its skin), `~/.config/lazygit/config.yml`,
-`~/.config/nvim`, and `~/.config/starship.toml` — nearly every path this
-repo now also declares. `mise bootstrap dotfiles apply` surfaces these as
-"conflicting dotfile declarations" one at a time (first hit is usually
-`~/.config/git`, since it's alphabetically early), not all at once.
-`--force` does **not** resolve this — `--force` only overrides a real
-pre-existing file/directory blocking a symlink target; two configs both
-declaring the same target is a different error, and has to be resolved by
-removing the losing declaration. The fix is to delete that whole old
-`[dotfiles]` table from the real `~/.config/mise/config.toml` (keep
-`[tool_alias]`/`[settings]`/`[tools]`) — a one-time edit to a live machine
-file, not something this repo's tooling does for you.
+`~/.config/mise/` also contains `config.macos.toml`, `miserc.toml`, and a
+pair of `*.backup.<timestamp>` symlinks, all still pointing into
+`~/dev/dotfiles2`. **`config.macos.toml` is not dormant:** mise
+auto-loads `config.<os>.toml` next to the global config, so it is a live
+config layer, and it carries its own `[dotfiles]` table. `mise bootstrap
+dotfiles status` shows it managing three targets this repo never declares:
+
+```text
+~/Library/Application Support/k9s/config.yaml                  ← config.macos.toml
+~/Library/Application Support/k9s/skins/catppuccin-mocha.yaml  ← config.macos.toml
+~/Library/Application Support/lazygit/config.yml               ← config.macos.toml
+```
+
+Those are the non-XDG macOS paths that this repo deliberately doesn't
+target, because `shell/.zshrc` exports `XDG_CONFIG_HOME` and
+[k9s](./core_tools.md#k9s)/lazygit therefore resolve to `~/.config/`
+instead. Their sources resolve back through `~/.config/` and so currently
+land on *this* repo's files — harmless today, but it means a second,
+unowned config is quietly duplicating them, and it would break confusingly
+if `~/dev/dotfiles2` were ever deleted while these declarations remained.
+
+Clearing out `config.macos.toml`, `miserc.toml` and the two `.backup.`
+symlinks is the last step of the migration. Not touched here — they live
+outside this repo.

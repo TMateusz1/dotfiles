@@ -134,7 +134,9 @@ skipped anyway because there's nothing worth overriding beyond theming, and
 theming doesn't need a file at all: `shell/.zshrc` exports `GLAMOUR_STYLE`
 (gh's own documented environment variable — see `gh help environment`)
 pointing at this repo's vendored [glow](#glow) theme, reusing it rather
-than vendoring a second copy.
+than vendoring a second copy. That export is guarded on the theme file
+existing rather than on gh being installed, since the same variable serves
+every glamour-based CLI — see [shell.md](./shell.md).
 
 ## glab
 
@@ -149,10 +151,15 @@ not something this repo can guarantee across every machine it gets applied
 to. Symlinking that file (or its directory) risks a real credential
 landing inside a tracked, public file, which conflicts directly with
 [AGENTS.md](../AGENTS.md)'s "never commit secrets" rule — so this repo
-doesn't touch `~/.config/glab-cli/` at all, and doesn't attempt to theme
-glab either: unlike gh, checked directly and confirmed `glab`'s
-`glamour_style` setting has no environment-variable override, only the
-persisted (and therefore unsafe-to-symlink) config file.
+doesn't touch `~/.config/glab-cli/` at all.
+
+Theming glab is therefore left to whatever `GLAMOUR_STYLE` does on its own
+(see [shell.md](./shell.md)): `glab config`'s own help documents no
+environment override for its persisted `glamour_style` setting, but the
+glab binary does reference `GLAMOUR_STYLE`, and which of the two wins
+hasn't been verified here. Nothing in this repo depends on the answer —
+glab either picks up the shared Catppuccin style or falls back to its
+`dark` default, and both are acceptable.
 
 **Also worth knowing:** `glab config set` without `--global` writes a
 *second*, repo-local config to `.git/glab-cli/` inside whatever git
@@ -162,13 +169,23 @@ running that command inside any git repository.
 
 ## glow
 
-`glow/` maps to `~/.config/glow/`
+`glow/glamour.json` maps to `~/.config/glow/glamour.json`
 ([glow](https://github.com/charmbracelet/glow) follows XDG directly). Its
 primary use is `glow file.md` — render once and exit, like
 [bat](#bat) — though a `--tui`/`-t` flag also opens an interactive
 file-browsing mode if wanted; grouped here rather than in
 [core_tools.md](./core_tools.md) since rendering a file is the documented,
 default use.
+
+**This is a single-file `[dotfiles]` entry, not a directory one** — the
+only such exception besides mise's. glow auto-creates and rewrites its own
+`glow.yml` inside its config directory (verified: delete it and it
+reappears on the very next plain `glow file.md` run). Symlinking the whole
+directory would therefore point a self-writing tool straight at this git
+repo — which is exactly how a stray, machine-generated `glow.yml` once got
+committed here. Only the theme is managed; `glow.yml` stays machine-local,
+and `.gitignore` lists it as a backstop in case the directory-level symlink
+ever comes back. See [bootstrap.md](./bootstrap.md#what-gets-symlinked).
 
 **Theme:** `glamour.json` is the official
 [catppuccin/glamour](https://github.com/catppuccin/glamour) Mocha style
@@ -178,24 +195,28 @@ scale by design (h1 red through h6 lavender), and links/images already
 land on this repo's blue accent (`#89b4fa`) in the official style, so no
 accent swap was needed here, unlike [bottom](./core_tools.md#bottom).
 
-**No `glow.yml` is shipped, and the theme is wired through a shell alias,
-not the config file.** glow's own config `style` field has no path
-expansion at all — checked directly against the real binary: neither a
-leading `~`, nor `$HOME`, nor `$XDG_CONFIG_HOME` inside `glow.yml`'s
-`style:` value resolves, and there's no `GLOW_STYLE`/`GLAMOUR_STYLE`
-environment variable either (also checked directly). It also fails
-*silently* on a bad or unresolved path — it just renders unstyled, no
-error — so a broken reference here wouldn't even be visible as an error.
-An explicit `--style <path>` flag does work correctly, so `shell/.zshrc`
-aliases `glow` to always pass one:
+**The theme is wired through a shell alias, not through config.** glow's
+own `style` field has no path expansion at all — checked directly against
+the real binary: neither a leading `~`, nor `$HOME`, nor
+`$XDG_CONFIG_HOME` inside `glow.yml`'s `style:` value resolves. Nor does
+glow honour `GLOW_STYLE`/`GLAMOUR_STYLE` — also checked directly, both
+with and without a `glow.yml` present, so this isn't the config file
+shadowing the environment. That leaves only an absolute path, which can't
+be committed to a public repo, or the `--style` flag, which does work. So
+`shell/.zshrc` aliases glow to always pass one:
 
 ```sh
 alias glow="glow --style \"\$XDG_CONFIG_HOME/glow/glamour.json\""
 ```
 
-No other `glow.yml` settings were worth overriding beyond the theme, so no
-file is shipped for it — same call as [fd](#fd)/[jq](#jq) having nothing to
-add.
+This also matters because glow fails *silently* on an unresolved style
+path — it just renders unstyled, with no error — so a broken reference
+would never announce itself.
+
+Note that other glamour-based CLIs (`gh`, `glab`) *do* read
+`GLAMOUR_STYLE`, which `shell/.zshrc` exports for exactly that reason —
+glow is the odd one out here. See [gh](#gh) and
+[shell.md](./shell.md).
 
 **Validation:** no linter exists for glamour's JSON style format beyond
 generic JSON syntax, and this repo doesn't currently lint JSON at all (this

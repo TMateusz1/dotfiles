@@ -1,13 +1,21 @@
 return {
   "christoomey/vim-tmux-navigator",
+  -- Not lazy-loaded: the plugin defines its own <C-h/j/k/l> mappings when it
+  -- loads, so deferring it would leave those keys unmapped until something
+  -- else triggered the load.
   lazy = false,
-  keys = {
-    -- Plugin default mappings already cover <C-h/j/k/l>; these add arrow-key
-    -- equivalents, matching tmux.conf's own smart pane switching (which
-    -- already binds both hjkl and the arrow keys the same way).
-    { "<C-Left>", "<cmd>TmuxNavigateLeft<cr>", desc = "Move to left split/pane" },
-    { "<C-Down>", "<cmd>TmuxNavigateDown<cr>", desc = "Move to lower split/pane" },
-    { "<C-Up>", "<cmd>TmuxNavigateUp<cr>", desc = "Move to upper split/pane" },
-    { "<C-Right>", "<cmd>TmuxNavigateRight<cr>", desc = "Move to right split/pane" },
-  },
+  config = function()
+    -- Arrow-key equivalents of the plugin's own <C-h/j/k/l> defaults, matching
+    -- tmux.conf's smart pane switching (which binds both spellings the same
+    -- way). Set here rather than via lazy's `keys`, which declares
+    -- lazy-loading triggers and would contradict `lazy = false` above.
+    local map = function(lhs, cmd, desc)
+      vim.keymap.set("n", lhs, "<cmd>" .. cmd .. "<cr>", { silent = true, desc = desc })
+    end
+
+    map("<C-Left>", "TmuxNavigateLeft", "Move to left split/pane")
+    map("<C-Down>", "TmuxNavigateDown", "Move to lower split/pane")
+    map("<C-Up>", "TmuxNavigateUp", "Move to upper split/pane")
+    map("<C-Right>", "TmuxNavigateRight", "Move to right split/pane")
+  end,
 }

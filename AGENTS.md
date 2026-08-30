@@ -7,10 +7,10 @@ Read this before adding, restructuring, or touching config in this repo.
 
 A public dotfiles repository. It holds this user's personal tool
 configuration (shell, editor, TUIs, CLI tools, mise tool/task management,
-etc.), meant to be symlinked into place on any machine. Symlinking itself
-(the "installer"/stow step) is **not built yet** — it will be added later.
-Directory naming today must already be compatible with that future step (see
-below), even though no linking script exists yet.
+etc.), symlinked into place on a machine by mise's own native `[dotfiles]`
+provisioning — declared in the repo-root `mise.toml`, applied explicitly
+with `mise run bootstrap:all`. There is no hand-rolled installer/stow
+script and shouldn't be one. See [docs/bootstrap.md](./docs/bootstrap.md).
 
 ## Hard rules
 
@@ -35,8 +35,16 @@ below), even though no linking script exists yet.
 ## Repository layout
 
 ```text
-mise.toml            # repo-local mise config: tools + tasks for working on this repo itself
+mise.toml             # repo-local mise config: tools + tasks for working on this repo
+                      #   itself, plus the [dotfiles]/[bootstrap.repos] tables that
+                      #   define what gets symlinked where
 mise.lock             # committed lockfile for the repo-local mise config
+mise.desktop.toml     # GUI/desktop packages, loaded only via `-E desktop` (opt-in)
+hk.pkl                # lint/format steps + git hooks (see docs/linting.md)
+.rumdl.toml           # markdown lint config
+.yamlfmt              # YAML format config
+.stylua.toml          # Lua format config
+.gitignore            # includes tool-written state that must never be committed
 <tool>/               # one directory per dotfile/tool, e.g. nvim/, k9s/, mise/
   ...                 # that tool's config, laid out as that tool expects it
 docs/                 # per-topic documentation (conventions, per-tool notes, setup)
@@ -60,13 +68,23 @@ symlinked under `$XDG_CONFIG_HOME` (`~/.config/<name>`), e.g.:
 
 Use the tool's own lowercase config-dir name as the directory name — no
 prefixes, no `dot-` / `.` leading dots, no abbreviations that don't match
-the upstream tool's expected config folder name. This keeps a future
-symlink/stow script a dumb `for d in */; do ln -s "$d" "$XDG_CONFIG_HOME/$d"; done`-style
-mapping. If a tool doesn't follow the XDG convention on its own (e.g. it
-insists on `~/.toolrc` or a macOS `Application Support` path), still name
-the repo directory after the tool, and note the real target path explicitly
-in that directory's own short README (or in `docs/`) so the future linker
-step can special-case it.
+the upstream tool's expected config folder name. This keeps most
+`[dotfiles]` entries a trivial `"~/.config/<tool>" = "<tool>"` pair. If a
+tool doesn't follow the XDG convention on its own (e.g. it insists on
+`~/.toolrc` or a macOS `Application Support` path), still name the repo
+directory after the tool, give its `[dotfiles]` entry the real target path,
+and document that exception in the tool's `docs/` entry.
+
+**Directory entry vs. file entries.** Symlinking the whole directory
+(`"~/.config/<tool>" = "<tool>"`) is the default and is right for tools
+that only ever *read* their config. It is wrong for a tool that **writes
+into its own config directory** — with a directory symlink, that tool
+writes straight into this git repo. For those, symlink the specific files
+this repo owns instead (e.g. `"~/.config/glow/glamour.json" =
+"glow/glamour.json"`), leave the tool's generated file machine-local, and
+add it to `.gitignore` as a second line of defence. Check for this when
+adding a tool: run it once and see whether anything appears or changes in
+its config directory.
 
 ## Visual consistency: Catppuccin everywhere
 
@@ -95,8 +113,9 @@ tool" — consistency across the whole setup is a stated goal, not a nice-to-hav
 There are (at least) two mise configs in this repo — don't mix them up:
 
 1. **Repo-local** — `./mise.toml` (+ `./mise.lock`): tools/tasks needed to
-   work *on this repository* (linting, formatting, future install/symlink
-   tooling, etc.). Lives at the repo root.
+   work *on this repository* (linting, formatting), plus the `[dotfiles]`
+   and `[bootstrap.repos]` tables and the `bootstrap:*` tasks that apply
+   this repo to a machine. Lives at the repo root.
 2. **Global** — `./mise/config.toml`: the user's global mise config,
    destined for `~/.config/mise/config.toml`. Governs tool versions/tasks
    available in *every* project on the machine, dotfiles repo or not.
@@ -105,7 +124,11 @@ Rules that apply to **both**:
 
 - **Always commit a lockfile.** Set `lockfile = true` under `[settings]` in
   both configs, and commit the resulting `mise.lock` alongside its
-  `mise.toml`/`config.toml`. Never leave tool resolution unpinned.
+  `mise.toml`/`config.toml`. Never leave tool resolution unpinned. For the
+  global config this means **two** `[dotfiles]` entries — `config.toml` and
+  `mise.lock` both have to reach `~/.config/mise/`, or the committed pins
+  never take effect on the machine and mise quietly maintains its own
+  unpinned lockfile there instead.
 - **Disable asdf and vfox backends.** Set
   `disable_backends = ["asdf", "vfox"]` under `[settings]`. We manage tools
   through mise's native/aqua/ubi-style backends only — no asdf or vfox
@@ -165,6 +188,15 @@ Rule specific to the **global** config:
 3. Apply Catppuccin theming if the tool supports theming.
 4. If the tool needs a binary, prefer sourcing it via mise (global config)
    rather than a manual install step, unless there's a documented reason
-   not to (e.g. Neovim LSP servers — see above).
-5. Update `README.md` and add/update the relevant page under `docs/`.
-6. Double-check the diff for secrets before committing (see "Hard rules").
+   not to (e.g. Neovim LSP servers — see above). Re-run `mise lock` for
+   whichever config you touched and commit the updated lockfile.
+5. **Add a `[dotfiles]` entry in `mise.toml`** — without it the config is
+   never symlinked anywhere and the tool silently keeps using its defaults.
+   Run the tool once first and check whether it writes into its own config
+   directory; if it does, symlink individual files rather than the
+   directory (see "Directory entry vs. file entries" above).
+6. Verify the config against the tool's real binary — actually load it and
+   confirm the settings took effect, rather than assuming (see "Linting
+   conventions": most of these formats have no linter to catch mistakes).
+7. Update `README.md` and add/update the relevant page under `docs/`.
+8. Double-check the diff for secrets before committing (see "Hard rules").

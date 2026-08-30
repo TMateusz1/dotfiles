@@ -5,7 +5,11 @@ return {
   opts = {
     flavour = "mocha",
   },
-  init = function()
+  -- `config` (not `init`): lazy.nvim runs `init` *before* the plugin loads, so
+  -- setting the colorscheme there applies it before `opts` ever reaches
+  -- catppuccin.setup() — silently discarding every option here.
+  config = function(_, opts)
+    require("catppuccin").setup(opts)
     vim.cmd.colorscheme("catppuccin")
   end,
 }

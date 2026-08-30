@@ -9,15 +9,21 @@ follows.
 
 ## Status
 
-Symlinking is implemented (via mise's own `[dotfiles]`/`[bootstrap.repos]`
-— see [docs/bootstrap.md](./docs/bootstrap.md)) but **not yet applied to
-any machine**. Each tool directory is named so that `<tool>/` → normally
+Symlinking is implemented via mise's own `[dotfiles]`/`[bootstrap.repos]`
+(see [docs/bootstrap.md](./docs/bootstrap.md)) and **applied on this
+machine** — every target below is a live symlink into this repo, with one
+exception: `~/.config/nvim` still points at an older, unrelated dotfiles
+repo and hasn't been migrated (see [docs/nvim.md](./docs/nvim.md)).
+
+Each tool directory is named so that `<tool>/` → normally
 `~/.config/<tool>/`, except where a tool's own target path forces an
 exception (documented in that tool's entry under `docs/`, e.g.
-[tmux](./docs/core_tools.md#tmux)).
+[tmux](./docs/core_tools.md#tmux)), or where the tool writes into its own
+config directory and only individual files are symlinked (e.g.
+[glow](./docs/util_tools.md#glow)).
 
-`shell/.zshrc` (→ `~/.zshrc`) already activates most of the shell
-integration these tools need — see [docs/shell.md](./docs/shell.md).
+`shell/.zshrc` (→ `~/.zshrc`) activates the shell integration these tools
+need — see [docs/shell.md](./docs/shell.md).
 
 ## Layout
 
@@ -38,7 +44,7 @@ starship/              # starship prompt → ~/.config/starship.toml (flat, see 
 k9s/                   # k9s config + skin (see docs/core_tools.md#k9s)
 bottom/                # bottom (btm) system monitor → ~/.config/bottom/ (see docs/core_tools.md#bottom)
 yazi/                  # yazi file manager → ~/.config/yazi/ (see docs/core_tools.md#yazi)
-glow/                  # glow markdown renderer → ~/.config/glow/ (see docs/util_tools.md#glow)
+glow/                  # glow theme → ~/.config/glow/glamour.json only (see docs/util_tools.md#glow)
 kitty/                 # kitty config + theme → ~/.config/kitty/ (see docs/desktop_tools.md)
 nvim/                  # neovim config → ~/.config/nvim/ (see docs/nvim.md)
 docs/                  # notes on what's configured, and why

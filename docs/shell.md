@@ -62,6 +62,19 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   theme — glow's own config file has no way to reference it (no path
   expansion at all in its `style` field) — see
   [util_tools.md#glow](./util_tools.md#glow).
+- `export GLAMOUR_STYLE=...` points the same theme at CLIs that render
+  Markdown through Charm's
+  [glamour](https://github.com/charmbracelet/glamour) library. `gh`
+  documents it explicitly (`gh help environment`); the `glab` binary
+  references the same variable too, so it is deliberately *not* scoped to
+  gh alone — though glab's precedence against its own persisted
+  `glamour_style` setting hasn't been verified here, and glab's config is
+  something this repo deliberately doesn't manage (see
+  [util_tools.md#glab](./util_tools.md#glab)). Guarded on the theme file
+  being readable rather than on any one tool being installed, because
+  glamour renders unstyled with no error when the path is bad — a broken
+  reference would otherwise be invisible. glow itself ignores this
+  variable entirely, hence the separate alias above.
 - `y()` — yazi's own documented shell wrapper, so quitting yazi `cd`s the
   shell to wherever it was left — see
   [core_tools.md#yazi](./core_tools.md#yazi).

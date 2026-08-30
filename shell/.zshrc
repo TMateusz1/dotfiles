@@ -91,9 +91,13 @@ if command -v glow >/dev/null 2>&1; then
   alias glow="glow --style \"\$XDG_CONFIG_HOME/glow/glamour.json\""
 fi
 
-if command -v gh >/dev/null 2>&1; then
-  # gh's own documented env var for its Markdown renderer (`gh help
-  # environment`) — reuses this repo's glow theme, no gh config file needed.
+# Markdown rendering for CLIs built on Charm's glamour library — gh documents
+# this var (`gh help environment`); glab and other glamour tools read the same
+# one, so this themes them together rather than being gh-specific. glow itself
+# ignores it (see docs/util_tools.md#glow) and is handled by the alias above.
+# Gated on the theme file, not on any one tool: a missing path here renders
+# unstyled with no error, which would be invisible.
+if [[ -r "$XDG_CONFIG_HOME/glow/glamour.json" ]]; then
   export GLAMOUR_STYLE="$XDG_CONFIG_HOME/glow/glamour.json"
 fi
 

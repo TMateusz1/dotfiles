@@ -69,11 +69,19 @@ run = "mise -E desktop bootstrap packages apply"
 "~/.config/lazygit" = "lazygit"
 "~/.config/k9s" = "k9s"
 "~/.config/kitty" = "kitty"
-"~/.config/glow" = "glow"
 "~/.config/bottom" = "bottom"
 "~/.config/yazi" = "yazi"
-"~/.config/mise/config.toml" = "mise/config.toml"
 "~/.config/nvim" = "nvim"
+# glow is symlinked file-by-file, not as a whole directory: glow auto-creates
+# and rewrites its own `glow.yml` in this directory, which — with a directory
+# symlink — means it writes into this git repo. Only the theme is managed
+# here; glow.yml stays machine-local. See docs/util_tools.md#glow.
+"~/.config/glow/glamour.json" = "glow/glamour.json"
+# Both halves of the global mise config: without the lockfile, the pinned
+# versions/checksums committed here never reach the machine and mise silently
+# maintains its own unpinned one. See docs/mise.md.
+"~/.config/mise/config.toml" = "mise/config.toml"
+"~/.config/mise/mise.lock" = "mise/mise.lock"
 
 [bootstrap.repos]
 # oh-my-zsh has no tagged releases (it's designed to track master via its
