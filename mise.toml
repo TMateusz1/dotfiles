@@ -9,6 +9,7 @@ dotfiles.default_mode = "symlink"
 
 [env]
 HK_MISE = 1
+MISE_NPM_PACKAGE_MANAGER = "npm"
 
 [tools]
 "node" = "24"
