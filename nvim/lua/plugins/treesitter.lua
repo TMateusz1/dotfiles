@@ -9,6 +9,7 @@ local parsers = {
   "gosum",
   "gowork",
   "gotmpl",
+  "helm", -- Helm templates: gotmpl inside YAML, used by helm-ls
 
   -- Rust
   "rust",

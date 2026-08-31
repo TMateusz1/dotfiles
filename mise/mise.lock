@@ -45,6 +45,26 @@ url = "https://github.com/ClementTsang/bottom/releases/download/0.14.9/bottom_aa
 url_api = "https://api.github.com/repos/ClementTsang/bottom/releases/assets/531978112"
 provenance = "github-attestations"
 
+[[tools."aqua:LuaLS/lua-language-server"]]
+version = "3.19.1"
+backend = "aqua:LuaLS/lua-language-server"
+specifiers = ["3.19.1"]
+
+[tools."aqua:LuaLS/lua-language-server"."platforms.linux-arm64"]
+checksum = "sha256:abd2572e8fc929dc838a81ffb8473c5bce0bf39bfe8edb4b120b3b623176ce83"
+url = "https://github.com/LuaLS/lua-language-server/releases/download/3.19.1/lua-language-server-3.19.1-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/LuaLS/lua-language-server/releases/assets/513570945"
+
+[tools."aqua:LuaLS/lua-language-server"."platforms.linux-x64"]
+checksum = "sha256:e9235d2d72ef55bc41cf8c99cda2ed64777682024b4bb81f5dea425060c5cbb8"
+url = "https://github.com/LuaLS/lua-language-server/releases/download/3.19.1/lua-language-server-3.19.1-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/LuaLS/lua-language-server/releases/assets/513572259"
+
+[tools."aqua:LuaLS/lua-language-server"."platforms.macos-arm64"]
+checksum = "sha256:0bc077f4447f076b4c92c14e9fd303f5b569eda2ec74b4dca2b55f75fae2e90c"
+url = "https://github.com/LuaLS/lua-language-server/releases/download/3.19.1/lua-language-server-3.19.1-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/LuaLS/lua-language-server/releases/assets/513570627"
+
 [[tools."aqua:ajeetdsouza/zoxide"]]
 version = "0.10.0"
 backend = "aqua:ajeetdsouza/zoxide"
@@ -64,6 +84,29 @@ url_api = "https://api.github.com/repos/ajeetdsouza/zoxide/releases/assets/46631
 checksum = "sha256:b55ae6f2f5f23d0a6ccb3bd4eeb2af9c7e0a6556e5255c82100e40305129bbb0"
 url = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.10.0/zoxide-0.10.0-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/ajeetdsouza/zoxide/releases/assets/466316174"
+
+[[tools."aqua:astral-sh/ruff"]]
+version = "0.16.5"
+backend = "aqua:astral-sh/ruff"
+specifiers = ["0.16.5"]
+
+[tools."aqua:astral-sh/ruff"."platforms.linux-arm64"]
+checksum = "sha256:796079ea998dba3e455394077ba51a4c500c2402d3920580c646a0580f20370c"
+url = "https://github.com/astral-sh/ruff/releases/download/0.16.5/ruff-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/532582816"
+provenance = "github-attestations"
+
+[tools."aqua:astral-sh/ruff"."platforms.linux-x64"]
+checksum = "sha256:65b8bae7e43f12a91b71036a52176012b3aefb725d5ae263e2771474110a0983"
+url = "https://github.com/astral-sh/ruff/releases/download/0.16.5/ruff-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/532582898"
+provenance = "github-attestations"
+
+[tools."aqua:astral-sh/ruff"."platforms.macos-arm64"]
+checksum = "sha256:ed142f8656e0092828c103dd058b55b871c88e13a801cade8f860d8a9ca8943e"
+url = "https://github.com/astral-sh/ruff/releases/download/0.16.5/ruff-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/532582805"
+provenance = "github-attestations"
 
 [[tools."aqua:atuinsh/atuin"]]
 version = "18.20.1"
@@ -217,6 +260,29 @@ checksum = "sha256:509cb27aef747f48faf9bce424f59dcf79572c905204b990ee935bbfcc7fa
 url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_darwin_arm64.tar.gz"
 url_api = "https://api.github.com/repos/gotestyourself/gotestsum/releases/assets/291996838"
 
+[[tools."aqua:hadolint/hadolint"]]
+version = "2.15.1"
+backend = "aqua:hadolint/hadolint"
+specifiers = ["2.15.1"]
+
+[tools."aqua:hadolint/hadolint"."platforms.linux-arm64"]
+checksum = "sha256:f6198ef8090f404dbb771abfee086eb8c48ac177f30da7fd3510aca35b344b5d"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-arm64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/496546507"
+provenance = "github-attestations"
+
+[tools."aqua:hadolint/hadolint"."platforms.linux-x64"]
+checksum = "sha256:c7187db94eeeeca956519a6af171adc31453941a1e777961f6e680f697c8c507"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/496546506"
+provenance = "github-attestations"
+
+[tools."aqua:hadolint/hadolint"."platforms.macos-arm64"]
+checksum = "sha256:5c09f3213f8e40406abe048233d985eebef336d4a6a20021be47fadb6cf480a2"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-macos-arm64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/496546505"
+provenance = "github-attestations"
+
 [[tools."aqua:jesseduffield/lazygit"]]
 version = "0.64.1"
 backend = "aqua:jesseduffield/lazygit"
@@ -303,6 +369,26 @@ url = "https://github.com/mikefarah/yq/releases/download/v4.53.6/yq_darwin_arm64
 url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/522028033"
 provenance = "cosign"
 
+[[tools."aqua:mrjosh/helm-ls"]]
+version = "0.5.4"
+backend = "aqua:mrjosh/helm-ls"
+specifiers = ["0.5.4"]
+
+[tools."aqua:mrjosh/helm-ls"."platforms.linux-arm64"]
+checksum = "sha256:565d4a298d15e69a1bc7275a7fcf287d364668e53fdf09110d76aac5c820f78c"
+url = "https://github.com/mrjosh/helm-ls/releases/download/v0.5.4/helm_ls_linux_arm64"
+url_api = "https://api.github.com/repos/mrjosh/helm-ls/releases/assets/321167536"
+
+[tools."aqua:mrjosh/helm-ls"."platforms.linux-x64"]
+checksum = "sha256:5d857ba25c461d3218bb98d9e98cb61bc948bfa92b124667d7e6ed695fe2da5f"
+url = "https://github.com/mrjosh/helm-ls/releases/download/v0.5.4/helm_ls_linux_amd64"
+url_api = "https://api.github.com/repos/mrjosh/helm-ls/releases/assets/321167516"
+
+[tools."aqua:mrjosh/helm-ls"."platforms.macos-arm64"]
+checksum = "sha256:8d917fedac8aa7c0199bccb5fc54df68303d215d2c76a47b59094ea272e250c1"
+url = "https://github.com/mrjosh/helm-ls/releases/download/v0.5.4/helm_ls_darwin_arm64"
+url_api = "https://api.github.com/repos/mrjosh/helm-ls/releases/assets/321167501"
+
 [[tools."aqua:mvdan/gofumpt"]]
 version = "0.11.0"
 backend = "aqua:mvdan/gofumpt"
@@ -342,6 +428,26 @@ url_api = "https://api.github.com/repos/neovim/neovim/releases/assets/526503737"
 checksum = "sha256:65fb000099e47ca1b762584c484cc833f40e30851a0ec450d4174e16317c1f9b"
 url = "https://github.com/neovim/neovim/releases/download/v0.12.5/nvim-macos-arm64.tar.gz"
 url_api = "https://api.github.com/repos/neovim/neovim/releases/assets/526503741"
+
+[[tools."aqua:rust-lang/rust-analyzer"]]
+version = "2026-08-24"
+backend = "aqua:rust-lang/rust-analyzer"
+specifiers = ["2026-08-24"]
+
+[tools."aqua:rust-lang/rust-analyzer"."platforms.linux-arm64"]
+checksum = "sha256:3463f9115c725fc5dfb002431833ec83d1f1f9c4c35b76ad5f47b92c58a521f1"
+url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-aarch64-unknown-linux-gnu.gz"
+url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/527179314"
+
+[tools."aqua:rust-lang/rust-analyzer"."platforms.linux-x64"]
+checksum = "sha256:c4d409690b98d84ce98174829362a59214825d72304fe2504f4b906a116b51fe"
+url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-x86_64-unknown-linux-gnu.gz"
+url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/527179627"
+
+[tools."aqua:rust-lang/rust-analyzer"."platforms.macos-arm64"]
+checksum = "sha256:5f4557c2ea4d62f80f1ffeea2646d0d56fab7172a0db11f3065c4d246b763989"
+url = "https://github.com/rust-lang/rust-analyzer/releases/download/2026-08-24/rust-analyzer-aarch64-apple-darwin.gz"
+url_api = "https://api.github.com/repos/rust-lang/rust-analyzer/releases/assets/527179278"
 
 [[tools."aqua:sharkdp/bat"]]
 version = "0.26.1"
@@ -466,6 +572,26 @@ url = "https://github.com/tree-sitter/tree-sitter/releases/download/v0.26.13/tre
 url_api = "https://api.github.com/repos/tree-sitter/tree-sitter/releases/assets/526034751"
 provenance = "github-attestations"
 
+[[tools."aqua:yannh/kubeconform"]]
+version = "0.8.0"
+backend = "aqua:yannh/kubeconform"
+specifiers = ["0.8.0"]
+
+[tools."aqua:yannh/kubeconform"."platforms.linux-arm64"]
+checksum = "sha256:1f53fc8e81258197a35e8603054162a5af1de8c5af13746c71ab680d9534ed87"
+url = "https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/yannh/kubeconform/releases/assets/438612685"
+
+[tools."aqua:yannh/kubeconform"."platforms.linux-x64"]
+checksum = "sha256:9bc2bffbf71f261128533edaf912153948b7ff238f9a531ae6d34466ec287883"
+url = "https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/yannh/kubeconform/releases/assets/438612666"
+
+[tools."aqua:yannh/kubeconform"."platforms.macos-arm64"]
+checksum = "sha256:f84f4dfbebf4a6b0b230385fa065a39ea35e02608c2b50d025dcf64775a69d67"
+url = "https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/yannh/kubeconform/releases/assets/438612680"
+
 [[tools."cargo:eza"]]
 version = "0.23.5"
 backend = "cargo:eza"
@@ -508,6 +634,16 @@ url = "https://dl.google.com/go/go1.27.0.linux-amd64.tar.gz"
 checksum = "sha256:90493b3bbd5e10f91d12153198bf1994fd756399b4fec93b49b0c6e2acdeeb3e"
 url = "https://dl.google.com/go/go1.27.0.darwin-arm64.tar.gz"
 
+[[tools."go:github.com/fatih/gomodifytags"]]
+version = "1.17.0"
+backend = "go:github.com/fatih/gomodifytags"
+specifiers = ["1.17.0"]
+
+[[tools."go:github.com/josharian/impl"]]
+version = "1.5.0"
+backend = "go:github.com/josharian/impl"
+specifiers = ["1.5.0"]
+
 [[tools."go:golang.org/x/tools/cmd/goimports"]]
 version = "0.49.0"
 backend = "go:golang.org/x/tools/cmd/goimports"
@@ -517,6 +653,33 @@ specifiers = ["0.49.0"]
 version = "0.23.0"
 backend = "go:golang.org/x/tools/gopls"
 specifiers = ["0.23.0"]
+
+[[tools.node]]
+version = "24.20.0"
+backend = "core:node"
+specifiers = ["24.20.0"]
+
+[tools.node."platforms.linux-arm64"]
+checksum = "sha256:3515603e2487879a39bc75716f1a2affd027500c64ba50e845cf72cb33219013"
+url = "https://nodejs.org/dist/v24.20.0/node-v24.20.0-linux-arm64.tar.gz"
+
+[tools.node."platforms.linux-x64"]
+checksum = "sha256:855d581f8a4eb1a8117e3426de25fe02770592febcfb31369aee1ffbfee9e8ec"
+url = "https://nodejs.org/dist/v24.20.0/node-v24.20.0-linux-x64.tar.gz"
+
+[tools.node."platforms.macos-arm64"]
+checksum = "sha256:40e5607e5ecb3db9192723776da2d75d966260fc74a7a9e731c1bd67dda96bc8"
+url = "https://nodejs.org/dist/v24.20.0/node-v24.20.0-darwin-arm64.tar.gz"
+
+[[tools."npm:vscode-langservers-extracted"]]
+version = "4.10.0"
+backend = "npm:vscode-langservers-extracted"
+specifiers = ["4.10.0"]
+
+[[tools."npm:yaml-language-server"]]
+version = "1.24.0"
+backend = "npm:yaml-language-server"
+specifiers = ["1.24.0"]
 
 [[tools.rust]]
 version = "1.98.0"

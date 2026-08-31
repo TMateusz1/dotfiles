@@ -54,6 +54,21 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   tool installs. `detect-private-key` in particular backs the "never commit
   secrets" rule in [AGENTS.md](../AGENTS.md).
 
+## hk is for this repo; Neovim formats everything else
+
+Since Neovim gained conform.nvim and nvim-lint, two things format code and it is
+worth being precise about which does what:
+
+- **hk (`hk.pkl`)** runs at commit time on **this repository's own files** —
+  markdown, TOML, YAML, Lua, shell. It is what keeps the dotfiles tidy.
+- **conform.nvim / nvim-lint** run in the editor, on **whatever project is
+  open**. They never touch this repo's pre-commit path.
+
+They overlap on file types (both can format Lua and YAML here) but never on
+responsibility, and both call the same underlying binaries — `stylua`,
+`yamlfmt`, `taplo` — so a file formatted by one satisfies the other. See
+[nvim.md#formatting](./nvim.md#formatting).
+
 ## No established linter, no check
 
 Several config formats in this repo have no real third-party linter:

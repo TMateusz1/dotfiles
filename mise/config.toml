@@ -34,3 +34,26 @@ disable_backends = ["asdf", "vfox"]
 # Required by nvim-treesitter's main branch to compile parsers — and it must
 # not be the npm build (see docs/nvim.md). This aqua entry is a static binary.
 "aqua:tree-sitter/tree-sitter" = "0.26.13"
+
+# --- Language servers, linters and formatters used by Neovim ------------------
+# Neovim never installs these (no mason.nvim) — it only configures clients
+# against whatever is on $PATH. See docs/nvim.md#lsp.
+
+# Static single-file binaries, same class as everything above.
+"aqua:LuaLS/lua-language-server" = "3.19.1"   # editing this very config
+"aqua:rust-lang/rust-analyzer" = "2026-08-24"
+"aqua:astral-sh/ruff" = "0.16.5"              # Python: lint + format + `ruff server`
+"aqua:mrjosh/helm-ls" = "0.5.4"
+"aqua:hadolint/hadolint" = "2.15.1"           # Dockerfile linter
+"aqua:yannh/kubeconform" = "0.8.0"            # Kubernetes manifest validation
+
+# Go helpers, built with the pinned Go toolchain like gopls/goimports above.
+"go:github.com/fatih/gomodifytags" = { version = "1.17.0", depends = ["go"] }
+"go:github.com/josharian/impl" = { version = "1.5.0", depends = ["go"] }
+
+# YAML and JSON are the one deliberate exception to preferring static binaries:
+# no static language server exists for either, and Kubernetes/CRD schema
+# completion is worth the Node dependency. Nothing else here needs Node.
+"node" = "24.20.0"
+"npm:yaml-language-server" = { version = "1.24.0", depends = ["node"] }
+"npm:vscode-langservers-extracted" = { version = "4.10.0", depends = ["node"] }

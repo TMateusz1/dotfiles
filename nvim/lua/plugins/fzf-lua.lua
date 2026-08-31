@@ -8,6 +8,9 @@ return {
     { "<leader>fr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent files" },
     { "<leader>fb", "<cmd>FzfLua buffers<cr>", desc = "Buffers" },
     { "<leader>fh", "<cmd>FzfLua helptags<cr>", desc = "Help tags" },
+    { "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", desc = "Document symbols" },
+    { "<leader>fS", "<cmd>FzfLua lsp_live_workspace_symbols<cr>", desc = "Workspace symbols" },
+    { "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", desc = "Document diagnostics" },
   },
   opts = {
     ui_select = {},

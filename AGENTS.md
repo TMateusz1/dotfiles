@@ -170,12 +170,19 @@ Rule specific to the **global** config:
   mise (global config or a per-project mise config) or installed manually by
   the user. Neovim config only *configures* LSP clients (e.g. via
   `nvim-lspconfig` / native `vim.lsp.config`), it never installs them.
-  - **Treesitter parsers are the one carve-out**, and only because they
-    aren't executables in the sense the rule is about: nvim-treesitter
-    compiles per-language grammars locally from source. The rule still
-    binds where it counts — the `tree-sitter` CLI that does the compiling
-    is pinned in the global mise config like any other tool, never fetched
-    by Neovim, and never from npm. See [docs/nvim.md](./docs/nvim.md#treesitter).
+  - **Two carve-outs, both for locally compiled artifacts** — never for
+    fetched executables. In each case the rule still binds where it counts:
+    the toolchain doing the compiling is pinned in the global mise config,
+    never fetched by Neovim.
+    - **Treesitter parsers**: nvim-treesitter compiles per-language grammars
+      locally from source. The `tree-sitter` CLI that compiles them is a
+      pinned mise tool, and never the npm build. See
+      [docs/nvim.md](./docs/nvim.md#treesitter).
+    - **blink.cmp's fuzzy matcher**: blink ships a Rust library and by
+      default *downloads* a prebuilt copy from GitHub releases, which this
+      rule forbids. It is therefore built from source (`cargo build
+      --release`) with the `rust` toolchain pinned in the global mise
+      config. See [docs/nvim.md](./docs/nvim.md#completion).
 - Trusted, actively maintained plugins only (see "General config
   philosophy" above) — favor small, focused, well-known plugins over
   mega-plugins or obscure ones, and only add a plugin when a real gap

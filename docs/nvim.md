@@ -43,6 +43,14 @@ mise only, Catppuccin theming).
 | [mikavilpas/yazi.nvim](https://github.com/mikavilpas/yazi.nvim)                                               | Yazi file manager in a float       | `<leader>e`/`<leader>E` open the real `yazi` binary already pinned in the global mise config — see "File explorers" below.                                                                                                                                                       |
 | [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)                                     | Animated cursor trail              | Pure-Lua cursor smear drawn with virtual text; no terminal support required. Defaults kept — see "Cursor" below.                                                                                                                                                                 |
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
+| [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)                                             | LSP server definitions             | Only a data source: it puts `lsp/*.lua` on the runtimepath so `vim.lsp.enable()` can find servers. No `lspconfig.setup()` — see "LSP" below.                                                                                                                                     |
+| [saghen/blink.cmp](https://github.com/saghen/blink.cmp)                                                       | Completion                         | Rust fuzzy matcher **built from source** with the mise-pinned toolchain, never downloaded — see "Completion" below.                                                                                                                                                              |
+| [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)                                             | Formatting                         | Format on save, switchable per buffer and globally under `<leader>u`. Formatters are mise binaries — see "Formatting".                                                                                                                                                           |
+| [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)                                           | Linting                            | Deliberately narrow: only what no LSP covers (hadolint, kubeconform). No golangci-lint — see "Linting".                                                                                                                                                                          |
+| [folke/lazydev.nvim](https://github.com/folke/lazydev.nvim)                                                   | Lua API completion                 | Teaches `lua_ls` the Neovim API while editing this config. `ft = "lua"`.                                                                                                                                                                                                         |
+| [b0o/SchemaStore.nvim](https://github.com/b0o/SchemaStore.nvim)                                               | JSON/YAML schema catalogue         | Pure Lua, no binary and no runtime download. Feeds `jsonls` and `yamlls`.                                                                                                                                                                                                        |
+| [olexsmir/gopher.nvim](https://github.com/olexsmir/gopher.nvim)                                               | Go struct tags / interface stubs   | Thin wrapper over `gomodifytags` and `impl`; its own installer is switched off so the binaries come from mise — see "Go".                                                                                                                                                        |
+| [nvim-neotest/neotest](https://github.com/nvim-neotest/neotest)                                               | Test runner                        | With `neotest-golang`; drives `go test` directly, so it needs no binary beyond the Go toolchain — see "Testing".                                                                                                                                                                 |
 | [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)                         | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
 | [rmagatti/auto-session](https://github.com/rmagatti/auto-session)                                             | Per-directory session persistence  | Restores buffers, window layout and buffer-local options on reopen. Almost entirely defaults — see "Sessions" below.                                                                                                                                                             |
 | [goolord/alpha-nvim](https://github.com/goolord/alpha-nvim)                                                   | Start screen / dashboard           | Shown by a bare `nvim`; skipped whenever Neovim gets an argument. Its `dashboard` theme, re-skinned onto catppuccin's `Alpha*` highlight groups — see "Dashboard" below.                                                                                                         |
@@ -669,6 +677,7 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
 - **`keymaps.lua`**: `<Esc>` in normal mode also runs `:nohlsearch`, so a
   search's highlighted matches clear without needing a separate keybind or
   losing Esc's usual behavior.
+- **`filetypes.lua`**: Helm chart detection — see [Helm](#helm).
 
 ## Native UI
 
@@ -700,6 +709,259 @@ does not depend on it. It would not have solved the layout problem anyway:
 `ui2` opens its cmdline window with `relative = 'laststatus', row = 1`, which is
 the row *below* the statusline — the same place the built-in cmdline already
 sits. Moving the cmdline above the statusline is what noice is here for.
+
+## LSP
+
+Seven servers, all enabled from `lua/plugins/lsp.lua`:
+
+| Server          | Language         | Binary from mise                   |
+| --------------- | ---------------- | ---------------------------------- |
+| `gopls`         | Go               | `go:golang.org/x/tools/gopls`      |
+| `lua_ls`        | Lua              | `aqua:LuaLS/lua-language-server`   |
+| `yamlls`        | YAML, Kubernetes | `npm:yaml-language-server`         |
+| `jsonls`        | JSON             | `npm:vscode-langservers-extracted` |
+| `helm_ls`       | Helm charts      | `aqua:mrjosh/helm-ls`              |
+| `ruff`          | Python           | `aqua:astral-sh/ruff`              |
+| `rust_analyzer` | Rust             | `aqua:rust-lang/rust-analyzer`     |
+
+**No mason.nvim.** Every binary above is pinned in the global mise config and
+resolved from `$PATH`; Neovim configures clients and never installs anything.
+This is the rule from AGENTS.md, and it is the reason the table has a "binary
+from mise" column at all — a server that isn't pinned there simply won't start.
+
+### Configured natively, not through a framework
+
+Neovim 0.11+ reads `lsp/<name>.lua` from the runtimepath. `nvim-lspconfig` is
+present **only** to put those definitions there — 413 of them — and nothing
+calls `require("lspconfig").setup()`, which is the older API. Servers are turned
+on with `vim.lsp.enable{...}` and this repo's overrides are layered on with
+`vim.lsp.config(name, {...})`.
+
+### Keymaps: only what Neovim doesn't already provide
+
+Neovim 0.12 ships LSP mappings by default. Checked against `nvim --clean`, these
+already exist and are **deliberately not redefined**:
+
+| Key         | Action                       |
+| ----------- | ---------------------------- |
+| `grn`       | Rename                       |
+| `gra`       | Code action                  |
+| `grr`       | References                   |
+| `gri`       | Implementation               |
+| `grt`       | Type definition              |
+| `gO`        | Document symbols             |
+| `]d` / `[d` | Next / previous diagnostic   |
+| `i_<C-s>`   | Signature help               |
+| `K`         | Hover (bound on `LspAttach`) |
+
+Only the gaps are added, buffer-locally on `LspAttach`:
+
+| Key          | Action                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| `gd`         | Definition — via fzf-lua, so several results land in a picker rather than the quickfix list |
+| `gD`         | Declaration                                                                                 |
+| `<leader>cd` | Line diagnostics in a float                                                                 |
+| `<leader>cf` | Format buffer (works regardless of the format-on-save toggle)                               |
+| `<leader>cr` | Restart the client                                                                          |
+| `<leader>ci` | `:LspInfo`                                                                                  |
+| `<leader>uh` | Toggle inlay hints                                                                          |
+
+Plus symbol search through the picker already in use: `<leader>fs` (document),
+`<leader>fS` (workspace), `<leader>fd` (document diagnostics).
+
+### Diagnostics
+
+`virtual_lines = { current_line = true }` rather than `virtual_text`. gopls
+messages routinely run past the window width and inline text truncates them;
+virtual lines wrap, and restricting them to the cursor's line stops the buffer
+from reflowing while typing. `signcolumn` was already `yes`, so the gutter signs
+cost no width.
+
+### gopls
+
+`gofumpt`, `staticcheck`, `usePlaceholders` and `completeUnimported` are on,
+along with the `unusedparams`/`unusedwrite`/`shadow`/`nilness`/`useany`
+analyses and the full inlay-hint set. The one setting worth calling out is
+`directoryFilters = { "-vendor", "-node_modules", "-.git" }`: operator repos
+vendor large dependency trees, and indexing them makes gopls slow to start and
+fills completion with duplicate symbols.
+
+### Helm
+
+Helm needed one thing beyond enabling `helm_ls`: **a filetype**. Neovim has no
+built-in one, chart templates are `.yaml` files, and nvim-lspconfig declares
+`filetypes = { "helm", "yaml.helm-values" }` for helm-ls. Left alone, templates
+stayed `yaml`, helm-ls never attached, and yaml-language-server attached instead
+and treated every `{{ ... }}` as broken YAML. The installed `helm` treesitter
+parser sat unused for the same reason.
+
+nvim-lspconfig's own docs point at the `vim-helm` plugin for this. It is one
+filetype rule, which `vim.filetype.add()` does natively, so `lua/config/filetypes.lua`
+handles it instead of adding a plugin:
+
+| Path                                               | Filetype           | Servers                |
+| -------------------------------------------------- | ------------------ | ---------------------- |
+| `templates/*.yaml`, `*.tpl`, `templates/NOTES.txt` | `helm`             | helm-ls only           |
+| `values*.yaml`                                     | `yaml.helm-values` | helm-ls **and** yamlls |
+| `Chart.yaml`                                       | `yaml`             | yamlls                 |
+
+`values.yaml` deliberately keeps a `yaml`-prefixed filetype so it still gets
+schema support from yamlls, while the `.helm-values` suffix also lets helm-ls
+attach — that pairing is what makes `.Values.*` completion inside a template
+resolve against the real file.
+
+Every rule is guarded by an upward search for `Chart.yaml`. Without that guard
+any `templates/` directory anywhere — Ansible, Rails, a docs site — would be
+misdetected as Helm.
+
+### Documentation
+
+No extra plugin — `K` is enough, and noice renders the markdown gopls returns.
+`K` again enters the hover window so it can be scrolled. `K` **on an import
+path** gives the whole package's documentation, which covers package browsing
+without a dedicated godoc plugin.
+
+## Completion
+
+[blink.cmp](https://github.com/saghen/blink.cmp), sources `lsp`, `path`,
+`snippets`, `buffer`, using Neovim's native `vim.snippet`.
+
+**The fuzzy matcher is built from source, not downloaded.** blink ships a Rust
+library and by default fetches a prebuilt copy from GitHub releases — which
+AGENTS.md forbids. `build = "cargo build --release"` compiles it locally with
+the `rust` toolchain already pinned in the global mise config. That is the same
+carve-out, for the same reason, as nvim-treesitter compiling its parsers: the
+artifact is built here, and the toolchain that builds it is pinned and never
+fetched by Neovim. AGENTS.md records both exceptions explicitly.
+
+### Keys
+
+The `super-tab` preset, **not** blink's `default`. In the default preset the
+accept key is `<C-y>` and `<Tab>` only jumps between the placeholders of an
+already-expanded snippet — so pressing Tab on a snippet in the menu does
+nothing, which reads as "snippets are broken" rather than "wrong key".
+
+| Key                                  | Action                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `<Tab>`                              | Accept the selected item; inside a snippet, jump to the next field; otherwise a literal tab |
+| `<S-Tab>`                            | Jump to the previous snippet field                                                          |
+| `<C-n>` / `<C-p>`, `<Down>` / `<Up>` | Select next / previous                                                                      |
+| `<C-space>`                          | Show menu, then documentation                                                               |
+| `<C-e>`                              | Cancel                                                                                      |
+| `<C-b>` / `<C-f>`                    | Scroll the documentation window                                                             |
+| `<C-k>`                              | Signature help                                                                              |
+
+`<CR>` is deliberately left alone so Enter always inserts a newline. blink's
+`enter` preset makes `<CR>` accept instead, which is the other common choice —
+it is a one-word change if the Tab behaviour ever gets in the way.
+
+`fuzzy.implementation` is `prefer_rust`, not `rust`: if the build ever fails on
+a new machine, completion degrades to the Lua matcher instead of breaking the
+config. The cost of that safety is that a failed build is **silent**, so the
+validation below checks the Rust module actually loaded.
+
+### Snippets
+
+`friendly-snippets` plus this repo's own `nvim/snippets/go.json`. blink's
+default snippet source scans `stdpath("config") .. "/snippets"`, and a bare
+directory needs no manifest — the filename becomes the filetype, so `go.json`
+is picked up as Go snippets.
+
+The custom set is aimed at controller work rather than at generic Go: a
+`Reconcile` skeleton with `IgnoreNotFound` handling, `SetupWithManager`,
+`RequeueAfter`, the controller-runtime logger, a kubebuilder RBAC marker,
+wrapped-error returns, a parallel table-driven test, and a context with timeout.
+
+## Formatting
+
+[conform.nvim](https://github.com/stevearc/conform.nvim). Every formatter is a
+mise binary; conform only sequences them.
+
+| Filetype | Formatters                 |
+| -------- | -------------------------- |
+| Go       | `goimports` then `gofumpt` |
+| Lua      | `stylua`                   |
+| Python   | `ruff_format`              |
+| YAML     | `yamlfmt`                  |
+| TOML     | `taplo`                    |
+| JSON     | `jq`                       |
+| Shell    | `shfmt`                    |
+
+**Format on save is on by default and switchable at two levels**, because the
+common failure mode is opening someone else's repo with a different style:
+
+| Key          | Scope                                            |
+| ------------ | ------------------------------------------------ |
+| `<leader>us` | Global — `vim.g.disable_autoformat`              |
+| `<leader>uS` | Current buffer only — `vim.b.disable_autoformat` |
+
+`format_on_save` is a *function* that returns `nil` when either flag is set,
+which is conform's own documented pattern. `<leader>cf` still formats on demand
+regardless of the toggles.
+
+## Linting
+
+[nvim-lint](https://github.com/mfussenegger/nvim-lint), scoped to what no
+language server already reports:
+
+| Linter        | Files                                      |
+| ------------- | ------------------------------------------ |
+| `hadolint`    | Dockerfile                                 |
+| `kubeconform` | YAML that looks like a Kubernetes manifest |
+
+kubeconform is not wired to `yaml` wholesale: it rejects any document without an
+`apiVersion`/`kind`, which is most YAML. An autocommand scans the first 40 lines
+for `apiVersion:` and only then runs it.
+
+**Go is deliberately absent.** gopls already runs `staticcheck` and the
+unusedparams/shadow/nilness analyses, so golangci-lint on every write would
+duplicate those messages and add seconds of latency on a large repo. The binary
+stays in mise and is run on purpose — `golangci-lint run`, or in CI. The
+trade-off is that some findings only show up there; the fix, if that ever bites,
+is an on-demand mapping rather than putting it back on `BufWritePost`.
+
+This is separate from `hk.pkl`, which formats and lints **this repository's own
+files** at commit time. conform and nvim-lint act in the editor, on whatever
+project is open. See [linting.md](./linting.md).
+
+## Go
+
+gopls covers completion, navigation, refactoring and code actions. Two things it
+does not do are filled by [gopher.nvim](https://github.com/olexsmir/gopher.nvim),
+a thin wrapper whose own installer is switched off (`installation = false`) so
+the binaries come from mise:
+
+| Key           | Action                 | Binary         |
+| ------------- | ---------------------- | -------------- |
+| `<leader>cta` | Add `json` struct tags | `gomodifytags` |
+| `<leader>cty` | Add `yaml` struct tags | `gomodifytags` |
+| `<leader>ctr` | Remove struct tags     | `gomodifytags` |
+| `<leader>cI`  | Implement an interface | `impl`         |
+| `<leader>ce`  | Expand `if err != nil` | —              |
+
+gopher.nvim is less well known than `ray-x/go.nvim`; it was chosen because
+go.nvim is a mega-plugin, which this repo's plugin rule argues against. If it
+stops being maintained, the fallback is three `nvim_create_user_command`
+wrappers around the same two binaries — the binaries are the part that matters.
+
+## Testing
+
+[neotest](https://github.com/nvim-neotest/neotest) with
+[neotest-golang](https://github.com/fredrikaverpil/neotest-golang), which shells
+out to `go test -json`. No extra binary beyond the Go toolchain.
+
+| Key          | Runs                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| `<leader>tt` | Nearest test                                                                                |
+| `<leader>tf` | Tests in the file                                                                           |
+| `<leader>tp` | Tests in the **package** — the current file's directory, which in Go is exactly the package |
+| `<leader>ta` | Everything under the cwd                                                                    |
+| `<leader>ts` | Summary panel                                                                               |
+| `<leader>to` | Output of the last test                                                                     |
+| `<leader>tS` | Stop the current run                                                                        |
+
+`<leader>ta` on a large repo takes a while; treat it as "start it and watch the
+summary panel" rather than an instant action, and `<leader>tS` aborts.
 
 ## Bottom of the screen
 
@@ -1019,6 +1281,57 @@ was read but not rewritten.
   resolved through `screenpos()` to confirm they occupy the same screen row.
   `:echo` and `vim.notify` also render on row 39, sized to their content, so
   neither covers lualine.
+- LSP, against a real Go module in a scratch directory (`go.mod`, a type with
+  unaligned struct fields, an unused variable, a passing test and a Dockerfile),
+  driven through a login shell so `$PATH` carries the mise tools. gopls attaches
+  with `cmd = { "gopls" }`, and a real diagnostic comes back —
+  `declared and not used: unused`, source `compiler`. All seven server
+  definitions resolve in nvim-lspconfig's `lsp/` directory. `grn` and `gra`
+  still report Neovim's own `vim.lsp.buf.rename()`/`code_action()`, confirming
+  the native mappings were not clobbered, while `gd`/`gD` are the ones added
+  here.
+- Snippet expansion, after the accept key turned out to be the problem rather
+  than the snippets: `<Tab>`/`<S-Tab>` are mapped in insert mode under the
+  `super-tab` preset (and `<C-y>`, the old default's accept key, is
+  correspondingly gone). The `errw` snippet resolves from the registry with the
+  right body, and `vim.snippet.expand` — the same mechanism blink drives —
+  turns it into `return fmt.Errorf("doing thing: %w", err)` with the snippet
+  left active and a forward jump available.
+- Helm, on a real chart fixture (`Chart.yaml`, `values.yaml`,
+  `templates/deployment.yaml` with `{{ .Release.Name }}`). Before the filetype
+  rule this was a genuine hole found by testing rather than by reading: the
+  template came up as `yaml` with **yamlls** attached and helm-ls absent. After
+  it, the same file is `helm` with `helm_ls` attached and yamlls correctly out
+  of the way. `vim.filetype.match` resolves all five cases, the last two being
+  the guards that matter: a `templates/deployment.yaml` with **no** `Chart.yaml`
+  above it stays `yaml`, and so does an unrelated `/tmp/zwykly.yaml`.
+  `values.yaml` comes back `yaml.helm-values` with both helm_ls and yamlls
+  attached, which is the combination that makes `.Values.*` completion work.
+- Completion is genuinely on the Rust matcher, not the silent Lua fallback:
+  `require("blink.cmp.fuzzy.rust")` loads, and `target/release/libblink_cmp_fuzzy.dylib`
+  exists after the build. This is worth checking explicitly precisely because
+  `prefer_rust` degrades quietly. The 9 custom Go snippets are all present in
+  the registry blink builds for `go` (68 entries in total, the rest from
+  friendly-snippets).
+- Format on save, all four states, checking the file on disk after `:w` for the
+  alignment `gofmt` introduces: enabled → formatted; `<leader>us` (global) →
+  untouched; `<leader>uS` (buffer) → untouched; re-enabled → formatted again.
+  conform reports both `goimports` and `gofumpt` as available for Go. Note the
+  first attempt at this test asserted on the wrong line — `gofmt` aligns
+  `Name string` into `Name     string` and leaves the longest field alone, so
+  the original predicate could never have gone true.
+- Linting, including the negative control that matters here: a Dockerfile with
+  `FROM ubuntu:latest` yields two hadolint diagnostics with the expected
+  "Pin the version explicitly" message, while a Go buffer has **no** linter
+  registered (`linters_by_ft.go` is nil) and golangci-lint appears in no
+  diagnostic source. Go findings come from gopls alone, as intended.
+- Testing: the neotest-golang adapter loads, recognises `main_test.go` as a test
+  file and resolves the module root correctly. Discovery and a full run could
+  not be driven from the headless harness — neotest's `discover_positions` must
+  be called from an async context and errors out otherwise — so this is
+  verified as far as the harness allows, plus `go test -json` (the exact
+  mechanism the adapter shells out to) reporting two passing actions on the
+  fixture.
 - Colorscheme: `vim.g.colors_name` is `"catppuccin-mocha"` and
   `require("catppuccin").options.flavour` is `"mocha"` — together these
   confirm `opts` actually reached `setup()` (see "Theme" above). Checked

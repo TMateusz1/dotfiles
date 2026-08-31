@@ -1,0 +1,97 @@
+{
+  "Wrapped error return": {
+    "prefix": "errw",
+    "body": ["return fmt.Errorf(\"${1:doing thing}: %w\", ${2:err})$0"],
+    "description": "Return an error wrapped with %w so errors.Is/As keep working"
+  },
+  "If err, wrapped": {
+    "prefix": "iferrw",
+    "body": [
+      "if err != nil {",
+      "\treturn fmt.Errorf(\"${1:doing thing}: %w\", err)",
+      "}",
+      "$0"
+    ],
+    "description": "if err != nil with a wrapped error"
+  },
+  "Table-driven test": {
+    "prefix": "tdt",
+    "body": [
+      "func Test${1:Func}(t *testing.T) {",
+      "\tt.Parallel()",
+      "",
+      "\ttests := map[string]struct {",
+      "\t\t${2:in}      ${3:string}",
+      "\t\twant    ${4:string}",
+      "\t\twantErr bool",
+      "\t}{",
+      "\t\t\"${5:case}\": {},",
+      "\t}",
+      "",
+      "\tfor name, tc := range tests {",
+      "\t\tt.Run(name, func(t *testing.T) {",
+      "\t\t\tt.Parallel()",
+      "\t\t\t$0",
+      "\t\t})",
+      "\t}",
+      "}"
+    ],
+    "description": "Table-driven, parallel subtests keyed by name"
+  },
+  "Reconcile method": {
+    "prefix": "reconcile",
+    "body": [
+      "func (r *${1:Reconciler}) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {",
+      "\tlog := logf.FromContext(ctx)",
+      "",
+      "\tvar ${2:obj} ${3:v1alpha1.Thing}",
+      "\tif err := r.Get(ctx, req.NamespacedName, &$2); err != nil {",
+      "\t\treturn ctrl.Result{}, client.IgnoreNotFound(err)",
+      "\t}",
+      "",
+      "\t$0",
+      "",
+      "\treturn ctrl.Result{}, nil",
+      "}"
+    ],
+    "description": "controller-runtime Reconcile with NotFound handling"
+  },
+  "SetupWithManager": {
+    "prefix": "setupmgr",
+    "body": [
+      "func (r *${1:Reconciler}) SetupWithManager(mgr ctrl.Manager) error {",
+      "\treturn ctrl.NewControllerManagedBy(mgr).",
+      "\t\tFor(&${2:v1alpha1.Thing}{}).",
+      "\t\tOwns(&${3:corev1.Pod}{}).",
+      "\t\tComplete(r)",
+      "}"
+    ],
+    "description": "Wire a reconciler into the manager"
+  },
+  "Requeue after": {
+    "prefix": "requeue",
+    "body": ["return ctrl.Result{RequeueAfter: ${1:time.Minute}}, nil$0"],
+    "description": "Requeue the request after a delay"
+  },
+  "Logger from context": {
+    "prefix": "logctx",
+    "body": ["log := logf.FromContext(ctx)$0"],
+    "description": "controller-runtime logger out of the context"
+  },
+  "Kubebuilder RBAC marker": {
+    "prefix": "kbrbac",
+    "body": [
+      "// +kubebuilder:rbac:groups=${1:example.com},resources=${2:things},verbs=get;list;watch;create;update;patch;delete"
+    ],
+    "description": "RBAC marker for controller-gen"
+  },
+  "Context with timeout": {
+    "prefix": "ctxt",
+    "body": [
+      "ctx, cancel := context.WithTimeout(${1:ctx}, ${2:30 * time.Second})",
+      "defer cancel()",
+      "$0"
+    ],
+    "description": "Derived context with a timeout and deferred cancel"
+  }
+}
