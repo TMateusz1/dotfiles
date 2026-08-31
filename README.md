@@ -60,7 +60,7 @@ docs/                  # notes on what's configured, and why
 | Core tools (tmux, lazygit, k9s, bottom, yazi)                                            | [docs/core_tools.md](./docs/core_tools.md)       |
 | Desktop tools (kitty)                                                                    | [docs/desktop_tools.md](./docs/desktop_tools.md) |
 | Neovim (LSP, blink.cmp, conform, neotest, Treesitter, fzf-lua, oil/yazi, noice)          | [docs/nvim.md](./docs/nvim.md)                   |
-| languages (rust, go)                                                                     | [docs/langs.md](./docs/langs.md)                 |
+| languages (Rust, Go, Python, Robot Framework, Kubernetes, Helm)                          | [docs/langs.md](./docs/langs.md)                 |
 | linting / pre-commit (hk)                                                                | [docs/linting.md](./docs/linting.md)             |
 | bootstrap (symlinks, zsh plugins, desktop apps)                                          | [docs/bootstrap.md](./docs/bootstrap.md)         |
 

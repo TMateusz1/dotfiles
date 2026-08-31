@@ -23,6 +23,7 @@ disable_backends = ["asdf", "vfox"]
 "go:golang.org/x/tools/cmd/goimports" = { version = "0.49.0", depends = ["go"] }
 "aqua:mvdan/gofumpt" = "0.11.0"
 "aqua:gotestyourself/gotestsum" = "1.13.0"
+"python" = "3.14.7"
 "aqua:starship/starship" = "1.26.0"
 "aqua:derailed/k9s" = "0.51.0"
 "aqua:charmbracelet/glow" = "3.0.0"
@@ -44,16 +45,18 @@ disable_backends = ["asdf", "vfox"]
 "aqua:rust-lang/rust-analyzer" = "2026-08-24"
 "aqua:astral-sh/ruff" = "0.16.5"              # Python: lint + format + `ruff server`
 "aqua:mrjosh/helm-ls" = "0.5.4"
+"aqua:helm/helm" = "4.2.4"                    # helm-ls shells out for `helm lint`
 "aqua:hadolint/hadolint" = "2.15.1"           # Dockerfile linter
 "aqua:yannh/kubeconform" = "0.8.0"            # Kubernetes manifest validation
+"aqua:google/yamlfmt" = "0.21.0"              # YAML/values formatting outside this repo
 
 # Go helpers, built with the pinned Go toolchain like gopls/goimports above.
 "go:github.com/fatih/gomodifytags" = { version = "1.17.0", depends = ["go"] }
 "go:github.com/josharian/impl" = { version = "1.5.0", depends = ["go"] }
 
-# YAML and JSON are the one deliberate exception to preferring static binaries:
-# no static language server exists for either, and Kubernetes/CRD schema
-# completion is worth the Node dependency. Nothing else here needs Node.
+# YAML, JSON and basedpyright need Node; the first two have no static language
+# server, and basedpyright is the type-aware half of the Python LSP setup.
 "node" = "24.20.0"
 "npm:yaml-language-server" = { version = "1.24.0", depends = ["node"] }
 "npm:vscode-langservers-extracted" = { version = "4.10.0", depends = ["node"] }
+"npm:basedpyright" = { version = "1.39.10", depends = ["node"] }

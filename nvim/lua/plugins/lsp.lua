@@ -41,16 +41,15 @@ return {
           gofumpt = true,
           staticcheck = true,
           usePlaceholders = true,
-          completeUnimported = true,
           -- Operator repos vendor large dependency trees; indexing them makes
           -- gopls slow to start and pollutes completion with copies.
-          directoryFilters = { "-vendor", "-node_modules", "-.git" },
+          directoryFilters = { "-**/vendor", "-**/node_modules", "-**/.git" },
           analyses = {
             unusedparams = true,
             unusedwrite = true,
             shadow = true,
             nilness = true,
-            useany = true,
+            any = true,
           },
           hints = {
             assignVariableTypes = true,
@@ -91,9 +90,39 @@ return {
       settings = {
         yaml = {
           schemaStore = { enable = false, url = "" }, -- SchemaStore.nvim replaces it
-          schemas = require("schemastore").yaml.schemas(),
+          schemas = require("schemastore").yaml.schemas({
+            extra = {
+              {
+                name = "Kubernetes",
+                description = "Kubernetes manifests in conventional project paths",
+                url = "kubernetes",
+                fileMatch = {
+                  "k8s/**/*.yaml",
+                  "k8s/**/*.yml",
+                  "manifests/**/*.yaml",
+                  "manifests/**/*.yml",
+                  "deploy/**/*.yaml",
+                  "deploy/**/*.yml",
+                  "**/*.k8s.yaml",
+                  "**/*.k8s.yml",
+                },
+              },
+            },
+          }),
           validate = true,
           keyOrdering = false, -- alphabetical key order is not a real rule
+        },
+      },
+    })
+
+    vim.lsp.config("helm_ls", {
+      settings = {
+        ["helm-ls"] = {
+          helmLint = { enabled = true },
+          yamlls = {
+            enabled = true,
+            path = "yaml-language-server",
+          },
         },
       },
     })
@@ -105,6 +134,8 @@ return {
       "yamlls",
       "helm_ls",
       "ruff",
+      "basedpyright",
+      "robotcode",
       "rust_analyzer",
     })
 
@@ -116,6 +147,13 @@ return {
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("dotfiles.lsp.attach", { clear = true }),
       callback = function(ev)
+        local client = vim.lsp.get_client_by_id(ev.data.client_id)
+        if client and client.name == "ruff" then
+          -- Ruff intentionally complements basedpyright. Let the type-aware
+          -- server own hover instead of presenting two competing responses.
+          client.server_capabilities.hoverProvider = false
+        end
+
         local function map(mode, lhs, rhs, desc)
           vim.keymap.set(mode, lhs, rhs, { buffer = ev.buf, desc = desc })
         end

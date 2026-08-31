@@ -240,6 +240,26 @@ url = "https://github.com/golangci/golangci-lint/releases/download/v2.13.2/golan
 url_api = "https://api.github.com/repos/golangci/golangci-lint/releases/assets/532995398"
 provenance = "github-attestations"
 
+[[tools."aqua:google/yamlfmt"]]
+version = "0.21.0"
+backend = "aqua:google/yamlfmt"
+specifiers = ["0.21.0"]
+
+[tools."aqua:google/yamlfmt"."platforms.linux-arm64"]
+checksum = "sha256:5b2689c963b177271330c5ce8ca7396751107e5a826be46f03d2cb9b6f0c7784"
+url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650208"
+
+[tools."aqua:google/yamlfmt"."platforms.linux-x64"]
+checksum = "sha256:1f300d9257b232bb3b541d7fb1b0e6b3c121bcbab381c86cd38cb8722be8a566"
+url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650203"
+
+[tools."aqua:google/yamlfmt"."platforms.macos-arm64"]
+checksum = "sha256:4b417ecb94339d57e4c122ecc948c1a00fe328b5853266de9806e652a92858fa"
+url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650209"
+
 [[tools."aqua:gotestyourself/gotestsum"]]
 version = "1.13.0"
 backend = "aqua:gotestyourself/gotestsum"
@@ -282,6 +302,23 @@ checksum = "sha256:5c09f3213f8e40406abe048233d985eebef336d4a6a20021be47fadb6cf48
 url = "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-macos-arm64"
 url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/496546505"
 provenance = "github-attestations"
+
+[[tools."aqua:helm/helm"]]
+version = "4.2.4"
+backend = "aqua:helm/helm"
+specifiers = ["4.2.4"]
+
+[tools."aqua:helm/helm"."platforms.linux-arm64"]
+checksum = "sha256:564de2191b881e9f71b5606b25345821ea1682f06ab90499d3ab22b530176da1"
+url = "https://get.helm.sh/helm-v4.2.4-linux-arm64.tar.gz"
+
+[tools."aqua:helm/helm"."platforms.linux-x64"]
+checksum = "sha256:c306b46f719b0a4da32d0f78ee21bf90ce8d602f15b22ab753f0674d1670a7f3"
+url = "https://get.helm.sh/helm-v4.2.4-linux-amd64.tar.gz"
+
+[tools."aqua:helm/helm"."platforms.macos-arm64"]
+checksum = "sha256:d747eb4e28bd2727173d15b759fa0a17822291ec09db7ced3d55af290a3661a2"
+url = "https://get.helm.sh/helm-v4.2.4-darwin-arm64.tar.gz"
 
 [[tools."aqua:jesseduffield/lazygit"]]
 version = "0.64.1"
@@ -671,6 +708,11 @@ url = "https://nodejs.org/dist/v24.20.0/node-v24.20.0-linux-x64.tar.gz"
 checksum = "sha256:40e5607e5ecb3db9192723776da2d75d966260fc74a7a9e731c1bd67dda96bc8"
 url = "https://nodejs.org/dist/v24.20.0/node-v24.20.0-darwin-arm64.tar.gz"
 
+[[tools."npm:basedpyright"]]
+version = "1.39.10"
+backend = "npm:basedpyright"
+specifiers = ["1.39.10"]
+
 [[tools."npm:vscode-langservers-extracted"]]
 version = "4.10.0"
 backend = "npm:vscode-langservers-extracted"
@@ -680,6 +722,26 @@ specifiers = ["4.10.0"]
 version = "1.24.0"
 backend = "npm:yaml-language-server"
 specifiers = ["1.24.0"]
+
+[[tools.python]]
+version = "3.14.7"
+backend = "core:python"
+specifiers = ["3.14.7"]
+
+[tools.python."platforms.linux-arm64"]
+checksum = "sha256:7f0b801b0ba2c74531cd2e66ee898569cdf1f323a24383576f2a6761001e01f1"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.14.7+20260825-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+provenance = "github-attestations"
+
+[tools.python."platforms.linux-x64"]
+checksum = "sha256:a0f39e822fd3b96a2605f30f954acf9a2cdf91faa1385a13e24bc407a41e05ea"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.14.7+20260825-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+provenance = "github-attestations"
+
+[tools.python."platforms.macos-arm64"]
+checksum = "sha256:17ecb3d29c49765856370cbb47d948a24ec518be40f607362c1bbb3ebbc5c442"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.14.7+20260825-aarch64-apple-darwin-install_only_stripped.tar.gz"
+provenance = "github-attestations"
 
 [[tools.rust]]
 version = "1.98.0"

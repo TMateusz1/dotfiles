@@ -47,7 +47,9 @@ Global (`mise/config.toml`):
 - Core tools — `tmux`, `lazygit`, `k9s`, `bottom`, `yazi` — see
   [core_tools.md](./core_tools.md)
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
-  `gofumpt`, `gotestsum`) — see [langs.md](./langs.md)
+  `gofumpt`, `gotestsum`) and `python`; editor tooling includes basedpyright,
+  Ruff, Helm 4/helm-ls, YAML language tooling, yamlfmt and kubeconform — see
+  [langs.md](./langs.md)
 - `neovim` — editor, see [nvim.md](./nvim.md)
 - `tree-sitter` — the CLI nvim-treesitter needs to compile parsers; a hard
   runtime dependency of the Neovim config, deliberately the aqua build

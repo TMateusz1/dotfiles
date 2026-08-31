@@ -46,7 +46,7 @@ mise only, Catppuccin theming).
 | [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)                                             | LSP server definitions             | Only a data source: it puts `lsp/*.lua` on the runtimepath so `vim.lsp.enable()` can find servers. No `lspconfig.setup()` — see "LSP" below.                                                                                                                                     |
 | [saghen/blink.cmp](https://github.com/saghen/blink.cmp)                                                       | Completion                         | Rust fuzzy matcher **built from source** with the mise-pinned toolchain, never downloaded — see "Completion" below.                                                                                                                                                              |
 | [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)                                             | Formatting                         | Format on save, switchable per buffer and globally under `<leader>u`. Formatters are mise binaries — see "Formatting".                                                                                                                                                           |
-| [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)                                           | Linting                            | Deliberately narrow: only what no LSP covers (hadolint, kubeconform). No golangci-lint — see "Linting".                                                                                                                                                                          |
+| [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)                                           | Linting                            | Automatic linting stays narrow (hadolint); slower project/schema checks run asynchronously into quickfix on demand — see "Linting".                                                                                                                                              |
 | [folke/lazydev.nvim](https://github.com/folke/lazydev.nvim)                                                   | Lua API completion                 | Teaches `lua_ls` the Neovim API while editing this config. `ft = "lua"`.                                                                                                                                                                                                         |
 | [b0o/SchemaStore.nvim](https://github.com/b0o/SchemaStore.nvim)                                               | JSON/YAML schema catalogue         | Pure Lua, no binary and no runtime download. Feeds `jsonls` and `yamlls`.                                                                                                                                                                                                        |
 | [olexsmir/gopher.nvim](https://github.com/olexsmir/gopher.nvim)                                               | Go struct tags / interface stubs   | Thin wrapper over `gomodifytags` and `impl`; its own installer is switched off so the binaries come from mise — see "Go".                                                                                                                                                        |
@@ -712,22 +712,25 @@ sits. Moving the cmdline above the statusline is what noice is here for.
 
 ## LSP
 
-Seven servers, all enabled from `lua/plugins/lsp.lua`:
+Nine servers, all enabled from `lua/plugins/lsp.lua`:
 
-| Server          | Language         | Binary from mise                   |
-| --------------- | ---------------- | ---------------------------------- |
-| `gopls`         | Go               | `go:golang.org/x/tools/gopls`      |
-| `lua_ls`        | Lua              | `aqua:LuaLS/lua-language-server`   |
-| `yamlls`        | YAML, Kubernetes | `npm:yaml-language-server`         |
-| `jsonls`        | JSON             | `npm:vscode-langservers-extracted` |
-| `helm_ls`       | Helm charts      | `aqua:mrjosh/helm-ls`              |
-| `ruff`          | Python           | `aqua:astral-sh/ruff`              |
-| `rust_analyzer` | Rust             | `aqua:rust-lang/rust-analyzer`     |
+| Server          | Language         | Executable source                   |
+| --------------- | ---------------- | ----------------------------------- |
+| `gopls`         | Go               | `go:golang.org/x/tools/gopls`       |
+| `lua_ls`        | Lua              | `aqua:LuaLS/lua-language-server`    |
+| `yamlls`        | YAML, Kubernetes | `npm:yaml-language-server`          |
+| `jsonls`        | JSON             | `npm:vscode-langservers-extracted`  |
+| `helm_ls`       | Helm charts      | `aqua:mrjosh/helm-ls`               |
+| `ruff`          | Python           | `aqua:astral-sh/ruff`               |
+| `basedpyright`  | Python           | `npm:basedpyright`                  |
+| `robotcode`     | Robot Framework  | Project-local Python environment    |
+| `rust_analyzer` | Rust             | `aqua:rust-lang/rust-analyzer`      |
 
-**No mason.nvim.** Every binary above is pinned in the global mise config and
-resolved from `$PATH`; Neovim configures clients and never installs anything.
-This is the rule from AGENTS.md, and it is the reason the table has a "binary
-from mise" column at all — a server that isn't pinned there simply won't start.
+**No mason.nvim.** Global binaries are pinned in mise and resolved from `$PATH`;
+RobotCode is deliberately pinned by each Robot project so it sees that
+project's Python environment and keyword libraries. Neovim configures clients
+and never installs anything. A server that is not available on `$PATH` simply
+does not start.
 
 ### Configured natively, not through a framework
 
@@ -779,12 +782,33 @@ cost no width.
 
 ### gopls
 
-`gofumpt`, `staticcheck`, `usePlaceholders` and `completeUnimported` are on,
-along with the `unusedparams`/`unusedwrite`/`shadow`/`nilness`/`useany`
-analyses and the full inlay-hint set. The one setting worth calling out is
-`directoryFilters = { "-vendor", "-node_modules", "-.git" }`: operator repos
-vendor large dependency trees, and indexing them makes gopls slow to start and
-fills completion with duplicate symbols.
+`gofumpt`, `staticcheck` and `usePlaceholders` are on, along with the
+`unusedparams`/`unusedwrite`/`shadow`/`nilness`/`any` analyses and the full
+inlay-hint set. The filters are recursive (`-**/vendor`, `-**/node_modules`,
+`-**/.git`): operator repos vendor large dependency trees, and indexing them
+makes gopls slow to start and fills completion with duplicate symbols.
+
+### Python and Robot Framework
+
+Python intentionally attaches both basedpyright and Ruff. Basedpyright owns
+type-aware completion, navigation, hover and type checking; Ruff owns linting,
+import organization and formatting. Ruff hover is disabled on attach so only
+one server answers documentation requests.
+
+RobotCode is enabled, but not globally installed. Each Robot project provides
+`robotcode` from its own environment, normally by pinning
+`robotcode[languageserver,lint]`; that also supplies Robocop diagnostics. The
+LSP supplies completion, navigation and formatting through conform's LSP
+fallback. Without a project-local executable, treesitter highlighting still
+works but no Robot LSP client starts.
+
+### Kubernetes
+
+yamlls receives an explicit Kubernetes schema for conventional manifest paths:
+`k8s/**`, `manifests/**`, `deploy/**`, and `*.k8s.yaml`/`*.k8s.yml`. Other
+layouts can opt in per file with a YAML language-server schema modeline. Schema
+validation stays interactive in the LSP; the fuller kubeconform check is an
+on-demand quickfix command described under [Linting](#linting).
 
 ### Helm
 
@@ -813,6 +837,10 @@ resolve against the real file.
 Every rule is guarded by an upward search for `Chart.yaml`. Without that guard
 any `templates/` directory anywhere — Ansible, Rails, a docs site — would be
 misdetected as Helm.
+
+helm-ls has its built-in `helm lint` and yamlls integrations enabled. The
+globally pinned Helm 4 CLI is therefore a runtime dependency, not merely a
+separate shell convenience.
 
 ### Documentation
 
@@ -903,6 +931,12 @@ mise binary; conform only sequences them.
 | JSON     | `jq`                       |
 | Shell    | `shfmt`                    |
 
+`yaml.helm-values` inherits the YAML formatter, so values files use the same
+globally available yamlfmt outside this dotfiles repo. Helm templates are not
+fed to a generic YAML formatter because Go-template expressions are not plain
+YAML. Robot Framework has no separate global formatter: conform's LSP fallback
+uses the project-local RobotCode formatter when that client is attached.
+
 **Format on save is on by default and switchable at two levels**, because the
 common failure mode is opening someone else's repo with a different style:
 
@@ -917,24 +951,28 @@ regardless of the toggles.
 
 ## Linting
 
-[nvim-lint](https://github.com/mfussenegger/nvim-lint), scoped to what no
-language server already reports:
+[nvim-lint](https://github.com/mfussenegger/nvim-lint) automatically runs only
+fast, file-local checks that do not duplicate a language server:
 
-| Linter        | Files                                      |
-| ------------- | ------------------------------------------ |
-| `hadolint`    | Dockerfile                                 |
-| `kubeconform` | YAML that looks like a Kubernetes manifest |
+| Linter     | Files      | Trigger            |
+| ---------- | ---------- | ------------------ |
+| `hadolint` | Dockerfile | Open and write     |
 
-kubeconform is not wired to `yaml` wholesale: it rejects any document without an
-`apiVersion`/`kind`, which is most YAML. An autocommand scans the first 40 lines
-for `apiVersion:` and only then runs it.
+Potentially slower checks use the shared asynchronous runner, replace the
+quickfix list on completion, open it when findings exist and close it after a
+clean run. They never block Neovim and never run on save:
 
-**Go is deliberately absent.** gopls already runs `staticcheck` and the
-unusedparams/shadow/nilness analyses, so golangci-lint on every write would
-duplicate those messages and add seconds of latency on a large repo. The binary
-stays in mise and is run on purpose — `golangci-lint run`, or in CI. The
-trade-off is that some findings only show up there; the fix, if that ever bites,
-is an on-demand mapping rather than putting it back on `BufWritePost`.
+| Key           | Check                                         |
+| ------------- | --------------------------------------------- |
+| `<leader>cgl` | `golangci-lint run` for the current Go module |
+| `<leader>cgL` | The same project check with `--fix`           |
+| `<leader>ckl` | kubeconform for the current YAML file         |
+
+gopls already runs staticcheck and the unusedparams/shadow/nilness analyses,
+so running golangci-lint on every write would duplicate messages and add
+latency on large repositories. kubeconform likewise stays explicit because
+most YAML is not Kubernetes, and a filename/path heuristic should not decide
+whether every save launches schema validation.
 
 This is separate from `hk.pkl`, which formats and lints **this repository's own
 files** at commit time. conform and nvim-lint act in the editor, on whatever
@@ -947,13 +985,15 @@ does not do are filled by [gopher.nvim](https://github.com/olexsmir/gopher.nvim)
 a thin wrapper whose own installer is switched off (`installation = false`) so
 the binaries come from mise:
 
-| Key           | Action                 | Binary         |
-| ------------- | ---------------------- | -------------- |
-| `<leader>cta` | Add `json` struct tags | `gomodifytags` |
-| `<leader>cty` | Add `yaml` struct tags | `gomodifytags` |
-| `<leader>ctr` | Remove struct tags     | `gomodifytags` |
-| `<leader>cI`  | Implement an interface | `impl`         |
-| `<leader>ce`  | Expand `if err != nil` | —              |
+| Key           | Action                 | Binary          |
+| ------------- | ---------------------- | --------------- |
+| `<leader>cta` | Add `json` struct tags | `gomodifytags`  |
+| `<leader>cty` | Add `yaml` struct tags | `gomodifytags`  |
+| `<leader>ctr` | Remove struct tags     | `gomodifytags`  |
+| `<leader>cI`  | Implement an interface | `impl`          |
+| `<leader>ce`  | Expand `if err != nil` | —               |
+| `<leader>cgl` | Lint current project   | `golangci-lint` |
+| `<leader>cgL` | Lint and apply fixes   | `golangci-lint` |
 
 gopher.nvim is less well known than `ray-x/go.nvim`; it was chosen because
 go.nvim is a mega-plugin, which this repo's plugin rule argues against. If it
@@ -1301,7 +1341,7 @@ was read but not rewritten.
   unaligned struct fields, an unused variable, a passing test and a Dockerfile),
   driven through a login shell so `$PATH` carries the mise tools. gopls attaches
   with `cmd = { "gopls" }`, and a real diagnostic comes back —
-  `declared and not used: unused`, source `compiler`. All seven server
+  `declared and not used: unused`, source `compiler`. All nine server
   definitions resolve in nvim-lspconfig's `lsp/` directory. `grn` and `gra`
   still report Neovim's own `vim.lsp.buf.rename()`/`code_action()`, confirming
   the native mappings were not clobbered, while `gd`/`gD` are the ones added
@@ -1343,11 +1383,22 @@ was read but not rewritten.
   first attempt at this test asserted on the wrong line — `gofmt` aligns
   `Name string` into `Name     string` and leaves the longest field alone, so
   the original predicate could never have gone true.
-- Linting, including the negative control that matters here: a Dockerfile with
-  `FROM ubuntu:latest` yields two hadolint diagnostics with the expected
-  "Pin the version explicitly" message, while a Go buffer has **no** linter
-  registered (`linters_by_ft.go` is nil) and golangci-lint appears in no
-  diagnostic source. Go findings come from gopls alone, as intended.
+- Python and Robot Framework, against scratch projects rather than just config
+  inspection. A Python type error is reported by basedpyright while Ruff
+  attaches alongside it with hover disabled. A project-local Python 3.14
+  environment with Robot Framework and `robotcode[languageserver,lint]`
+  attaches RobotCode successfully; `robotcode analyze code` also completes
+  cleanly on the fixture.
+- Kubernetes schema completion, with yamlls loading the configured built-in
+  Kubernetes schema for a `*.k8s.yaml` fixture and reporting a string-valued
+  `spec.replicas` as `Expected "integer"`.
+- Linting, including the mappings themselves: `<leader>cgl` and
+  `<leader>cgL` run the real golangci-lint JSON command asynchronously and put
+  its `govet` finding in quickfix; the uppercase mapping executes the `--fix`
+  variant. `<leader>ckl` downloads the Kubernetes schema, reports an invalid
+  `spec.replicas` as an error and uses kubeconform's actual
+  `statusValid`/`statusInvalid` JSON vocabulary. None of these batch checks is
+  registered on `BufWritePost`.
 - Testing: the neotest-golang adapter loads, recognises `main_test.go` as a test
   file and resolves the module root correctly. Discovery and a full run could
   not be driven from the headless harness — neotest's `discover_positions` must

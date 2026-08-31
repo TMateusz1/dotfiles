@@ -28,14 +28,13 @@ rule) and skipping eza were the alternatives considered.
 
 - **`gopls`** (via `go:golang.org/x/tools/gopls`) — the Go language server.
   No standalone config file: gopls is configured through LSP client
-  initialization options, not a file of its own. Not yet wired into
-  [nvim/](./nvim.md) — no LSP client config exists there yet either (see
-  [nvim.md](./nvim.md)). Per [AGENTS.md](../AGENTS.md)'s Neovim conventions,
-  LSP server *binaries* come from mise (here), and Neovim only ever
+  initialization options, not a file of its own. Neovim enables it with
+  completion, navigation, staticcheck and extra analyses; see
+  [nvim.md#lsp](./nvim.md#lsp). Per [AGENTS.md](../AGENTS.md)'s Neovim
+  conventions, LSP server *binaries* come from mise (here), and Neovim only
   configures the client — never installs the server itself.
 - **`goimports`** (via `go:golang.org/x/tools/cmd/goimports`) — import
-  formatter, CLI-flags only, no config file. Same "not yet wired into nvim"
-  situation as gopls.
+  formatter, CLI-flags only, no config file. Conform runs it before `gofumpt`.
 - **`golangci-lint`** (via `aqua:golangci/golangci-lint`) — Go meta-linter.
   Checked directly (`golangci-lint config path` against this repo): its
   config file (`.golangci.yml`/`.toml`/`.json`) is discovered by walking up
@@ -43,7 +42,9 @@ rule) and skipping eza were the alternatives considered.
   fallback — confirmed by the "no config file detected" result here, where
   there's no Go code at all. So there's nothing that belongs in a dotfiles
   repo for it; a per-project `.golangci.yml` is a property of that project,
-  not a personal setting.
+  not a personal setting. Neovim runs it asynchronously for the current Go
+  project with `<leader>cgl`; `<leader>cgL` adds `--fix`. Both publish their
+  structured results to a fresh quickfix list and never run on save.
 - **`gofumpt`** (via `aqua:mvdan/gofumpt`) — stricter `gofmt`. CLI-flags
   only (`-lang`, `-modpath`, `-extra`, ...), no config file — checked its
   `-h` output directly.
@@ -81,44 +82,60 @@ unconditionally `~/Library/Application Support`, not read from the
 environment at all. Nothing is set there; noted here only so a future "why
 isn't `~/.config/go/env` doing anything" doesn't cost time.
 
+## python and Robot Framework
+
+The global config pins Python itself, `basedpyright` and Ruff. Python editing
+uses both language servers: basedpyright owns type-aware completion, navigation,
+hover and type checking, while Ruff owns lint diagnostics, import organization
+and formatting. Ruff's hover capability is disabled when it attaches so the two
+servers do not present competing documentation.
+
+Robot Framework deliberately follows a project-local policy. Neovim enables
+the `robotcode` LSP definition, but the global mise config does not install
+RobotCode or Robocop. Each Robot project pins its compatible environment and
+exposes `robotcode` on `PATH`, for example with the
+`robotcode[languageserver,lint]` extra. This keeps project keyword libraries and
+Robot Framework versions in the same environment the language server inspects.
+RobotCode then provides completion, navigation, diagnostics and LSP formatting;
+its lint extra supplies Robocop. If a project has no `robotcode` executable,
+Neovim still provides treesitter highlighting but no Robot LSP client starts.
+
 ## Editor tooling (LSP, linters, formatters)
 
 Neovim's language support is driven entirely by binaries pinned in the global
 mise config — there is no mason.nvim, and Neovim installs nothing. See
 [nvim.md#lsp](./nvim.md#lsp) for how they are wired up.
 
-| Tool                           | Backend                            | Role                                                          |
-| ------------------------------ | ---------------------------------- | ------------------------------------------------------------- |
-| `lua-language-server`          | `aqua:LuaLS/lua-language-server`   | LSP for editing this config                                   |
-| `rust-analyzer`                | `aqua:rust-lang/rust-analyzer`     | LSP for Rust                                                  |
-| `ruff`                         | `aqua:astral-sh/ruff`              | Python lint, format **and** LSP (`ruff server`) in one binary |
-| `helm-ls`                      | `aqua:mrjosh/helm-ls`              | LSP for Helm charts                                           |
-| `hadolint`                     | `aqua:hadolint/hadolint`           | Dockerfile linter                                             |
-| `kubeconform`                  | `aqua:yannh/kubeconform`           | Kubernetes manifest validation                                |
-| `gomodifytags`                 | `go:github.com/fatih/gomodifytags` | Add/remove Go struct tags                                     |
-| `impl`                         | `go:github.com/josharian/impl`     | Generate Go interface stubs                                   |
-| `yaml-language-server`         | `npm:yaml-language-server`         | LSP for YAML and Kubernetes                                   |
-| `vscode-langservers-extracted` | `npm:vscode-langservers-extracted` | LSP for JSON                                                  |
+| Tool                           | Backend                            | Role                                             |
+| ------------------------------ | ---------------------------------- | ------------------------------------------------ |
+| `lua-language-server`          | `aqua:LuaLS/lua-language-server`   | LSP for editing this config                      |
+| `rust-analyzer`                | `aqua:rust-lang/rust-analyzer`     | LSP for Rust                                     |
+| `basedpyright`                 | `npm:basedpyright`                 | Python completion, navigation and type checking  |
+| `ruff`                         | `aqua:astral-sh/ruff`              | Python lint, format and complementary LSP        |
+| `helm-ls`                      | `aqua:mrjosh/helm-ls`              | LSP for Helm charts                              |
+| `helm`                         | `aqua:helm/helm`                   | Helm 4 CLI used by helm-ls for chart linting     |
+| `hadolint`                     | `aqua:hadolint/hadolint`           | Dockerfile linter                                |
+| `kubeconform`                  | `aqua:yannh/kubeconform`           | On-demand Kubernetes manifest validation         |
+| `yamlfmt`                      | `aqua:google/yamlfmt`              | YAML and Helm values formatting                  |
+| `gomodifytags`                 | `go:github.com/fatih/gomodifytags` | Add/remove Go struct tags                        |
+| `impl`                         | `go:github.com/josharian/impl`     | Generate Go interface stubs                      |
+| `yaml-language-server`         | `npm:yaml-language-server`         | LSP for YAML and Kubernetes schema-aware editing |
+| `vscode-langservers-extracted` | `npm:vscode-langservers-extracted` | LSP for JSON                                     |
 
 `gopls`, `goimports`, `gofumpt`, `golangci-lint` and `gotestsum` were already
 present under [go](#go) and are reused as-is.
 
-### Two deliberate exceptions
+### Node-backed servers and project-local RobotCode
 
-**`node` and the two npm servers.** Everything else here is a static
-single-file binary, which is the standing preference in this repo. YAML and
-JSON have no static language server at all, and Kubernetes/CRD schema
-completion is worth enough on cloud-native work to accept the dependency.
-`node` exists in the global config *only* to run these two; nothing else needs
-it. This was weighed against dropping YAML/JSON LSP entirely and relying on
-`kubeconform` plus treesitter.
+**`node` and the three npm servers.** YAML and JSON have no static language
+server, and basedpyright's supported distribution is Node-backed. Kubernetes
+schema completion and Python type-aware completion are worth that shared
+runtime dependency.
 
-**Robot Framework has no LSP.** Its servers ship only as pip packages, which
-would pull a Python chain into the setup for one language. The treesitter
-`robot` parser stays, so highlighting and text objects work; completion and
-diagnostics do not. Similarly, Python gets no type checker — `basedpyright` is
-npm/pip only, and `ruff` already covers lint and format from a single static
-binary.
+**RobotCode stays project-local.** It must see the project's Python/Robot
+environment and keyword libraries, so installing one global copy would make
+completion less reliable. Neovim enables the client definition; each project
+provides the executable and lint extra as described above.
 
 ### `rust-analyzer` and the rustup copy
 
