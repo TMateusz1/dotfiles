@@ -12,7 +12,7 @@ HK_MISE = 1
 
 [tools]
 "node" = "24"
-"npm:@openai/codex" = { version = "latest", depends = ["node"] }
+"npm:@openai/codex" = { version = "0.151.0", depends = ["node"] }
 "aqua:anthropics/claude-code" = "2.1.251"
 "aqua:jdx/hk" = "1.56.1"
 "aqua:tamasfe/taplo" = "0.10.0"
