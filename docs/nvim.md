@@ -33,6 +33,7 @@ mise only, Catppuccin theming).
 | [nvim-mini/mini.surround](https://github.com/nvim-mini/mini.surround)                                         | Surround editing                   | Adds coherent `sa`/`sd`/`sr` operations with dot-repeat, counts and Catppuccin highlighting.                                                                                                                                                                                     |
 | [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | Syntax-aware function navigation   | Supplies maintained `@function.outer` queries for `[f` and `]f`; configured against its `main` branch API.                                                                                                                                                                       |
 | [Wansmer/treesj](https://github.com/Wansmer/treesj)                                                           | Split/join argument layouts        | `<leader>s` toggles the syntax node under the cursor between single-line and multiline forms using Treesitter.                                                                                                                                                                   |
+| [folke/noice.nvim](https://github.com/folke/noice.nvim)                                                       | Cmdline + message UI               | Renders the cmdline as a bar docked *above* the statusline, so the bottom reads tmux → lualine → commands. Pulls in `nui.nvim` — see "Bottom of the screen" below.                                                                                                               |
 | [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs)                                             | Auto-pairs                         | Inserts the closing bracket/quote, steps over one already there, and counts the quotes before the cursor so closing an open string does not double it — see "Pairs" below.                                                                                                       |
 | [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, devicons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                          |
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
@@ -584,7 +585,9 @@ indent-blankline exclusion, an auto-session `no_restore_cmds` hook plus argv
 capture to handle `nvim .`, three custom window mappings to make `<CR>` behave,
 and `nui.nvim` and `plenary.nvim` as dependencies. Oil and yazi together cover
 more ground and deleted every one of those integration points except the
-plenary dependency, which yazi still needs.
+plenary dependency, which yazi still needs. (`nui.nvim` later came back on its
+own account, as noice's dependency — see
+[Bottom of the screen](#bottom-of-the-screen).)
 
 ## Cursor
 
@@ -605,6 +608,8 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   palette to render correctly — a real dependency, not decoration);
   `winborder = "rounded"` (the stable Neovim-wide default for native and
   plugin floating windows that do not explicitly override it);
+  `cmdheight = 0` (gives up the reserved cmdline row so lualine sits on the
+  tmux bar — see [Bottom of the screen](#bottom-of-the-screen));
   `number` + `relativenumber` together (the common "hybrid" line-number
   style — absolute on the cursor's own line, relative everywhere else);
   `hlsearch`/`incsearch` plus `ignorecase`/`smartcase` (case-insensitive
@@ -636,7 +641,8 @@ supply one. Nothing else in this config hardcodes a border.
 `42%(1)` — average percentage and count — and returns an empty string when
 nothing is running, which lualine drops without leaving padding or a separator
 behind. That covers what fidget.nvim would be installed for once LSP arrives,
-with no extra plugin.
+with no extra plugin. Note this is *progress*, which is separate from messages:
+messages are noice's, below.
 
 **Diagnostics.** `vim.diagnostic.status()` is deliberately *not* added: lualine
 already renders a colored `diagnostics` component in `lualine_b`, and both read
@@ -645,7 +651,81 @@ the same counts. Adding it would show every count twice.
 **`vim._extui` is not enabled.** The module doesn't exist in the pinned Neovim
 0.12.5 — the experimental TUI replacement now lives at `vim._core.ui2`. The
 leading underscore is upstream saying it is private and unstable, so this config
-does not depend on it. Revisit if and when it gets a public name.
+does not depend on it. It would not have solved the layout problem anyway:
+`ui2` opens its cmdline window with `relative = 'laststatus', row = 1`, which is
+the row *below* the statusline — the same place the built-in cmdline already
+sits. Moving the cmdline above the statusline is what noice is here for.
+
+## Bottom of the screen
+
+The three bars at the bottom of the terminal are kitty → tmux → Neovim, and by
+default Neovim stacks them in an awkward order. Reading upward you get the tmux
+status line, then Neovim's cmdline, then lualine — so the statusline is
+sandwiched between two other bars instead of sitting on the tmux one:
+
+```text
+   buffer text            buffer text
+   ...                    ...
+   lualine          →     :wq          ← commands
+   :wq                    lualine      ← statusline, now on the tmux bar
+   tmux status            tmux status
+```
+
+Two changes get the right-hand layout, and neither is optional on its own.
+
+**`cmdheight = 0`** (in `options.lua`) gives up Neovim's reserved cmdline row,
+which moves the statusline to the bottom-most row — measured, not assumed: with
+`lines = 24` the statusline moves from row 22 to row 23. Without this there is a
+permanently blank row between lualine and tmux.
+
+**noice.nvim** then renders the cmdline itself. This part genuinely needs a
+plugin. Neovim's cmdline is structurally the last row of the TUI grid; there is
+no option that reorders it, and the experimental `vim._core.ui2` positions its
+own cmdline window at `relative = 'laststatus', row = 1`, i.e. right back below
+the statusline. Drawing the cmdline anywhere else means drawing it in a floating
+window, which is what noice does.
+
+The config picks noice's full-width `cmdline` bar rather than its default
+centred popup, and lifts it one row:
+
+```lua
+cmdline = { view = "cmdline" },
+views = { cmdline = { position = { row = "99%", col = 0 } } },
+```
+
+### Why the row is `"99%"` and not `lines - 2`
+
+nui — noice's windowing layer — resolves a percentage as
+`floor((container - size) * pct)`, where the container is the whole editor grid
+**including the statusline row**, and `size` is the float's *content* height,
+not its outer box. noice's `cmdline` view is one content row with no border, so
+`"100%"` resolves to `lines - 1`: exactly on top of lualine. `"99%"` resolves to
+`floor((lines - 1) * 0.99)`, which is `lines - 2` — one row higher — for every
+height up to about 102 rows, beyond which it drifts to a one-row gap.
+
+An absolute `lines - 2` would be exact at every height but wrong after a
+resize twice over: nui only re-evaluates *percentages* on each mount, and noice
+caches view instances with their options snapshotted at creation, so a later
+config update would not reach them. The percentage is the value that survives a
+terminal resize, which is why it wins over the arithmetically neater option.
+
+This was worth measuring rather than deriving. A first attempt kept noice's
+bordered popup and computed `"99%"` against a 3-row box; the box landed on rows
+37–39 of a 40-row screen with its bottom border over the statusline, because nui
+had positioned it by its 1-row *content* and grown the border around it.
+
+### What the result actually is
+
+Verified against a running instance: cmdline, search and messages all render on
+the row immediately above the statusline, and lualine keeps the bottom row.
+`laststatus` stays at `2`, so splits still get their own statuslines.
+
+Messages are noice's now too, and land in the same place — a content-width box
+on that row rather than a full-width bar, so it reads as a notification rather
+than a second cmdline. `long_message_to_split` is the one preset enabled, so a
+long message opens a real split instead of being truncated. Neither
+`nvim-notify` nor `snacks.nvim` is installed; noice's `notify` view falls back
+to its built-in `mini` view, which needs no extra plugin.
 
 ## Clipboard
 
@@ -862,6 +942,21 @@ was read but not rewritten.
   the same theme returns `#1e66f6`, latte's `blue`. Note that
   `catppuccin.setup{ flavour = ... }` alone does *not* move it — `M.flavour` is
   assigned in `M.load()`, so the colorscheme has to actually be applied.
+- Bottom-of-screen layout: `cmdheight = 0` moves the statusline from row 22 to
+  row 23 of a 24-row screen, i.e. onto the bottom row. The cmdline placement
+  was then measured on a *running* instance rather than in the usual headless
+  harness, because noice draws nothing when no UI is attached
+  (`nvim_list_uis()` is empty and Neovim emits no cmdline events). A headless
+  server was driven over `--listen`, with a second headless Neovim acting as
+  the UI client via `nvim_ui_attach` at 120x40, and keystrokes sent with
+  `--remote-send`. With `lines = 40`, pressing `:` and typing `set number`
+  produces the cmdline at 1-based screen row 39 with the statusline at row 40 —
+  one row above, as intended. Reading `nvim_win_get_config().row` alone is
+  misleading here: noice mounts two windows, and the one holding the text is
+  `relative = "win"` with `row = 0` *inside* the other, so both had to be
+  resolved through `screenpos()` to confirm they occupy the same screen row.
+  `:echo` and `vim.notify` also render on row 39, sized to their content, so
+  neither covers lualine.
 - Colorscheme: `vim.g.colors_name` is `"catppuccin-mocha"` and
   `require("catppuccin").options.flavour` is `"mocha"` — together these
   confirm `opts` actually reached `setup()` (see "Theme" above). Checked

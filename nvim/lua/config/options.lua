@@ -3,6 +3,10 @@ local opt = vim.opt
 opt.termguicolors = true -- required for the Catppuccin colorscheme's true-color palette
 opt.winborder = "rounded" -- consistent default for plugin and native floating windows
 
+-- No reserved cmdline row: noice renders the cmdline as a float above the
+-- statusline, so this lets lualine sit directly on tmux's status bar.
+opt.cmdheight = 0
+
 -- Line numbers
 opt.number = true
 opt.relativenumber = true
