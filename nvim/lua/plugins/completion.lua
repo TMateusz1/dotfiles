@@ -17,15 +17,29 @@ return {
       default = { "lsp", "path", "snippets", "buffer" },
     },
     snippets = { preset = "default" }, -- Neovim's native vim.snippet
-    -- `super-tab`, not blink's `default`: in the default preset the accept key
-    -- is <C-y> and <Tab> only jumps between placeholders of an *already
-    -- expanded* snippet, which reads as "snippets don't work". Here <Tab>
-    -- accepts the selected item, then jumps through the snippet's fields, and
-    -- falls back to a literal tab when no menu is open.
-    keymap = { preset = "super-tab" },
+    -- One key, one job. <Tab> is *only* snippet navigation and <CR> is the
+    -- only way to accept, because sharing <Tab> between the two collides
+    -- exactly where it hurts: typing inside a snippet placeholder opens the
+    -- completion menu, and a Tab meant as "next field" would take a
+    -- suggestion instead. blink's `super-tab` preset calls accept() before
+    -- snippet_forward, so that collision is structural rather than occasional.
+    keymap = { preset = "enter" },
     appearance = { nerd_font_variant = "mono" },
     completion = {
+      list = {
+        selection = {
+          -- Nothing is selected until <C-n>/<C-p> is pressed. This is what
+          -- keeps <CR> honest: with a preselected item, Enter would accept it
+          -- whenever the menu happened to be open and could never just insert
+          -- a newline. The cost is one extra keystroke to take the top
+          -- suggestion.
+          preselect = false,
+          auto_insert = true,
+        },
+      },
       documentation = { auto_show = true, auto_show_delay_ms = 200 },
+      -- Only renders once an item is actually selected, which with
+      -- preselect = false means while browsing with <C-n>.
       ghost_text = { enabled = true },
     },
     signature = { enabled = true },

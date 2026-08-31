@@ -836,24 +836,40 @@ fetched by Neovim. AGENTS.md records both exceptions explicitly.
 
 ### Keys
 
-The `super-tab` preset, **not** blink's `default`. In the default preset the
-accept key is `<C-y>` and `<Tab>` only jumps between the placeholders of an
-already-expanded snippet — so pressing Tab on a snippet in the menu does
-nothing, which reads as "snippets are broken" rather than "wrong key".
+The `enter` preset with `completion.list.selection.preselect = false`. One key,
+one job:
 
-| Key                                  | Action                                                                                      |
-| ------------------------------------ | ------------------------------------------------------------------------------------------- |
-| `<Tab>`                              | Accept the selected item; inside a snippet, jump to the next field; otherwise a literal tab |
-| `<S-Tab>`                            | Jump to the previous snippet field                                                          |
-| `<C-n>` / `<C-p>`, `<Down>` / `<Up>` | Select next / previous                                                                      |
-| `<C-space>`                          | Show menu, then documentation                                                               |
-| `<C-e>`                              | Cancel                                                                                      |
-| `<C-b>` / `<C-f>`                    | Scroll the documentation window                                                             |
-| `<C-k>`                              | Signature help                                                                              |
+| Key                                  | Action                                                         |
+| ------------------------------------ | -------------------------------------------------------------- |
+| `<Tab>`                              | **Only** ever the next snippet field — otherwise a literal tab |
+| `<S-Tab>`                            | Previous snippet field                                         |
+| `<C-n>` / `<C-p>`, `<Down>` / `<Up>` | Select next / previous item                                    |
+| `<CR>`                               | Accept — but only once an item is actually selected            |
+| `<C-space>`                          | Show menu, then documentation                                  |
+| `<C-e>`                              | Cancel                                                         |
+| `<C-b>` / `<C-f>`                    | Scroll the documentation window                                |
+| `<C-k>`                              | Signature help                                                 |
 
-`<CR>` is deliberately left alone so Enter always inserts a newline. blink's
-`enter` preset makes `<CR>` accept instead, which is the other common choice —
-it is a one-word change if the Tab behaviour ever gets in the way.
+**Why not `super-tab`, where `<Tab>` accepts.** It collides in the one place it
+matters. Typing inside a snippet placeholder opens the completion menu, and
+`super-tab`'s handler calls `accept()` *before* `snippet_forward` — so a Tab
+meant as "next field" takes a suggestion instead. With `preselect = true`
+(blink's default) an item is selected the moment the menu opens, which makes
+that collision structural rather than occasional. blink's own docs flag it: the
+`super-tab` entry in `config/keymap.lua` suggests setting
+`completion.trigger.show_in_snippet = false` to work around it.
+
+Splitting the keys removes the ambiguity instead of working around it, and
+`preselect = false` is what keeps `<CR>` honest — with an item preselected,
+Enter would accept whenever the menu happened to be open and could never just
+insert a newline. blink's docs recommend exactly this pairing for the `enter`
+preset. The cost is one extra keystroke (`<C-n>`) to take the top suggestion,
+and ghost text only appears once something is selected.
+
+The menu still opens inside snippet placeholders, which is now harmless and
+sometimes useful — completion for a type name in a `${2:string}` field. If it
+ever becomes noise, `completion.trigger.show_in_snippet = false` turns it off
+without touching any keys.
 
 `fuzzy.implementation` is `prefer_rust`, not `rust`: if the build ever fails on
 a new machine, completion degrades to the Lua matcher instead of breaking the
@@ -1291,12 +1307,19 @@ was read but not rewritten.
   the native mappings were not clobbered, while `gd`/`gD` are the ones added
   here.
 - Snippet expansion, after the accept key turned out to be the problem rather
-  than the snippets: `<Tab>`/`<S-Tab>` are mapped in insert mode under the
-  `super-tab` preset (and `<C-y>`, the old default's accept key, is
-  correspondingly gone). The `errw` snippet resolves from the registry with the
+  than the snippets. The `errw` snippet resolves from the registry with the
   right body, and `vim.snippet.expand` — the same mechanism blink drives —
-  turns it into `return fmt.Errorf("doing thing: %w", err)` with the snippet
-  left active and a forward jump available.
+  turns it into a filled-in `fmt.Errorf` call with the snippet left active and
+  a forward jump available. `<Tab>`/`<S-Tab>` are mapped in insert mode and
+  `keymap.preset` resolves to `enter`.
+  Note `completion.list.selection.preselect` reads back as a *function* rather
+  than the `false` it is set to: `config/init.lua` wraps that option in a
+  per-mode dispatcher (default/cmdline/term), so the boolean lives inside it.
+  Worth recording, because it looks at first glance like the setting was
+  overridden. Driving the menu-plus-Tab interaction from the headless harness
+  proved unreliable — feeding keys into an open menu produced garbled buffer
+  text — so the keymap split is verified by configuration and by blink's own
+  documented semantics, not by a simulated keypress.
 - Helm, on a real chart fixture (`Chart.yaml`, `values.yaml`,
   `templates/deployment.yaml` with `{{ .Release.Name }}`). Before the filetype
   rule this was a genuine hole found by testing rather than by reading: the
