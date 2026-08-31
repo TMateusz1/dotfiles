@@ -134,10 +134,12 @@ Bufferline entry; pressing a letter focuses that buffer. This mirrors
 | `<leader>xp` | Mark a displayed buffer, then close it    |
 
 All five routes use the same close function, as do Bufferline's close icon
-and right-click action. Clean buffers close immediately. A modified buffer
-uses Neovim's native `:confirm bdelete`, which offers Save, Discard and Cancel;
-nothing force-deletes unsaved work. Left and right mean Bufferline's visible
-ordering, not numeric buffer IDs.
+and right-click action. Clean buffers close immediately. A modified buffer asks
+first — Save, Discard or Cancel — and nothing force-deletes unsaved work. That
+question is a plain cmdline prompt rather than Neovim's native `:confirm`
+dialog, for the reason given under
+[Quitting and closing with unsaved changes](#quitting-and-closing-with-unsaved-changes).
+Left and right mean Bufferline's visible ordering, not numeric buffer IDs.
 
 ## Indent guides
 
@@ -315,7 +317,8 @@ devicons on its own) and
 Catppuccin's official integration keep it visually consistent with the rest of
 the editor. `<leader>f` is labelled **Find**, `<leader>G` **Git** and
 `<leader>x` **Close buffers**; individual entries come directly from the `desc`
-already attached to each keymap. `<leader>?` shows only mappings local to the current buffer.
+already attached to each keymap; `<leader>q` is **Quit**. `<leader>?` shows only
+mappings local to the current buffer.
 
 MiniClue was considered because Mini AI and Mini Surround are already present.
 WhichKey is a better fit here: it discovers described mappings and their prefix
@@ -676,8 +679,12 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   clipboard, below.
 - **`keymaps.lua`**: `<Esc>` in normal mode also runs `:nohlsearch`, so a
   search's highlighted matches clear without needing a separate keybind or
-  losing Esc's usual behavior.
+  losing Esc's usual behavior. `<leader>qq` quits everything, asking about
+  unsaved buffers first — see
+  [Quitting and closing with unsaved changes](#quitting-and-closing-with-unsaved-changes).
 - **`filetypes.lua`**: Helm chart detection — see [Helm](#helm).
+- **`buffers.lua`**: the shared buffer-close and quit-all flow, including the
+  unsaved-changes prompt.
 
 ## Native UI
 
@@ -817,6 +824,12 @@ layouts can opt in per file with a YAML language-server schema modeline. Schema
 validation stays interactive in the LSP; the fuller kubeconform check is an
 on-demand quickfix command described under [Linting](#linting).
 
+Those globs match at any depth. yaml-language-server prefixes every `fileMatch`
+with `**/` and matches with picomatch, so `deploy/**/*.yaml` covers
+`deploy/anything/nested/x.yaml` — checked against the installed server's
+`yamlSchemaService.js`, not assumed. Inside a Helm chart the schema arrives by a
+different route; see below.
+
 ### Helm
 
 Helm needed one thing beyond enabling `helm_ls`: **a filetype**. Neovim has no
@@ -826,24 +839,75 @@ stayed `yaml`, helm-ls never attached, and yaml-language-server attached instead
 and treated every `{{ ... }}` as broken YAML. The installed `helm` treesitter
 parser sat unused for the same reason.
 
-nvim-lspconfig's own docs point at the `vim-helm` plugin for this. It is one
-filetype rule, which `vim.filetype.add()` does natively, so `lua/config/filetypes.lua`
-handles it instead of adding a plugin:
+nvim-lspconfig's own docs point at the `vim-helm` plugin for this. It is a
+handful of filetype rules, which `vim.filetype.add()` does natively, so
+`lua/config/filetypes.lua` handles it instead of adding a plugin.
 
-| Path                                               | Filetype           | Servers                |
-| -------------------------------------------------- | ------------------ | ---------------------- |
-| `templates/*.yaml`, `*.tpl`, `templates/NOTES.txt` | `helm`             | helm-ls only           |
-| `values*.yaml`                                     | `yaml.helm-values` | helm-ls **and** yamlls |
-| `Chart.yaml`                                       | `yaml`             | yamlls                 |
+**Detection keys off the chart, not off a directory name.** An upward search for
+`Chart.yaml` finds the chart root; everything else is decided by the path
+*relative to that root*:
+
+| Path relative to the chart root         | Filetype           | Servers                |
+| --------------------------------------- | ------------------ | ---------------------- |
+| `Chart.yaml`, `Chart.lock`              | `yaml`             | yamlls                 |
+| `values*.yaml`                          | `yaml.helm-values` | helm-ls **and** yamlls |
+| `crds/**`, `ci/**`, any dotted segment  | `yaml`             | yamlls                 |
+| anything else `.yaml`/`.yml`/`.tpl`     | `helm`             | helm-ls only           |
+
+The earlier version of this rule required a directory literally named
+`templates/`. Plenty of charts do not use that name — `deploy/template/` is
+common — and for those the rule failed silently, leaving exactly the
+broken-YAML behaviour it existed to prevent. Keying off `Chart.yaml` is also
+simply the truer test: a chart is a chart because of its `Chart.yaml`.
+
+The carve-outs are the parts of a chart Helm never renders. `crds/` and `ci/`
+are plain YAML by Helm's own definition, and the dotted-segment rule keeps
+`.github/workflows/*.yaml` out of the Helm filetype when the repository root
+*is* the chart root. Searching upward stops at the *nearest* `Chart.yaml`, so a
+subchart under `charts/` resolves against its own root.
 
 `values.yaml` deliberately keeps a `yaml`-prefixed filetype so it still gets
 schema support from yamlls, while the `.helm-values` suffix also lets helm-ls
 attach — that pairing is what makes `.Values.*` completion inside a template
 resolve against the real file.
 
-Every rule is guarded by an upward search for `Chart.yaml`. Without that guard
-any `templates/` directory anywhere — Ansible, Rails, a docs site — would be
-misdetected as Helm.
+**The Kubernetes schema inside a chart comes from helm-ls, not from the yamlls
+client.** Template buffers are filetype `helm`, which yamlls does not handle;
+helm-ls spawns its *own* yaml-language-server for them, and that instance is
+configured through `helm-ls.yamlls.config`, entirely separately from the
+`vim.lsp.config("yamlls", ...)` block. helm-ls defaults its Kubernetes mapping
+to `templates/**` — the same directory-name assumption, and the same silent
+failure — so `lsp.lua` widens it:
+
+```lua
+config = {
+  schemas = { kubernetes = "**/{template,templates}/**" },
+  completion = true,
+  hover = true,
+},
+```
+
+This stays scoped to template directories on purpose. helm-ls also forwards
+`values*.yaml` to that server, and validating a values file against
+Pod/Deployment schemas would produce nothing but false positives. A chart that
+names its template directory something else still gets helm-ls, treesitter
+highlighting and `.Values.*` completion — only this glob needs extending.
+
+Verified end to end against a scratch chart at `deploy/Chart.yaml` with a
+`deploy/template/` directory: completing under `spec:` in a `kind: Deployment`
+template offers `replicas`, `selector`, `strategy` and the rest of
+`io.k8s.api.apps.v1.DeploymentSpec` alongside Helm's Go-template snippets.
+
+One known gap, unrelated to this config: yaml-language-server resolves the
+bundled Kubernetes schema for some kinds and not others — `kind: Deployment`
+completes, `kind: Service` returns nothing. That behaves identically for a plain
+manifest outside any chart, so it is the server's schema handling, not the
+filetype or glob wiring.
+
+`<leader>ckl` (kubeconform, under [Linting](#linting)) is registered for
+filetype `yaml` only, so it does not appear on `helm` buffers. Checking a
+template properly would mean rendering the chart with `helm template` first,
+which is a separate feature rather than a filetype list to extend.
 
 helm-ls has its built-in `helm lint` and yamlls integrations enabled. The
 globally pinned Helm 4 CLI is therefore a runtime dependency, not merely a
@@ -1100,6 +1164,48 @@ than a second cmdline. `long_message_to_split` is the one preset enabled, so a
 long message opens a real split instead of being truncated. Neither
 `nvim-notify` nor `snacks.nvim` is installed; noice's `notify` view falls back
 to its built-in `mini` view, which needs no extra plugin.
+
+### Quitting and closing with unsaved changes
+
+**Neovim's native `:confirm` dialog cannot be used while noice is active.**
+Since Neovim 0.11.3 the dialog is delivered to the UI through `ext_cmdline`,
+and noice's handling of that path is broken: the question renders as a centred
+`" Confirm "` box that never takes an answer, leaving the editor apparently
+frozen. This is upstream and unfixed —
+[folke/noice.nvim#1136](https://github.com/folke/noice.nvim/issues/1136) is
+closed as *not planned*, and
+[#1185](https://github.com/folke/noice.nvim/issues/1185) confirms that a
+`routes` override cannot redirect it either, because noice intercepts confirm
+prompts before its own route table is consulted. This repository pins Neovim
+0.12.5, so it is squarely in the affected range.
+
+Two consequences follow.
+
+**`'confirm'` is deliberately left off.** Turning it on is the obvious way to
+make `:q` and `:qa` offer to save instead of failing with `E37`, and it would
+route every one of those into the broken dialog. `:qa` on a modified buffer
+therefore still errors, which is at least honest and non-blocking.
+
+**`lua/config/buffers.lua` asks its own question instead**, and both the
+buffer-close flow (`<leader>xx`, Bufferline's close icon and right-click) and
+`<leader>qq` (quit all) go through it:
+
+| Situation               | Prompt                                                                 |
+| ----------------------- | ---------------------------------------------------------------------- |
+| Close a clean buffer    | none — closes immediately                                              |
+| Close a modified buffer | `Save changes to <file>? [y]es, [n]o, [c]ancel`                        |
+| Quit, nothing unsaved   | none — quits immediately                                               |
+| Quit with unsaved work  | `Unsaved: <files>. [w]rite all and quit, [d]iscard and quit, [c]ancel` |
+
+It uses `vim.fn.input()` rather than `vim.ui.select()`, and the reason is this
+section's own layout. The whole question lives in the *cmdline prompt*, which
+noice renders for as long as the prompt is open. A `vim.ui.select()` list is
+emitted as ordinary messages instead, and with no notification backend
+installed those land in the `mini` view — which times out after two seconds, so
+the question would fade while it was still being read.
+
+Escape, `Ctrl-C` and an empty answer all mean cancel. Nothing here force-deletes
+unsaved work without an explicit `n`/`d`.
 
 ## Clipboard
 

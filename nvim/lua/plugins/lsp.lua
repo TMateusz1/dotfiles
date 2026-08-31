@@ -163,9 +163,24 @@ return {
       settings = {
         ["helm-ls"] = {
           helmLint = { enabled = true },
+          -- helm-ls spawns its own yaml-language-server for template buffers;
+          -- the client configured above never sees them, so its Kubernetes
+          -- schema does not apply here.
           yamlls = {
             enabled = true,
             path = "yaml-language-server",
+            config = {
+              -- helm-ls' own default is `templates/**`, which misses charts
+              -- that name the directory anything else. The glob stays scoped
+              -- to template directories on purpose: helm-ls also forwards
+              -- `values*.yaml`, and validating those against Pod/Deployment
+              -- schemas would be nothing but false positives. A chart using a
+              -- third name still gets helm-ls, treesitter and `.Values.*`
+              -- completion — only this glob needs extending.
+              schemas = { kubernetes = "**/{template,templates}/**" },
+              completion = true,
+              hover = true,
+            },
           },
         },
       },
