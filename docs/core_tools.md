@@ -178,8 +178,9 @@ This repo's `shell/.zshrc` exports `XDG_CONFIG_HOME`, so it lands at
 
 - `theme.toml` — the official
   [catppuccin/yazi](https://github.com/catppuccin/yazi) Mocha "blue"
-  variant, vendored as-is (yazi's own README instructs renaming whichever
-  flavor/accent file you pick to `theme.toml`).
+  variant (yazi's own README instructs renaming whichever flavor/accent file
+  you pick to `theme.toml`). Vendored as-is apart from **one deliberate
+  edit**, the status-bar separators — see below.
 - `Catppuccin-mocha.tmTheme` — vendored from
   [catppuccin/bat](https://github.com/catppuccin/bat)'s `themes/`
   directory, per catppuccin/yazi's own setup instructions: `theme.toml`'s
@@ -193,6 +194,22 @@ overriding, and per this repo's philosophy nothing is added just to have a
 file present (same call as [fd](./util_tools.md#fd)/[jq](./util_tools.md#jq)
 having no config here).
 
+**Square status bar.** Upstream's `[status]` block draws the mode and
+permission blocks with powerline half-circles — `sep_left`/`sep_right` set to
+U+E0B6 (`` ) and U+E0B4 (`` ). Those are the only rounded edges in the
+bottom-bar stack: tmux's status line draws no separators at all, just colour
+fills, and Neovim's lualine is angular. Both separators are therefore set to
+empty strings, which leaves yazi's blocks with hard square edges to match:
+
+```toml
+[status]
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+```
+
+Neovim's yazi float is squared off to match — see
+[nvim.md](./nvim.md#file-explorers-oil-and-yazi).
+
 **Shell integration:** `shell/.zshrc` adds a `y()` function — the wrapper
 from yazi's own quick-start docs. yazi runs as a child process, so it can't
 change its parent shell's working directory itself; `y()` runs yazi with
@@ -203,5 +220,15 @@ on exit.
 generic syntax (already covered by `taplo`), and no custom step fills that
 gap either. Verified against the real `ya env`/`yazi` binaries directly: a
 deliberately broken `theme.toml` produces a clear TOML parse error with
-line/column from `ya env`; the vendored file loads without one. Not
+line/column from `ya env` (`ya env` needs a TTY, so this runs under `script`);
+the vendored file loads without one — `ya env` exits 0 and reports
+`Theme: .../theme.toml (41483 chars)` after the separator edit above.
+
+That the edit reaches the right keys was confirmed against the binary rather
+than assumed: yazi 26.8.15 embeds the Lua that renders the bar, and it reads
+`th.status.sep_left.open` / `.close` through `ui.Span(...)`, so those key names
+are current and an empty string is a valid span that draws nothing. Note the
+rendered bar itself could not be captured here — yazi needs real terminal
+dimensions, and a `script` pty in this environment only ever flushed a partial
+first frame, so the visual result is unverified even though the config is. Not
 checked automatically going forward.

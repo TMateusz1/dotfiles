@@ -30,12 +30,13 @@ mise only, Catppuccin theming).
 | [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
 | [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)                 | Indent guides + active scope       | Draws subtle guides with virtual text and highlights the current Treesitter scope. Uses Catppuccin's official integration.                                                                                                                                                       |
 | [nvim-mini/mini.ai](https://github.com/nvim-mini/mini.ai)                                                     | Extended text objects              | Adds arguments, function calls, tags and robust pair objects while preserving Neovim's native `an`/`in` Treesitter selection.                                                                                                                                                    |
+| [nvim-mini/mini.icons](https://github.com/nvim-mini/mini.icons)                                               | File/directory icons               | Replaces `nvim-web-devicons`, which is no longer installed. Catppuccin themes its highlight groups; devicons' fixed brand colors were the one non-Catppuccin palette left — see "Icons" below.                                                                                   |
 | [nvim-mini/mini.surround](https://github.com/nvim-mini/mini.surround)                                         | Surround editing                   | Adds coherent `sa`/`sd`/`sr` operations with dot-repeat, counts and Catppuccin highlighting.                                                                                                                                                                                     |
 | [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | Syntax-aware function navigation   | Supplies maintained `@function.outer` queries for `[f` and `]f`; configured against its `main` branch API.                                                                                                                                                                       |
 | [Wansmer/treesj](https://github.com/Wansmer/treesj)                                                           | Split/join argument layouts        | `<leader>s` toggles the syntax node under the cursor between single-line and multiline forms using Treesitter.                                                                                                                                                                   |
 | [folke/noice.nvim](https://github.com/folke/noice.nvim)                                                       | Cmdline + message UI               | Renders the cmdline as a bar docked *above* the statusline, so the bottom reads tmux → lualine → commands. Pulls in `nui.nvim` — see "Bottom of the screen" below.                                                                                                               |
 | [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs)                                             | Auto-pairs                         | Inserts the closing bracket/quote, steps over one already there, and counts the quotes before the cursor so closing an open string does not double it — see "Pairs" below.                                                                                                       |
-| [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, devicons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                          |
+| [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, mini.icons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                        |
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
 | [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Theme is `catppuccin-nvim`, **not** `catppuccin` — see "Theme" below. Its right section leads with Neovim 0.12's `vim.ui.progress_status()` — see "Native UI" below.                                                                                                             |
 | [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `=` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                         |
@@ -147,8 +148,9 @@ parser; ordinary indentation guides still work without one.
 
 ## Text objects and surrounds
 
-The standalone [mini.ai](https://github.com/nvim-mini/mini.ai) and
-[mini.surround](https://github.com/nvim-mini/mini.surround) modules are grouped
+The standalone [mini.ai](https://github.com/nvim-mini/mini.ai),
+[mini.surround](https://github.com/nvim-mini/mini.surround) and
+[mini.icons](https://github.com/nvim-mini/mini.icons) modules are grouped
 in `lua/plugins/minis.lua`; the full `mini.nvim` suite is not installed. Each is
 a separate plugin with its own lockfile pin, so nothing is pulled in that isn't
 actually used.
@@ -187,6 +189,42 @@ layout. `[f` jumps to the previous function start and `]f` to the next, in
 Normal, Visual and operator-pending modes; every jump is added to the jumplist.
 The mappings use the official `nvim-treesitter-textobjects` companion because
 mini.ai's `f` is specifically a function-*call* text object, not a definition.
+
+## Icons
+
+[mini.icons](https://github.com/nvim-mini/mini.icons) provides every icon in
+the editor. `nvim-web-devicons` is not installed at all.
+
+**The reason is the Catppuccin rule**, not novelty. devicons ships fixed brand
+colors — Go's cyan, Rust's orange, Lua's blue — which are a second, unrelated
+palette sitting inside an otherwise Catppuccin setup, and AGENTS.md is explicit
+that a tool doesn't get its own theme. Catppuccin already defines nine
+`MiniIcons*` highlight groups in its `mini` integration, which this config
+already enables, so mini.icons is themed the moment it is installed: verified
+by resolving the groups against the palette, `MiniIconsGreen` is `#a6e3a2` and
+`MiniIconsOrange` is `#fab388`, exactly mocha's `green` and `peach`.
+
+Two of the four consumers needed nothing. which-key lists mini.icons *ahead* of
+devicons in its own provider table, and oil's `util.lua` carries a literal
+`-- prefer mini.icons` comment, so both switch on their own. alpha declared
+devicons but never called it — this config uses literal glyphs, and alpha only
+touches devicons in its MRU helper, which isn't used. That dependency was dead.
+
+bufferline and lualine have no mini.icons support and require
+`nvim-web-devicons` by name, so the spec calls
+`MiniIcons.mock_nvim_web_devicons()`, mini.icons' own supported API for exactly
+this. It registers mini.icons under the old module name, so those requires keep
+working with no devicons install. That is also why this is the one mini module
+loaded with `lazy = false` and a `priority`: the mock has to exist before
+bufferline, lualine or alpha run their setup.
+
+The gain beyond color is that mini.icons knows categories devicons has no
+concept of — directories, LSP kinds, OS — which is why oil now shows a distinct
+folder glyph per directory rather than one generic icon.
+
+The cost, stated plainly: icons are colored by Catppuccin hue rather than by
+language brand. If you want a Go file to be Go-cyan specifically, that is the
+reason to go back.
 
 ## Pairs
 
@@ -264,7 +302,8 @@ statement-like nodes supported by TreeSJ's language presets. Its upstream
 
 [which-key.nvim](https://github.com/folke/which-key.nvim) displays the mappings
 available after a prefix, so pressing Space and pausing shows the leader map.
-The `modern` preset, rounded border, existing `nvim-web-devicons` dependency and
+The `modern` preset, rounded border, mini.icons (which which-key prefers over
+devicons on its own) and
 Catppuccin's official integration keep it visually consistent with the rest of
 the editor. `<leader>f` is labelled **Find**, `<leader>G` **Git** and
 `<leader>x` **Close buffers**; individual entries come directly from the `desc`
@@ -570,6 +609,13 @@ The binary is the one already pinned in the global mise config
 genuine dependency here — `yazi/utils.lua` and `yazi/renameable_buffer.lua`
 require `plenary.path` directly — and it stayed in the lockfile for that reason
 after neo-tree, its previous consumer, was removed.
+
+The float takes a **square** border — `yazi_floating_window_border = "single"`
+— rather than inheriting the global `winborder = "rounded"`. Yazi paints its own
+status bar across the bottom of that window, and that bar is square
+(see [core_tools.md#yazi](./core_tools.md#yazi)) to match tmux and lualine; a
+rounded frame around a square bar reads as a mismatch. This is the only float in
+the config that opts out of `winborder`, and it does so deliberately.
 
 `open_for_directories` is left `false`. Yazi *can* take netrw's place too, but
 two plugins fighting over directory buffers is a bug waiting to happen, and oil
@@ -904,6 +950,23 @@ was read but not rewritten.
 - Indent guides: `ibl` loads for real file buffers, uses Catppuccin's
   `IblIndent`/`IblScope` highlights, and stays disabled in dashboard,
   oil, fzf-lua and other utility buffers.
+- Icons: after removing every `nvim-web-devicons` dependency, lazy.nvim
+  uninstalls the plugin (`plugins["nvim-web-devicons"]` is `nil` and the
+  directory is gone), yet `require("nvim-web-devicons")` still resolves and
+  both APIs the remaining consumers use return real values —
+  `get_icon("init.lua")` gives `` with `MiniIconsGreen`, and
+  `get_icon_color("main.go")` gives `󰟓` with `#74c7ed`. Rendering was checked
+  end to end rather than through the API alone: lualine's filetype component
+  resolves to the highlight group `lualine_x_filetype_MiniIconsAzure_normal`
+  (it was `..._DevIconReadme_normal` before), and an oil listing of a scratch
+  project comes back as `󰉋 ../`, `󰴉 src/`, `Cargo.toml`, `󰟓 main.go` with
+  `MiniIconsPurple`/`MiniIconsAzure`/`MiniIconsOrange` extmarks — note the
+  directory has its own glyph, which devicons could not do. `MiniIconsGreen`
+  and `MiniIconsOrange` resolve to mocha's `green`/`peach`, confirming
+  Catppuccin owns the colors.
+- Yazi's float border: `require("yazi.config").default()` would give
+  `"rounded"` (it reads `winborder`), and the effective config is `"single"`,
+  while `vim.o.winborder` stays `"rounded"` for every other float.
 - Mini editing: `aN`/`iN` and `aL`/`iL` provide Mini AI's extended object
   searches without replacing native `an`/`in`; Mini Surround owns the
   `sa`/`sd`/`sr` family and uses Catppuccin's `MiniSurround` highlight.

@@ -41,8 +41,12 @@ current = { fg = "#1e1e2e", bg = "#89b4fa" }
 preview = { fg = "#1e1e2e", bg = "#cdd6f4" }
 
 [status]
-sep_left = { open = "", close = "" }
-sep_right = { open = "", close = "" }
+# Square edges, not the powerline half-circles yazi ships by default
+# (U+E0B6/U+E0B4). Empty separators leave the mode/permission blocks as plain
+# colour fills, matching tmux's status line — which draws no separators at
+# all — and Neovim's lualine. See docs/core_tools.md#yazi.
+sep_left = { open = "", close = "" }
+sep_right = { open = "", close = "" }
 
 progress_label = { fg = "#ffffff", bold = true }
 progress_normal = { fg = "#a6e3a1", bg = "#45475a" }

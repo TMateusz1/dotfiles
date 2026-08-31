@@ -1,6 +1,5 @@
 return {
   "goolord/alpha-nvim",
-  dependencies = { "nvim-tree/nvim-web-devicons" },
   -- Must be loaded at startup: alpha decides whether to draw from its own
   -- VimEnter autocommand, and there is no command or key to lazy-load from.
   lazy = false,
