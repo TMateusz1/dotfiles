@@ -39,7 +39,7 @@ mise only, Catppuccin theming).
 | [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, mini.icons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                        |
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
 | [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Theme is `catppuccin-nvim`, **not** `catppuccin` — see "Theme" below. Its right section leads with Neovim 0.12's `vim.ui.progress_status()` — see "Native UI" below.                                                                                                             |
-| [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `=` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                         |
+| [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `<leader>o` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                 |
 | [mikavilpas/yazi.nvim](https://github.com/mikavilpas/yazi.nvim)                                               | Yazi file manager in a float       | `<leader>e`/`<leader>E` open the real `yazi` binary already pinned in the global mise config — see "File explorers" below.                                                                                                                                                       |
 | [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)                                     | Animated cursor trail              | Pure-Lua cursor smear drawn with virtual text; no terminal support required. Defaults kept — see "Cursor" below.                                                                                                                                                                 |
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
@@ -563,7 +563,7 @@ filesystem*; yazi is for *looking around it*.
 | Key          | Opens                                                  |
 | ------------ | ------------------------------------------------------ |
 | `-`          | oil on the parent of the current file, in that window  |
-| `=`          | oil on the same directory, in a floating window        |
+| `<leader>o`  | oil on the same directory, in a floating window        |
 | `<leader>e`  | yazi, floating, focused on the current file            |
 | `<leader>E`  | yazi, floating, at the current working directory       |
 
@@ -589,11 +589,8 @@ macOS Trash instead of unlinking them, via oil's own `adapters/trash/mac.lua`;
 this is a native adapter, not a shell out to a `trash` binary that would have to
 be installed separately.
 
-**`=` costs you the indent operator, and that is a real trade.** Normal-mode `=`
-is now oil's, so `==`, `=ap` and `gg=G` no longer reindent. Only normal mode is
-mapped, so the visual-mode form still works: `V=` for a line, `vap=` for a
-paragraph, `ggVG=` for a buffer — verified, not assumed. If that trade turns out
-to be the wrong one, the fix is one line in `oil.lua`.
+Normal-mode `=` remains Neovim's native indent operator, so `==`, `=ap` and
+`gg=G` all work alongside the Oil mappings.
 
 ### yazi.nvim — the real yazi, in a float
 
@@ -656,6 +653,8 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   plugin floating windows that do not explicitly override it);
   `cmdheight = 0` (gives up the reserved cmdline row so lualine sits on the
   tmux bar — see [Bottom of the screen](#bottom-of-the-screen));
+  `title = true` (publishes the current buffer title; tmux captures it as the
+  pane title and forwards it to the Kitty tab/window title);
   `number` + `relativenumber` together (the common "hybrid" line-number
   style — absolute on the cursor's own line, relative everywhere else);
   `hlsearch`/`incsearch` plus `ignorecase`/`smartcase` (case-insensitive
@@ -1029,12 +1028,12 @@ was read but not rewritten.
   `sub/`. From `a.txt`, pressing `-` yields a `filetype=oil` buffer whose
   `get_current_dir()` is the project, listing `../`, `sub/`, `a.txt` and
   `b.txt` — with the cursor already on `a.txt`, the file it came from.
-  Pressing `=` opens a float whose border is the rounded set inherited from
+  Pressing `<leader>o` opens a float whose border is the rounded set inherited from
   `winborder`. `nvim .` with no session leaves exactly that listing on
   screen, which is the behavior the deleted `no_restore_cmds` hook used to
-  provide. Normal-mode `=` resolves to oil while `maparg("=", "x")` is
-  empty, and `V=` still reindents a line — so the operator survives in
-  visual mode. `:Yazi` and `:Oil` both exist, yazi resolves
+  provide. Normal-mode `=` remains unmapped and retains its native indent
+  operator, while `<leader>o` resolves to Oil's floating view. `:Yazi` and
+  `:Oil` both exist, yazi resolves
   `open_for_directories` to `false`, and smear-cursor loads with
   `enabled = true`. `neo-tree.nvim` and `nui.nvim` are gone from both the
   lockfile and lazy's plugin list, with no plugin reporting an error.

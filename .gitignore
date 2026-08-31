@@ -6,6 +6,9 @@
 *.swo
 *~
 
+# Neovim fallback log (written in the cwd when its normal state path is unavailable)
+/nvim.log
+
 # mise local overrides — machine-specific, never committed (see AGENTS.md)
 mise.local.toml
 mise.*.local.toml

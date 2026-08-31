@@ -7,7 +7,7 @@ return {
   keys = {
     { "-", "<cmd>Oil<cr>", desc = "Open parent directory" },
     {
-      "=",
+      "<leader>o",
       function()
         require("oil").open_float()
       end,

@@ -143,7 +143,9 @@ choice, it's the literal filename tmux requires at that path.
 **What's configured:** prefix remapped to `C-Space`; `prefix r` reloads the
 config. `tmux-256color` terminal type with truecolor overrides,
 extended-keys passthrough (e.g. Shift-Enter), focus events (Neovim
-autoread), OSC52 clipboard passthrough for remote copy/paste. Vi-style copy
+autoread), application-title forwarding (`set-titles` with `#T`, so Neovim's
+current buffer title reaches the Kitty tab/window), OSC52 clipboard
+passthrough for remote copy/paste. Vi-style copy
 mode, mouse on, 100k-line scrollback, `escape-time 10` (fast enough not to
 fight Neovim's `<Esc>`). Smart pane navigation (`C-h/j/k/l`) that forwards
 to Neovim/fzf when one of those is running in the current pane, otherwise
