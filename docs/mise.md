@@ -48,8 +48,9 @@ Global (`mise/config.toml`):
   [core_tools.md](./core_tools.md)
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) and `python`; editor tooling includes basedpyright,
-  Ruff, Helm 4/helm-ls, YAML language tooling, yamlfmt and kubeconform — see
-  [langs.md](./langs.md)
+  Ruff, mypy, RobotCode/Robot Framework/Robocop, Helm 4/helm-ls, YAML language
+  tooling, yamlfmt and kubeconform. uv powers the isolated `pipx:` Python CLI
+  installs — see [langs.md](./langs.md)
 - `neovim` — editor, see [nvim.md](./nvim.md)
 - `tree-sitter` — the CLI nvim-treesitter needs to compile parsers; a hard
   runtime dependency of the Neovim config, deliberately the aqua build

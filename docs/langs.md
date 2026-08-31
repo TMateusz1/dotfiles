@@ -84,21 +84,42 @@ isn't `~/.config/go/env` doing anything" doesn't cost time.
 
 ## python and Robot Framework
 
-The global config pins Python itself, `basedpyright` and Ruff. Python editing
-uses both language servers: basedpyright owns type-aware completion, navigation,
-hover and type checking, while Ruff owns lint diagnostics, import organization
-and formatting. Ruff's hover capability is disabled when it attaches so the two
-servers do not present competing documentation.
+The global config pins Python, basedpyright, Ruff and mypy. Their responsibilities
+do not overlap: basedpyright supplies type-aware completion, navigation and
+hover with its diagnostics disabled; Ruff supplies live lint diagnostics,
+import organization and formatting; mypy is the authoritative static type
+checker. Because a project-wide mypy run can be slow, `<leader>cpm` runs it
+asynchronously and publishes its JSON output to quickfix instead of running on
+every save.
 
-Robot Framework deliberately follows a project-local policy. Neovim enables
-the `robotcode` LSP definition, but the global mise config does not install
-RobotCode or Robocop. Each Robot project pins its compatible environment and
-exposes `robotcode` on `PATH`, for example with the
-`robotcode[languageserver,lint]` extra. This keeps project keyword libraries and
-Robot Framework versions in the same environment the language server inspects.
-RobotCode then provides completion, navigation, diagnostics and LSP formatting;
-its lint extra supplies Robocop. If a project has no `robotcode` executable,
-Neovim still provides treesitter highlighting but no Robot LSP client starts.
+Robot Framework has a global baseline like every other language here:
+RobotCode, Robot Framework and Robocop are isolated, pinned `pipx:` tools
+installed by mise through the pinned uv binary. RobotCode includes its
+language-server, analysis and lint extras.
+
+Local projects still win. For a root containing `.venv/bin/robotcode`, Neovim
+launches that exact executable. Otherwise an already activated environment wins
+through normal `$PATH` ordering, followed by mise's global RobotCode. When only
+project libraries—not RobotCode—exist in `.venv`, their `site-packages` path is
+passed to the global server so keyword imports remain visible.
+
+Day-to-day commands need no project installation for a basic suite:
+
+```sh
+robot tests/
+robotcode analyze code .
+robocop check .
+robocop format .
+```
+
+Projects should still declare their actual test libraries and may pin their own
+RobotCode/Robot Framework versions when compatibility requires it. A
+conventional `.venv` is discovered automatically; activating it before starting
+Neovim remains the escape hatch for any other environment layout.
+
+For Python, mypy discovers normal project configuration in `pyproject.toml`,
+`mypy.ini`, `.mypy.ini` or `setup.cfg`. `<leader>cpm` checks from that project
+root; a project-local `.venv/bin/mypy` takes precedence over the global binary.
 
 ## Editor tooling (LSP, linters, formatters)
 
@@ -110,8 +131,13 @@ mise config — there is no mason.nvim, and Neovim installs nothing. See
 | ------------------------------ | ---------------------------------- | ------------------------------------------------ |
 | `lua-language-server`          | `aqua:LuaLS/lua-language-server`   | LSP for editing this config                      |
 | `rust-analyzer`                | `aqua:rust-lang/rust-analyzer`     | LSP for Rust                                     |
-| `basedpyright`                 | `npm:basedpyright`                 | Python completion, navigation and type checking  |
+| `basedpyright`                 | `npm:basedpyright`                 | Python completion, navigation and hover          |
 | `ruff`                         | `aqua:astral-sh/ruff`              | Python lint, format and complementary LSP        |
+| `mypy`                         | `pipx:mypy`                        | Authoritative Python static type checker         |
+| `robotcode`                    | `pipx:robotcode`                   | Robot Framework LSP and project analysis         |
+| `robot`                        | `pipx:robotframework`              | Robot Framework runner                           |
+| `robocop`                      | `pipx:robotframework-robocop`      | Robot Framework lint and formatting              |
+| `uv`                           | `aqua:astral-sh/uv`                | Installer for isolated global Python CLIs        |
 | `helm-ls`                      | `aqua:mrjosh/helm-ls`              | LSP for Helm charts                              |
 | `helm`                         | `aqua:helm/helm`                   | Helm 4 CLI used by helm-ls for chart linting     |
 | `hadolint`                     | `aqua:hadolint/hadolint`           | Dockerfile linter                                |
@@ -125,17 +151,19 @@ mise config — there is no mason.nvim, and Neovim installs nothing. See
 `gopls`, `goimports`, `gofumpt`, `golangci-lint` and `gotestsum` were already
 present under [go](#go) and are reused as-is.
 
-### Node-backed servers and project-local RobotCode
+### Node-backed servers and isolated Python CLIs
 
 **`node` and the three npm servers.** YAML and JSON have no static language
 server, and basedpyright's supported distribution is Node-backed. Kubernetes
 schema completion and Python type-aware completion are worth that shared
 runtime dependency.
 
-**RobotCode stays project-local.** It must see the project's Python/Robot
-environment and keyword libraries, so installing one global copy would make
-completion less reliable. Neovim enables the client definition; each project
-provides the executable and lint extra as described above.
+**RobotCode, Robot Framework, Robocop and mypy use mise's `pipx:` backend.** uv
+creates a separate Python environment for each command, preventing their
+dependencies from leaking into projects. All use the globally pinned Python
+3.14.7 runtime. RobotCode's environment also pins Robot Framework and Robocop
+explicitly, while Neovim's local-first command selection preserves project
+overrides.
 
 ### `rust-analyzer` and the rustup copy
 

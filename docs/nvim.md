@@ -723,14 +723,14 @@ Nine servers, all enabled from `lua/plugins/lsp.lua`:
 | `helm_ls`       | Helm charts      | `aqua:mrjosh/helm-ls`               |
 | `ruff`          | Python           | `aqua:astral-sh/ruff`               |
 | `basedpyright`  | Python           | `npm:basedpyright`                  |
-| `robotcode`     | Robot Framework  | Project-local Python environment    |
+| `robotcode`     | Robot Framework  | `pipx:robotcode` global/local-first |
 | `rust_analyzer` | Rust             | `aqua:rust-lang/rust-analyzer`      |
 
-**No mason.nvim.** Global binaries are pinned in mise and resolved from `$PATH`;
-RobotCode is deliberately pinned by each Robot project so it sees that
-project's Python environment and keyword libraries. Neovim configures clients
-and never installs anything. A server that is not available on `$PATH` simply
-does not start.
+**No mason.nvim.** Every baseline binary is pinned in mise and resolved from
+`$PATH`; Neovim configures clients and never installs anything. RobotCode adds
+one local-first rule: a project's `.venv/bin/robotcode` is selected before the
+global binary. An activated nonstandard environment still wins through normal
+`$PATH` ordering.
 
 ### Configured natively, not through a framework
 
@@ -791,16 +791,23 @@ makes gopls slow to start and fills completion with duplicate symbols.
 ### Python and Robot Framework
 
 Python intentionally attaches both basedpyright and Ruff. Basedpyright owns
-type-aware completion, navigation, hover and type checking; Ruff owns linting,
-import organization and formatting. Ruff hover is disabled on attach so only
-one server answers documentation requests.
+type-aware completion, navigation and hover, but its diagnostics and type
+checking are disabled. Ruff owns live lint diagnostics, import organization and
+formatting; mypy is the authoritative project-wide static checker and runs on
+demand into quickfix with `<leader>cpm`.
 
-RobotCode is enabled, but not globally installed. Each Robot project provides
-`robotcode` from its own environment, normally by pinning
-`robotcode[languageserver,lint]`; that also supplies Robocop diagnostics. The
-LSP supplies completion, navigation and formatting through conform's LSP
-fallback. Without a project-local executable, treesitter highlighting still
-works but no Robot LSP client starts.
+RobotCode is globally pinned with its language-server, analysis and lint extras,
+alongside global Robot Framework and Robocop commands. Its launcher checks the
+project root in this order:
+
+1. `.venv/bin/robotcode` (or `venv/bin/robotcode`), even without activation;
+2. the first `robotcode` on `$PATH`, so an activated custom environment wins;
+3. mise's global RobotCode fallback.
+
+If a conventional project `.venv` contains libraries but not RobotCode, its
+`site-packages` is passed to the global server through `PYTHONPATH`. Completion
+therefore sees project keyword libraries without requiring every project to
+install its own language server.
 
 ### Kubernetes
 
@@ -934,8 +941,9 @@ mise binary; conform only sequences them.
 `yaml.helm-values` inherits the YAML formatter, so values files use the same
 globally available yamlfmt outside this dotfiles repo. Helm templates are not
 fed to a generic YAML formatter because Go-template expressions are not plain
-YAML. Robot Framework has no separate global formatter: conform's LSP fallback
-uses the project-local RobotCode formatter when that client is attached.
+YAML. For Robot Framework, conform's LSP fallback uses whichever RobotCode
+client won the local/global selection; the separately exposed `robocop format`
+command is also available globally.
 
 **Format on save is on by default and switchable at two levels**, because the
 common failure mode is opening someone else's repo with a different style:
@@ -967,12 +975,15 @@ clean run. They never block Neovim and never run on save:
 | `<leader>cgl` | `golangci-lint run` for the current Go module |
 | `<leader>cgL` | The same project check with `--fix`           |
 | `<leader>ckl` | kubeconform for the current YAML file         |
+| `<leader>cpm` | mypy for the current Python project           |
 
 gopls already runs staticcheck and the unusedparams/shadow/nilness analyses,
 so running golangci-lint on every write would duplicate messages and add
 latency on large repositories. kubeconform likewise stays explicit because
 most YAML is not Kubernetes, and a filename/path heuristic should not decide
-whether every save launches schema validation.
+whether every save launches schema validation. mypy is similarly explicit: it
+walks the project and maintains `.mypy_cache`, while Ruff remains the fast live
+feedback path.
 
 This is separate from `hk.pkl`, which formats and lints **this repository's own
 files** at commit time. conform and nvim-lint act in the editor, on whatever
@@ -1384,11 +1395,11 @@ was read but not rewritten.
   `Name string` into `Name     string` and leaves the longest field alone, so
   the original predicate could never have gone true.
 - Python and Robot Framework, against scratch projects rather than just config
-  inspection. A Python type error is reported by basedpyright while Ruff
-  attaches alongside it with hover disabled. A project-local Python 3.14
-  environment with Robot Framework and `robotcode[languageserver,lint]`
-  attaches RobotCode successfully; `robotcode analyze code` also completes
-  cleanly on the fixture.
+  inspection. basedpyright and Ruff attach while basedpyright publishes no
+  diagnostics; `<leader>cpm` uses a project-local mypy when present and parses
+  its JSON type error into the correct quickfix line and column. RobotCode
+  attaches once from the global mise binary and once through an executable
+  marker proving `.venv/bin/robotcode` takes precedence.
 - Kubernetes schema completion, with yamlls loading the configured built-in
   Kubernetes schema for a `*.k8s.yaml` fixture and reporting a string-valued
   `spec.replicas` as `Expected "integer"`.

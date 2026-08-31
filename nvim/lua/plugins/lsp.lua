@@ -6,6 +6,50 @@
 -- is on that path purely to supply those definitions. `vim.lsp.enable()` turns
 -- them on; `vim.lsp.config()` layers this repo's overrides on top. There is no
 -- `require("lspconfig").setup()` anywhere — that API is the old one.
+local function project_venv(root)
+  for _, name in ipairs({ ".venv", "venv" }) do
+    local path = vim.fs.joinpath(root, name)
+    if vim.uv.fs_stat(path) then
+      return path
+    end
+  end
+end
+
+local function start_robotcode(dispatchers, config)
+  local root = config.root_dir or vim.uv.cwd()
+  local venv = project_venv(root)
+  local executable = "robotcode"
+  local env
+
+  if venv then
+    local local_executable = vim.fs.joinpath(venv, "bin", "robotcode")
+    if vim.fn.executable(local_executable) == 1 then
+      executable = local_executable
+    else
+      -- The global server can still resolve libraries installed in the
+      -- project's conventional virtualenv even when RobotCode itself is not
+      -- installed there.
+      local site_packages = vim.fs.find("site-packages", {
+        path = venv,
+        type = "directory",
+        limit = 1,
+      })[1]
+      if site_packages then
+        local pythonpath = site_packages
+        if vim.env.PYTHONPATH then
+          pythonpath = pythonpath .. ":" .. vim.env.PYTHONPATH
+        end
+        env = { PYTHONPATH = pythonpath }
+      end
+    end
+  end
+
+  return vim.lsp.rpc.start({ executable, "language-server" }, dispatchers, {
+    cwd = root,
+    env = env,
+  })
+end
+
 return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
@@ -125,6 +169,29 @@ return {
           },
         },
       },
+    })
+
+    vim.lsp.config("basedpyright", {
+      -- basedpyright remains the Python language-service engine, but mypy is
+      -- the authoritative type checker and Ruff owns lint diagnostics.
+      settings = {
+        basedpyright = {
+          analysis = { typeCheckingMode = "off" },
+        },
+      },
+      handlers = {
+        ["textDocument/publishDiagnostics"] = function() end,
+      },
+      on_init = function(client)
+        client.server_capabilities.diagnosticProvider = nil
+      end,
+    })
+
+    vim.lsp.config("robotcode", {
+      -- Prefer a conventional project-local installation without requiring
+      -- shell activation, then fall back to the first `robotcode` on PATH
+      -- (normally the globally pinned mise binary).
+      cmd = start_robotcode,
     })
 
     vim.lsp.enable({

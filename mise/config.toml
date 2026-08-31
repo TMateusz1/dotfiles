@@ -44,6 +44,7 @@ disable_backends = ["asdf", "vfox"]
 "aqua:LuaLS/lua-language-server" = "3.19.1"   # editing this very config
 "aqua:rust-lang/rust-analyzer" = "2026-08-24"
 "aqua:astral-sh/ruff" = "0.16.5"              # Python: lint + format + `ruff server`
+"aqua:astral-sh/uv" = "0.12.7"                # installer for isolated pipx: CLI tools below
 "aqua:mrjosh/helm-ls" = "0.5.4"
 "aqua:helm/helm" = "4.2.4"                    # helm-ls shells out for `helm lint`
 "aqua:hadolint/hadolint" = "2.15.1"           # Dockerfile linter
@@ -54,8 +55,32 @@ disable_backends = ["asdf", "vfox"]
 "go:github.com/fatih/gomodifytags" = { version = "1.17.0", depends = ["go"] }
 "go:github.com/josharian/impl" = { version = "1.5.0", depends = ["go"] }
 
+# Python CLIs live in isolated uv-managed environments. RobotCode is a global
+# fallback: nvim prefers a project's .venv copy when one exists. Its explicit
+# transitive pins keep the language server, Robot Framework and Robocop aligned.
+"pipx:robotcode" = { version = "2.7.0", extras = [
+  "languageserver",
+  "analyze",
+  "lint",
+], uvx_args = "--python 3.14.7 --with robotframework==7.3.2 --with robotframework-robocop==9.0.0", depends = [
+  "python",
+  "aqua:astral-sh/uv",
+] }
+"pipx:robotframework" = { version = "7.3.2", uvx_args = "--python 3.14.7", depends = [
+  "python",
+  "aqua:astral-sh/uv",
+] }
+"pipx:robotframework-robocop" = { version = "9.0.0", uvx_args = "--python 3.14.7 --with robotframework==7.3.2", depends = [
+  "python",
+  "aqua:astral-sh/uv",
+] }
+"pipx:mypy" = { version = "2.3.1", uvx_args = "--python 3.14.7", depends = [
+  "python",
+  "aqua:astral-sh/uv",
+] }
+
 # YAML, JSON and basedpyright need Node; the first two have no static language
-# server, and basedpyright is the type-aware half of the Python LSP setup.
+# server, and basedpyright supplies Python completion and navigation.
 "node" = "24.20.0"
 "npm:yaml-language-server" = { version = "1.24.0", depends = ["node"] }
 "npm:vscode-langservers-extracted" = { version = "4.10.0", depends = ["node"] }

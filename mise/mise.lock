@@ -108,6 +108,29 @@ url = "https://github.com/astral-sh/ruff/releases/download/0.16.5/ruff-aarch64-a
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/532582805"
 provenance = "github-attestations"
 
+[[tools."aqua:astral-sh/uv"]]
+version = "0.12.7"
+backend = "aqua:astral-sh/uv"
+specifiers = ["0.12.7"]
+
+[tools."aqua:astral-sh/uv"."platforms.linux-arm64"]
+checksum = "sha256:66393193038dd7eb108abd7a218d9cec04ac70ab98242b0720fa94de19223b7c"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.7/uv-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/532935189"
+provenance = "github-attestations"
+
+[tools."aqua:astral-sh/uv"."platforms.linux-x64"]
+checksum = "sha256:788f18abea7c5f55d6216e4f5613fd89d4d59b631efeec117b2b07fe72f1da21"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.7/uv-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/532935280"
+provenance = "github-attestations"
+
+[tools."aqua:astral-sh/uv"."platforms.macos-arm64"]
+checksum = "sha256:127ebdda7ad953cdf198e964b570ea5771b85467ea93eb7cb6d6f8e6f55408f3"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.7/uv-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/532935178"
+provenance = "github-attestations"
+
 [[tools."aqua:atuinsh/atuin"]]
 version = "18.20.1"
 backend = "aqua:atuinsh/atuin"
@@ -722,6 +745,39 @@ specifiers = ["4.10.0"]
 version = "1.24.0"
 backend = "npm:yaml-language-server"
 specifiers = ["1.24.0"]
+
+[[tools."pipx:mypy"]]
+version = "2.3.1"
+backend = "pipx:mypy"
+specifiers = ["2.3.1"]
+
+[tools."pipx:mypy".options]
+uvx_args = "--python 3.14.7"
+
+[[tools."pipx:robotcode"]]
+version = "2.7.0"
+backend = "pipx:robotcode"
+specifiers = ["2.7.0"]
+
+[tools."pipx:robotcode".options]
+extras = "languageserver,analyze,lint"
+uvx_args = "--python 3.14.7 --with robotframework==7.3.2 --with robotframework-robocop==9.0.0"
+
+[[tools."pipx:robotframework"]]
+version = "7.3.2"
+backend = "pipx:robotframework"
+specifiers = ["7.3.2"]
+
+[tools."pipx:robotframework".options]
+uvx_args = "--python 3.14.7"
+
+[[tools."pipx:robotframework-robocop"]]
+version = "9.0.0"
+backend = "pipx:robotframework-robocop"
+specifiers = ["9.0.0"]
+
+[tools."pipx:robotframework-robocop".options]
+uvx_args = "--python 3.14.7 --with robotframework==7.3.2"
 
 [[tools.python]]
 version = "3.14.7"
