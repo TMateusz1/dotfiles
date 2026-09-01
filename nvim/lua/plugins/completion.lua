@@ -1,3 +1,7 @@
+local function is_friendly_kubernetes_snippet(file)
+  return file:match("friendly%-snippets.*/snippets/kubernetes%.json$") ~= nil
+end
+
 return {
   "saghen/blink.cmp",
   version = "*",
@@ -15,6 +19,33 @@ return {
     fuzzy = { implementation = "prefer_rust" },
     sources = {
       default = { "lsp", "path", "snippets", "buffer" },
+      providers = {
+        -- friendly-snippets registers Kubernetes under `yaml` only. Helm
+        -- templates deliberately use the `helm` filetype, so give them a
+        -- narrowly filtered view of that set instead of extending Helm with
+        -- every YAML snippet (which would also pull in Docker Compose).
+        kubernetes_snippets = {
+          name = "Kubernetes",
+          module = "blink.cmp.sources.snippets",
+          opts = {
+            friendly_snippets = true,
+            global_snippets = {},
+            get_filetype = function()
+              return "yaml"
+            end,
+            filter_snippets = function(_, file)
+              return is_friendly_kubernetes_snippet(file)
+            end,
+            use_label_description = true,
+          },
+        },
+      },
+      per_filetype = {
+        helm = {
+          inherit_defaults = true,
+          "kubernetes_snippets",
+        },
+      },
     },
     snippets = { preset = "default" }, -- Neovim's native vim.snippet
     -- One key, one job. <Tab> is *only* snippet navigation and <CR> is the
@@ -23,7 +54,17 @@ return {
     -- completion menu, and a Tab meant as "next field" would take a
     -- suggestion instead. blink's `super-tab` preset calls accept() before
     -- snippet_forward, so that collision is structural rather than occasional.
-    keymap = { preset = "enter" },
+    keymap = {
+      preset = "enter",
+      ["<Esc>"] = {
+        function()
+          if vim.snippet.active() then
+            vim.snippet.stop()
+          end
+        end,
+        "fallback",
+      },
+    },
     appearance = { nerd_font_variant = "mono" },
     completion = {
       list = {

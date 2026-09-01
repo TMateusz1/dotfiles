@@ -23,6 +23,14 @@ local function unsaved()
   end, vim.api.nvim_list_bufs())
 end
 
+--- Buffers that appear in ordinary buffer navigation (and Bufferline).
+---@return integer[]
+local function listed()
+  return vim.tbl_filter(function(bufnr)
+    return vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].buflisted
+  end, vim.api.nvim_list_bufs())
+end
+
 ---@param bufnr integer
 ---@return string
 local function label(bufnr)
@@ -94,6 +102,25 @@ function M.quit_all()
   elseif answer == "d" then
     vim.cmd("quitall!")
   end
+end
+
+--- Close the focused UI layer: float, current buffer, or Neovim itself.
+function M.smart_close()
+  local winid = vim.api.nvim_get_current_win()
+  local win_config = vim.api.nvim_win_get_config(winid)
+  if win_config.relative ~= "" or win_config.external then
+    vim.api.nvim_win_close(winid, true)
+    return
+  end
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  local visible = listed()
+  if #visible == 0 or (#visible == 1 and visible[1] == bufnr) then
+    M.quit_all()
+    return
+  end
+
+  M.close(bufnr)
 end
 
 return M

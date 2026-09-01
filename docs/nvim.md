@@ -123,6 +123,18 @@ selection, `<leader><leader>` overlays a pick letter on every displayed
 Bufferline entry; pressing a letter focuses that buffer. This mirrors
 `<leader>xp`, which uses the same picker to close an entry instead.
 
+`<leader>q` is the context-aware quick close. In a floating window it closes
+only that float. In an ordinary window it closes the current buffer; if that is
+the final listed buffer (or there are no listed buffers, as on the dashboard),
+it exits Neovim instead. Modified files still use the save/discard/cancel flow
+below, so the shortcut never silently loses edits.
+
+`<leader>Q` always applies that unsaved-aware quit flow to the entire Neovim
+instance, even when a float or utility window is focused. Native `<C-w>q`
+remains available for the distinct operation of closing only the current split.
+`ZZ` and `ZQ` stay native and deliberately gain no leader aliases: they bypass
+the consistent save/discard/cancel questions below.
+
 `<leader>x` is the buffer-close namespace:
 
 | Key          | Action                                    |
@@ -317,8 +329,9 @@ devicons on its own) and
 Catppuccin's official integration keep it visually consistent with the rest of
 the editor. `<leader>f` is labelled **Find**, `<leader>G` **Git** and
 `<leader>x` **Close buffers**; individual entries come directly from the `desc`
-already attached to each keymap; `<leader>q` is **Quit**. `<leader>?` shows only
-mappings local to the current buffer.
+already attached to each keymap; `<leader>q` is the direct **Smart close**
+action and `<leader>Q` is **Smart quit all**, rather than either key forming a
+prefix group. `<leader>?` shows only mappings local to the current buffer.
 
 MiniClue was considered because Mini AI and Mini Surround are already present.
 WhichKey is a better fit here: it discovers described mappings and their prefix
@@ -380,12 +393,22 @@ grammars are per-language build artifacts of a CLI that mise itself pins.
 | git             | `diff`, `gitattributes`, `gitcommit`, `gitignore`, `git_config`, `git_rebase`                                                                  |
 | Neovim itself   | `lua`, `luadoc`, `vim`, `vimdoc`, `query`                                                                                                      |
 
-Robot Framework works with no extra wiring: Neovim already resolves both
-`.robot` and `.resource` to filetype `robot` (verified), so the parser is
-picked up automatically. Worth knowing that upstream classes `robot` as a
-**tier 3** parser — no listed maintainer, unlike the tier 1/2 grammars
-behind everything else here — so it's the most likely one to lag behind
-Robot Framework syntax changes.
+Robot Framework needs no custom *filetype* wiring: Neovim already resolves both
+`.robot` and `.resource` to filetype `robot` (verified), so they share the
+same parser and RobotCode client. The parser does need a version override,
+however. nvim-treesitter still registers the tier-3 `robot` parser at
+`v1.3.0`, before fixes for comment sections, newer settings, nested variable
+subscripts, inline Python and braces inside arguments. The config uses
+nvim-treesitter's supported `User TSUpdate` hook to keep the official
+`Hubro/tree-sitter-robot` source but pin reviewed commit
+`8f1a8d8c3875db2cd29865b5a1db7716b4eab4c3`.
+
+Run `:TSUpdate robot` after first pulling that override on a machine with the
+older parser. Clean installs and later `:TSUpdate` runs use the pin
+automatically; Neovim does not contact the network to update it on every
+startup. RobotCode semantic tokens complement the syntax tree for constructs
+the upstream grammar does not yet model, including current `VAR`/`GROUP`
+syntax.
 
 ### Why highlighting is enabled by capability, not by a filetype list
 
@@ -679,8 +702,9 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   clipboard, below.
 - **`keymaps.lua`**: `<Esc>` in normal mode also runs `:nohlsearch`, so a
   search's highlighted matches clear without needing a separate keybind or
-  losing Esc's usual behavior. `<leader>qq` quits everything, asking about
-  unsaved buffers first — see
+  losing Esc's usual behavior. `<leader>q` closes the focused float, current
+  buffer or editor according to context; `<leader>Q` always quits the entire
+  editor. Both use the unsaved-aware flow — see
   [Quitting and closing with unsaved changes](#quitting-and-closing-with-unsaved-changes).
 - **`filetypes.lua`**: Helm chart detection — see [Helm](#helm).
 - **`buffers.lua`**: the shared buffer-close and quit-all flow, including the
@@ -816,19 +840,27 @@ If a conventional project `.venv` contains libraries but not RobotCode, its
 therefore sees project keyword libraries without requiring every project to
 install its own language server.
 
+RobotCode advertises Robot-specific semantic tokens rather than only the
+standard LSP token vocabulary. Catppuccin therefore links the language-scoped
+`@lsp.type.*.robot` groups to its existing Treesitter palette: headers,
+settings and control flow; test and keyword declarations/calls; variables and
+arguments; namespaces; delimiters; escapes; documentation and errors all remain
+distinct. The separator/terminator tokens that only cover layout whitespace
+stay intentionally unstyled. These semantic highlights layer on top of
+Treesitter and are available for both `.robot` and `.resource` buffers.
+
 ### Kubernetes
 
 yamlls receives an explicit Kubernetes schema for conventional manifest paths:
-`k8s/**`, `manifests/**`, `deploy/**`, and `*.k8s.yaml`/`*.k8s.yml`. Other
-layouts can opt in per file with a YAML language-server schema modeline. Schema
-validation stays interactive in the LSP; the fuller kubeconform check is an
-on-demand quickfix command described under [Linting](#linting).
-
-Those globs match at any depth. yaml-language-server prefixes every `fileMatch`
-with `**/` and matches with picomatch, so `deploy/**/*.yaml` covers
-`deploy/anything/nested/x.yaml` — checked against the installed server's
-`yamlSchemaService.js`, not assumed. Inside a Helm chart the schema arrives by a
-different route; see below.
+`k8s/**`, `kubernetes/**`, `deploy/**`, `deployment/**`,
+`deployments/**`, `manifests/**`, `base/**`, `overlays/**`, and
+`*.k8s.yaml`/`*.k8s.yml`. Both `.yaml` and `.yml` are covered at any
+directory depth. Other layouts can opt in per file with a YAML language-server
+schema modeline. Schema validation stays interactive in the LSP; the fuller
+kubeconform check is an on-demand quickfix command described under
+[Linting](#linting). Inside a Helm chart the schema arrives by a different
+route, but it is generated from the same directory and filename lists; see
+below.
 
 ### Helm
 
@@ -847,12 +879,12 @@ handful of filetype rules, which `vim.filetype.add()` does natively, so
 `Chart.yaml` finds the chart root; everything else is decided by the path
 *relative to that root*:
 
-| Path relative to the chart root         | Filetype           | Servers                |
-| --------------------------------------- | ------------------ | ---------------------- |
-| `Chart.yaml`, `Chart.lock`              | `yaml`             | yamlls                 |
-| `values*.yaml`                          | `yaml.helm-values` | helm-ls **and** yamlls |
-| `crds/**`, `ci/**`, any dotted segment  | `yaml`             | yamlls                 |
-| anything else `.yaml`/`.yml`/`.tpl`     | `helm`             | helm-ls only           |
+| Path relative to the chart root        | Filetype           | Servers                |
+| -------------------------------------- | ------------------ | ---------------------- |
+| `Chart.yaml`, `Chart.lock`             | `yaml`             | yamlls                 |
+| `values*.yaml`, `values*.yml`          | `yaml.helm-values` | helm-ls                |
+| `crds/**`, `ci/**`, any dotted segment | `yaml`             | yamlls                 |
+| anything else `.yaml`/`.yml`/`.tpl`    | `helm`             | helm-ls only           |
 
 The earlier version of this rule required a directory literally named
 `templates/`. Plenty of charts do not use that name — `deploy/template/` is
@@ -866,36 +898,45 @@ are plain YAML by Helm's own definition, and the dotted-segment rule keeps
 *is* the chart root. Searching upward stops at the *nearest* `Chart.yaml`, so a
 subchart under `charts/` resolves against its own root.
 
-`values.yaml` deliberately keeps a `yaml`-prefixed filetype so it still gets
-schema support from yamlls, while the `.helm-values` suffix also lets helm-ls
-attach — that pairing is what makes `.Values.*` completion inside a template
-resolve against the real file.
+`values.yaml` deliberately keeps a `yaml`-prefixed compound filetype for tools
+that understand dotted filetypes, while the `.helm-values` suffix lets helm-ls
+attach. helm-ls's values schema support is what makes `.Values.*` completion
+inside a template resolve against the real file.
+
+helm-ls is told explicitly that `values.yaml` is the main values file,
+`values.lint.yaml` is the lint overlay and `values*.y*ml` finds additional
+values files. helm-ls passes that last value to Go's `filepath.Glob`, so the
+single pattern deliberately covers both `.yaml` and `.yml` without relying
+on unsupported brace expansion.
 
 **The Kubernetes schema inside a chart comes from helm-ls, not from the yamlls
 client.** Template buffers are filetype `helm`, which yamlls does not handle;
 helm-ls spawns its *own* yaml-language-server for them, and that instance is
 configured through `helm-ls.yamlls.config`, entirely separately from the
 `vim.lsp.config("yamlls", ...)` block. helm-ls defaults its Kubernetes mapping
-to `templates/**` — the same directory-name assumption, and the same silent
-failure — so `lsp.lua` widens it:
+to `templates/**`. That covers a conventional chart, but a chart YAML detected
+as filetype `helm` under `k8s/**`, `deploy/**`, `manifests/**` or another
+configured Kubernetes path still bypasses standalone yamlls. `lsp.lua`
+therefore builds the internal glob from the same shared directory/suffix lists:
 
 ```lua
 config = {
-  schemas = { kubernetes = "**/{template,templates}/**" },
+  schemas = { kubernetes = helm_kubernetes_file_match },
   completion = true,
   hover = true,
 },
 ```
 
-This stays scoped to template directories on purpose. helm-ls also forwards
-`values*.yaml` to that server, and validating a values file against
-Pod/Deployment schemas would produce nothing but false positives. A chart that
-names its template directory something else still gets helm-ls, treesitter
-highlighting and `.Values.*` completion — only this glob needs extending.
+helm-ls exposes only one string glob per schema, so the generated value is a
+single picomatch brace expression covering `template/**`, `templates/**`, all
+of the conventional Kubernetes directories above, and `*.k8s.yaml`/`.yml`.
+Values files keep helm-ls's generated values schema through its custom schema
+provider rather than being treated as Kubernetes resources.
 
 Verified end to end against a scratch chart at `deploy/Chart.yaml` with a
-`deploy/template/` directory: completing under `spec:` in a `kind: Deployment`
-template offers `replicas`, `selector`, `strategy` and the rest of
+`deploy/template/` directory and against `chart/k8s/deployment.yaml`.
+Both buffers resolve to filetype `helm`, attach only `helm_ls`, and offer
+`replicas`, `selector`, `strategy` and the rest of
 `io.k8s.api.apps.v1.DeploymentSpec` alongside Helm's Go-template snippets.
 
 One known gap, unrelated to this config: yaml-language-server resolves the
@@ -946,6 +987,7 @@ one job:
 | `<CR>`                               | Accept — but only once an item is actually selected            |
 | `<C-space>`                          | Show menu, then documentation                                  |
 | `<C-e>`                              | Cancel                                                         |
+| `<Esc>`                              | Stop an active snippet, then leave Insert/Select mode          |
 | `<C-b>` / `<C-f>`                    | Scroll the documentation window                                |
 | `<C-k>`                              | Signature help                                                 |
 
@@ -970,6 +1012,13 @@ sometimes useful — completion for a type name in a `${2:string}` field. If it
 ever becomes noise, `completion.trigger.show_in_snippet = false` turns it off
 without touching any keys.
 
+Escape ends a native snippet session before performing its ordinary mode exit.
+`vim.snippet.stop()` clears the `$1`/`$2` placeholder highlights and disables
+later Tab/Shift-Tab jumps without undoing the expanded text or edits already
+made inside it. Blink owns the Insert- and Select-mode mappings, so the handler
+lives in Blink's `enter` keymap and then deliberately falls through to the
+original Escape behavior.
+
 `fuzzy.implementation` is `prefer_rust`, not `rust`: if the build ever fails on
 a new machine, completion degrades to the Lua matcher instead of breaking the
 config. The cost of that safety is that a failed build is **silent**, so the
@@ -981,6 +1030,13 @@ validation below checks the Rust module actually loaded.
 default snippet source scans `stdpath("config") .. "/snippets"`, and a bare
 directory needs no manifest — the filename becomes the filetype, so `go.json`
 is picked up as Go snippets.
+
+friendly-snippets publishes its Kubernetes set for `yaml`, but Helm templates
+use the deliberately separate `helm` filetype. A dedicated Blink provider
+exposes only friendly-snippets' `kubernetes.json` in `helm` buffers. It does not
+extend Helm with YAML wholesale, so Docker Compose snippets do not leak into
+charts; it is also not enabled for `yaml.helm-values`, where Kubernetes resource
+scaffolds would be inappropriate.
 
 The custom set is aimed at controller work rather than at generic Go: a
 `Reconcile` skeleton with `IgnoreNotFound` handling, `SetupWithManager`,
@@ -1127,9 +1183,17 @@ The config picks noice's full-width `cmdline` bar rather than its default
 centred popup, and lifts it one row:
 
 ```lua
-cmdline = { view = "cmdline" },
+cmdline = {
+  view = "cmdline",
+  format = { input = { view = "cmdline" } },
+},
 views = { cmdline = { position = { row = "99%", col = 0 } } },
 ```
+
+The explicit `input` format matters: Noice normally overrides its general
+cmdline view for `vim.fn.input()` and uses the centred `cmdline_input` popup.
+Routing that format back to `cmdline` keeps save/discard/cancel questions on the
+same bottom row as commands and searches.
 
 ### Why the row is `"99%"` and not `lines - 2`
 
@@ -1154,8 +1218,9 @@ had positioned it by its 1-row *content* and grown the border around it.
 
 ### What the result actually is
 
-Verified against a running instance: cmdline, search and messages all render on
-the row immediately above the statusline, and lualine keeps the bottom row.
+Verified against a running instance: cmdline, search, input prompts and messages
+all render on the row immediately above the statusline, and lualine keeps the
+bottom row.
 `laststatus` stays at `2`, so splits still get their own statuslines.
 
 Messages are noice's now too, and land in the same place — a content-width box
@@ -1188,7 +1253,8 @@ therefore still errors, which is at least honest and non-blocking.
 
 **`lua/config/buffers.lua` asks its own question instead**, and both the
 buffer-close flow (`<leader>xx`, Bufferline's close icon and right-click) and
-`<leader>qq` (quit all) go through it:
+`<leader>q` (smart close) go through it. `<leader>Q` calls the same quit-all
+branch directly:
 
 | Situation               | Prompt                                                                 |
 | ----------------------- | ---------------------------------------------------------------------- |
@@ -1214,50 +1280,55 @@ no `"+y` prefix, no extra keymaps. The part that takes thought is *which*
 clipboard tool backs that register when Neovim is at the far end of
 `laptop → ssh → tmux → nvim`:
 
-| Where Neovim runs | Provider | How it reaches the local clipboard                                        |
-| ----------------- | -------- | ------------------------------------------------------------------------- |
-| locally           | `pbcopy` | macOS clipboard directly (`wl-copy`/`xclip` on a Linux desktop)           |
-| over SSH, in tmux | `tmux`   | tmux's paste buffer, which tmux syncs with the terminal over OSC 52       |
-| over SSH, no tmux | `osc52`  | Neovim writes/reads the clipboard through the terminal itself over OSC 52 |
+| Where Neovim runs | Provider                       | How it reaches the local clipboard                                        |
+| ----------------- | ------------------------------ | ------------------------------------------------------------------------- |
+| locally           | automatic (`pbcopy`, etc.)     | macOS clipboard directly (`wl-copy`/`xclip` on a Linux desktop)           |
+| over SSH, in tmux | `tmux OSC 52 (synchronized)`   | tmux's paste buffer, synchronized with the terminal over OSC 52           |
+| over SSH, no tmux | Neovim's built-in `osc52`      | Neovim writes/reads the clipboard through the terminal itself over OSC 52 |
 
 ```lua
-if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
-  vim.g.clipboard = vim.env.TMUX and "tmux" or "osc52"
-end
+require("config.clipboard").setup()
 ```
 
-All three are **Neovim's own built-in providers**, selected by name; local
-runs are left to auto-detection, which already gets them right.
+Local runs are left to Neovim's auto-detection, which already gets them right.
+Direct SSH uses Neovim's built-in OSC 52 provider. The tmux path is a small
+custom provider because the upstream timing assumption is too short for this
+network path.
 
-### Why this is three lines and not a clipboard module
+### Why the tmux path has a clipboard module
 
-Neovim 0.12's built-in `tmux` provider *is* the hand-rolled approach that was
-carried around in earlier configs, upstreamed verbatim — copy is
-`tmux load-buffer -w -`, paste is
-`tmux refresh-client -l && sleep 0.05 && tmux save-buffer -`. There is
-nothing left to write: `refresh-client -l` asks the outer terminal for its
-clipboard and stores the reply in a tmux buffer, `save-buffer -` reads it
-back.
+Neovim 0.12's built-in tmux provider copies correctly with
+`tmux load-buffer -w -`, but paste runs
+`tmux refresh-client -l && sleep 0.05 && tmux save-buffer -`. A fixed 50 ms
+sleep can read the old buffer when the clipboard reply crosses SSH more slowly.
 
-That routing is also what makes the remote case *reliable*, not just short.
-The classic OSC 52 failure — pasting base64 gibberish instead of the text —
-happens when a terminal's reply to a clipboard query arrives after the
-editor stopped listening and lands in the buffer as ordinary input. On the
-tmux path no reply ever reaches Neovim: tmux consumes the escape sequence
-and Neovim only ever reads a tmux buffer over a pipe. The direct `osc52`
-path can still hit it in principle, but that path is now upstream's
-implementation rather than a local copy of it.
+`config/clipboard.lua` keeps the upstream copy command. For paste it snapshots
+tmux's buffer names, targets the current client with `refresh-client -l`, then
+polls every 15 ms for at most two seconds. tmux documents a clipboard reply as
+a **new** paste buffer, so its name is the synchronization signal. This is
+stronger than comparing contents: copying the same text twice and copying an
+empty clipboard both still create a new buffer. The provider reads that exact
+buffer by name; a failed, interrupted or timed-out request returns an empty
+characterwise register and warns once instead of pasting stale data. Paste
+requests are serialized within one Neovim process.
+
+tmux 3.7c has a separate upstream bug where an OSC 52 reply split across reads
+can be parsed as keyboard input when `escape-time` is very short. The tmux
+config temporarily uses 100 ms rather than 10 ms to mitigate it; revisit that
+value after [tmux/tmux#5388](https://github.com/tmux/tmux/issues/5388) is in a
+stable release.
 
 ### Why the providers are named instead of auto-detected
 
-Auto-detection would pick the `tmux` provider on its own. It would *not*
-pick OSC 52: that fallback is skipped whenever `'clipboard'` is non-empty
+Auto-detection would pick Neovim's built-in `tmux` provider on its own, which
+would reintroduce the fixed delay. It would *not* pick OSC 52: that fallback is
+skipped whenever `'clipboard'` is non-empty
 (upstream's reasoning, in `provider/clipboard.vim`, is that it "can be slow
 and cause a lot of user prompts"), and `'clipboard'` is exactly what
 `unnamedplus` sets. Opting in by name is the documented way around that.
-Naming both also pins the choice on remote hosts where the detection order
-might land elsewhere first — e.g. an `xclip` that talks to a forwarded
-`$DISPLAY` rather than to the machine actually in front of you.
+Explicitly selecting both remote paths also prevents detection from landing on
+an `xclip` that talks to a forwarded `$DISPLAY` rather than to the machine
+actually in front of you.
 
 The assignment runs in `options.lua`, before lazy.nvim starts: the clipboard
 provider is resolved once, on first use, and reads `g:clipboard` at that
@@ -1272,6 +1343,13 @@ moment — set it later and it is silently ignored (`:h faq-runtime`).
   `clipboard_control` includes `read-clipboard`/`read-primary`, already set.
   Without the read permissions a terminal answers copy requests but not
   paste requests, which is the usual reason remote `y` works and `p` doesn't.
+  This intentionally lets programs reached through the terminal read the
+  macOS clipboard without prompting; `read-clipboard-ask` is the safer but
+  interactive alternative.
+
+Restart Neovim after changing provider code. After changing tmux/Kitty
+clipboard settings, start a fresh tmux server and a fresh Kitty window so
+terminal capabilities and permissions are renegotiated end to end.
 
 One consequence of `unnamedplus` worth knowing: deletes and changes (`d`,
 `c`, `x`) write to the system clipboard too, since they go through the same
@@ -1380,7 +1458,10 @@ was read but not rewritten.
   `<leader><leader>` invokes `BufferLinePick` for letter-based focus. The five
   `<leader>x` mappings resolve to current, others, left, right and pick-close
   operations; the configured close callback is shared by keyboard and mouse
-  actions and runs `:confirm bdelete` rather than a forced deletion.
+  actions. `<leader>q` closes a focused float first, otherwise closes the
+  current buffer, and delegates to the unsaved-aware quit flow when the current
+  buffer is the final listed one. `<leader>Q` resolves directly to Smart quit
+  all; native `<C-w>q` remains the split-only close.
 - Indent guides: `ibl` loads for real file buffers, uses Catppuccin's
   `IblIndent`/`IblScope` highlights, and stays disabled in dashboard,
   oil, fzf-lua and other utility buffers.
@@ -1452,8 +1533,9 @@ was read but not rewritten.
   misleading here: noice mounts two windows, and the one holding the text is
   `relative = "win"` with `row = 0` *inside* the other, so both had to be
   resolved through `screenpos()` to confirm they occupy the same screen row.
-  `:echo` and `vim.notify` also render on row 39, sized to their content, so
-  neither covers lualine.
+  A `vim.fn.input()` save prompt now resolves to the same cmdline view and row,
+  rather than Noice's centred `cmdline_input` popup. `:echo` and `vim.notify`
+  also render on row 39, sized to their content, so neither covers lualine.
 - LSP, against a real Go module in a scratch directory (`go.mod`, a type with
   unaligned struct fields, an unused variable, a passing test and a Dockerfile),
   driven through a login shell so `$PATH` carries the mise tools. gopls attaches
@@ -1468,7 +1550,10 @@ was read but not rewritten.
   right body, and `vim.snippet.expand` — the same mechanism blink drives —
   turns it into a filled-in `fmt.Errorf` call with the snippet left active and
   a forward jump available. `<Tab>`/`<S-Tab>` are mapped in insert mode and
-  `keymap.preset` resolves to `enter`.
+  `keymap.preset` resolves to `enter`. The configured Escape handler stops the
+  native snippet session, clears its tabstop extmarks, preserves the expanded
+  text and falls through to the normal mode exit; subsequent Tab/Shift-Tab no
+  longer move between placeholders.
   Note `completion.list.selection.preselect` reads back as a *function* rather
   than the `false` it is set to: `config/init.lua` wraps that option in a
   per-mode dispatcher (default/cmdline/term), so the boolean lives inside it.
@@ -1477,6 +1562,12 @@ was read but not rewritten.
   proved unreliable — feeding keys into an open menu produced garbled buffer
   text — so the keymap split is verified by configuration and by blink's own
   documented semantics, not by a simulated keypress.
+- Helm snippet routing, through Blink's configured providers rather than the
+  raw friendly-snippets registry: a `helm` buffer enables the normal four
+  sources plus the isolated `kubernetes_snippets` provider, which returns
+  `k-deployment` while excluding Docker Compose's `docker-compose`; a
+  `yaml.helm-values` buffer keeps the normal sources and returns neither
+  Kubernetes nor Docker Compose scaffolds.
 - Helm, on a real chart fixture (`Chart.yaml`, `values.yaml`,
   `templates/deployment.yaml` with `{{ .Release.Name }}`). Before the filetype
   rule this was a genuine hole found by testing rather than by reading: the
@@ -1485,8 +1576,9 @@ was read but not rewritten.
   of the way. `vim.filetype.match` resolves all five cases, the last two being
   the guards that matter: a `templates/deployment.yaml` with **no** `Chart.yaml`
   above it stays `yaml`, and so does an unrelated `/tmp/zwykly.yaml`.
-  `values.yaml` comes back `yaml.helm-values` with both helm_ls and yamlls
-  attached, which is the combination that makes `.Values.*` completion work.
+  Both `values.yaml` and an additional `values.staging.yml` come back
+  `yaml.helm-values` with helm_ls attached, and helm-ls loads both when
+  completing `.Values.*`.
 - Completion is genuinely on the Rust matcher, not the silent Lua fallback:
   `require("blink.cmp.fuzzy.rust")` loads, and `target/release/libblink_cmp_fuzzy.dylib`
   exists after the build. This is worth checking explicitly precisely because
@@ -1505,10 +1597,16 @@ was read but not rewritten.
   diagnostics; `<leader>cpm` uses a project-local mypy when present and parses
   its JSON type error into the correct quickfix line and column. RobotCode
   attaches once from the global mise binary and once through an executable
-  marker proving `.venv/bin/robotcode` takes precedence.
+  marker proving `.venv/bin/robotcode` takes precedence. Both `.robot` and
+  `.resource` receive RobotCode semantic tokens, whose custom highlight groups
+  resolve through Catppuccin. The pinned parser handles comment sections,
+  name/tag settings, nested subscripts, inline Python and braced arguments
+  without parse errors; RobotCode supplies semantic highlighting for
+  `VAR`/`GROUP`.
 - Kubernetes schema completion, with yamlls loading the configured built-in
-  Kubernetes schema for a `*.k8s.yaml` fixture and reporting a string-valued
-  `spec.replicas` as `Expected "integer"`.
+  Kubernetes schema for the conventional-directory and `*.k8s.yaml` fixtures,
+  while an unrelated YAML file remains free of Kubernetes-only completion.
+  A string-valued `spec.replicas` is reported as `Expected "integer"`.
 - Linting, including the mappings themselves: `<leader>cgl` and
   `<leader>cgL` run the real golangci-lint JSON command asynchronously and put
   its `govet` finding in quickfix; the uppercase mapping executes the `--fix`
@@ -1545,7 +1643,7 @@ was read but not rewritten.
   `tree-sitter` CLI, then every target filetype opened as an actual buffer
   and checked for `vim.treesitter.highlighter.active` — `go`, `gomod`,
   `rust`, `javascript`, `typescript`, `typescriptreact`, `sh`, `python`,
-  `robot` (both `.robot` and `.resource`), `toml`, `json`, `yaml`, `xml`,
+  pinned `robot` (both `.robot` and `.resource`), `toml`, `json`, `yaml`, `xml`,
   `dosini`, `dockerfile`, `make`, `markdown`, `sql`, `csv` and `lua` all
   came back active with an empty `v:errmsg`. The negative case matters as
   much: a `.tex` buffer (language known, grammar not installed) and a
@@ -1586,11 +1684,14 @@ was read but not rewritten.
   and `require("catppuccin").options.integrations.alpha` is `true` without
   `colorscheme.lua` mentioning it.
 - Clipboard: `provider#clipboard#Executable()` — the name Neovim resolves for
-  the register it will actually use — was checked in all three environments,
-  with `provider#clipboard#Error()` empty each time: `pbcopy` locally,
-  `tmux` with `SSH_TTY` + `TMUX` set, `OSC 52` with `SSH_TTY` and `TMUX`
-  unset. Locally the round trip was run for real: `setreg("+", …)` inside
-  Neovim, then `pbpaste` outside it returned the same string.
+  the register it will actually use — was checked in all three environments:
+  local auto-detection, `tmux OSC 52 (synchronized)` with SSH + tmux, and
+  `OSC 52` with SSH but no tmux. A headless command simulation delayed the
+  tmux reply beyond the old 50 ms limit and covered identical, empty and
+  multiline clipboards plus refresh failure and timeout; none of the failures
+  returned the old buffer. The macOS/SSH round trip still needs an attached
+  Kitty client because reading a real desktop clipboard is deliberately not an
+  automated test.
 - `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`
   and `maparg("<C-h>", "n")` to the plugin's own
   `:<C-U>TmuxNavigateLeft<CR>`, confirming the arrow-key mappings register

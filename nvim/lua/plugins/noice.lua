@@ -5,7 +5,12 @@ return {
   opts = {
     -- Use noice's full-width bar style for the cmdline rather than its
     -- centred popup, then lift it one row so it sits above the statusline.
-    cmdline = { view = "cmdline" },
+    cmdline = {
+      view = "cmdline",
+      -- noice otherwise gives vim.fn.input() a separate centred popup. Keep
+      -- save/discard/cancel questions in the same bottom bar as commands.
+      format = { input = { view = "cmdline" } },
+    },
     views = {
       -- The bar is a 1-row float. nui positions a float by its *content*
       -- height from the top of the editor grid, and that grid includes the

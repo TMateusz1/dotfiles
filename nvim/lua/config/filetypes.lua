@@ -79,10 +79,10 @@ local function yaml_filetype(path)
     return "yaml"
   end
 
-  -- values.yaml is real YAML, so it keeps a yaml-prefixed filetype and yamlls'
-  -- schema support. The `.helm-values` suffix additionally lets helm-ls attach,
-  -- which is what makes `.Values.*` completion inside a template resolve
-  -- against the actual file.
+  -- values.yaml is real YAML, so it keeps a yaml-prefixed compound filetype for
+  -- tools that understand dotted filetypes. The `.helm-values` suffix lets
+  -- helm-ls attach, which is what makes `.Values.*` completion inside a
+  -- template resolve against the actual file.
   if name:match("^values.*%.ya?ml$") then
     return "yaml.helm-values"
   end

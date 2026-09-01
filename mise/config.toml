@@ -81,7 +81,8 @@ disable_backends = ["asdf", "vfox"]
 
 # YAML, JSON and basedpyright need Node; the first two have no static language
 # server, and basedpyright supplies Python completion and navigation.
-"node" = "24.20.0"
+"core:node" = "24.20.0"
+"npm:@openai/codex" = { version = "0.151.0", depends = ["node"] }
 "npm:yaml-language-server" = { version = "1.24.0", depends = ["node"] }
 "npm:vscode-langservers-extracted" = { version = "4.10.0", depends = ["node"] }
 "npm:basedpyright" = { version = "1.39.10", depends = ["node"] }

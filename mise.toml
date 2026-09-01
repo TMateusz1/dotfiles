@@ -12,7 +12,7 @@ HK_MISE = 1
 MISE_NPM_PACKAGE_MANAGER = "npm"
 
 [tools]
-"node" = "24"
+"core:node" = "24"
 "npm:@openai/codex" = { version = "0.151.0", depends = ["node"] }
 "aqua:anthropics/claude-code" = "2.1.251"
 "aqua:jdx/hk" = "1.56.1"

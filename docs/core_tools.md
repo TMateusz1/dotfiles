@@ -146,8 +146,10 @@ extended-keys passthrough (e.g. Shift-Enter), focus events (Neovim
 autoread), application-title forwarding (`set-titles` with `#T`, so Neovim's
 current buffer title reaches the Kitty tab/window), OSC52 clipboard
 passthrough for remote copy/paste. Vi-style copy
-mode, mouse on, 100k-line scrollback, `escape-time 10` (fast enough not to
-fight Neovim's `<Esc>`). Smart pane navigation (`C-h/j/k/l`) that forwards
+mode, mouse on, 100k-line scrollback, and `escape-time 100`: a temporary
+mitigation for tmux 3.7c misparsing split OSC 52 replies as input
+([upstream issue](https://github.com/tmux/tmux/issues/5388)), while still short
+enough not to fight Neovim's `<Esc>`. Smart pane navigation (`C-h/j/k/l`) that forwards
 to Neovim/fzf when one of those is running in the current pane, otherwise
 moves between tmux panes. The same treatment covers the arrow-key
 equivalents (`C-Left/Down/Up/Right`) and `C-\` (jump to the previously used

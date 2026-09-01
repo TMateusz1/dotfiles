@@ -61,6 +61,13 @@ local parsers = {
   "query",
 }
 
+-- nvim-treesitter still pins tree-sitter-robot v1.3.0, which predates grammar
+-- support for several current Robot Framework constructs. Keep the trusted
+-- upstream parser, but pin a reviewed commit rather than following its moving
+-- default branch. The User event is nvim-treesitter's supported parser-override
+-- hook and is applied by :TSInstall/:TSUpdate as well as the install call below.
+local robot_parser_revision = "8f1a8d8c3875db2cd29865b5a1db7716b4eab4c3"
+
 return {
   "nvim-treesitter/nvim-treesitter",
   -- The `main` branch is a full rewrite and the plugin's default branch; the
@@ -76,6 +83,19 @@ return {
     },
   },
   config = function()
+    vim.api.nvim_create_autocmd("User", {
+      group = vim.api.nvim_create_augroup("dotfiles.treesitter.parsers", { clear = true }),
+      pattern = "TSUpdate",
+      desc = "Pin the reviewed Robot Framework parser revision",
+      callback = function()
+        local robot = require("nvim-treesitter.parsers").robot
+        if robot and robot.install_info then
+          robot.install_info.url = "https://github.com/Hubro/tree-sitter-robot"
+          robot.install_info.revision = robot_parser_revision
+        end
+      end,
+    })
+
     require("nvim-treesitter").setup()
     require("nvim-treesitter-textobjects").setup({
       move = { set_jumps = true },

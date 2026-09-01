@@ -6,6 +6,40 @@
 -- is on that path purely to supply those definitions. `vim.lsp.enable()` turns
 -- them on; `vim.lsp.config()` layers this repo's overrides on top. There is no
 -- `require("lspconfig").setup()` anywhere — that API is the old one.
+local kubernetes_manifest_directories = {
+  "k8s",
+  "kubernetes",
+  "deploy",
+  "deployment",
+  "deployments",
+  "manifests",
+  "base",
+  "overlays",
+}
+
+local kubernetes_manifest_suffixes = {
+  "*.k8s.yaml",
+  "*.k8s.yml",
+}
+
+local kubernetes_file_matches = {}
+for _, directory in ipairs(kubernetes_manifest_directories) do
+  table.insert(kubernetes_file_matches, ("%s/**/*.yaml"):format(directory))
+  table.insert(kubernetes_file_matches, ("%s/**/*.yml"):format(directory))
+end
+vim.list_extend(kubernetes_file_matches, vim.deepcopy(kubernetes_manifest_suffixes))
+
+-- helm-ls models yamlls' schemas as map<string, string>, so one schema cannot
+-- receive the list above directly. Picomatch brace alternatives preserve the
+-- same path coverage in a single glob; template/templates remain included
+-- because they are Helm's normal rendered-manifest locations.
+local helm_kubernetes_alternatives = { "template/**", "templates/**" }
+for _, directory in ipairs(kubernetes_manifest_directories) do
+  table.insert(helm_kubernetes_alternatives, directory .. "/**")
+end
+vim.list_extend(helm_kubernetes_alternatives, vim.deepcopy(kubernetes_manifest_suffixes))
+local helm_kubernetes_file_match = "**/{" .. table.concat(helm_kubernetes_alternatives, ",") .. "}"
+
 local function project_venv(root)
   for _, name in ipairs({ ".venv", "venv" }) do
     local path = vim.fs.joinpath(root, name)
@@ -140,16 +174,7 @@ return {
                 name = "Kubernetes",
                 description = "Kubernetes manifests in conventional project paths",
                 url = "kubernetes",
-                fileMatch = {
-                  "k8s/**/*.yaml",
-                  "k8s/**/*.yml",
-                  "manifests/**/*.yaml",
-                  "manifests/**/*.yml",
-                  "deploy/**/*.yaml",
-                  "deploy/**/*.yml",
-                  "**/*.k8s.yaml",
-                  "**/*.k8s.yml",
-                },
+                fileMatch = vim.deepcopy(kubernetes_file_matches),
               },
             },
           }),
@@ -163,6 +188,13 @@ return {
       settings = {
         ["helm-ls"] = {
           helmLint = { enabled = true },
+          valuesFiles = {
+            mainValuesFile = "values.yaml",
+            lintOverlayValuesFile = "values.lint.yaml",
+            -- helm-ls uses Go's filepath.Glob (no brace expansion). This one
+            -- pattern intentionally covers values*.yaml and values*.yml.
+            additionalValuesFilesGlobPattern = "values*.y*ml",
+          },
           -- helm-ls spawns its own yaml-language-server for template buffers;
           -- the client configured above never sees them, so its Kubernetes
           -- schema does not apply here.
@@ -170,14 +202,10 @@ return {
             enabled = true,
             path = "yaml-language-server",
             config = {
-              -- helm-ls' own default is `templates/**`, which misses charts
-              -- that name the directory anything else. The glob stays scoped
-              -- to template directories on purpose: helm-ls also forwards
-              -- `values*.yaml`, and validating those against Pod/Deployment
-              -- schemas would be nothing but false positives. A chart using a
-              -- third name still gets helm-ls, treesitter and `.Values.*`
-              -- completion — only this glob needs extending.
-              schemas = { kubernetes = "**/{template,templates}/**" },
+              -- A `helm` buffer never sees the standalone yamlls settings
+              -- above. Mirror their Kubernetes path coverage into helm-ls'
+              -- private yaml-language-server as one supported string glob.
+              schemas = { kubernetes = helm_kubernetes_file_match },
               completion = true,
               hover = true,
             },

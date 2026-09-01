@@ -97,6 +97,13 @@ RobotCode, Robot Framework and Robocop are isolated, pinned `pipx:` tools
 installed by mise through the pinned uv binary. RobotCode includes its
 language-server, analysis and lint extras.
 
+Neovim uses the same `robot` filetype for `.robot` and `.resource`, pins a
+reviewed upstream tree-sitter-robot revision newer than the registry's
+`v1.3.0`, and layers RobotCode's language-specific semantic tokens over the
+syntax tree. That combination covers the parser's newer grammar fixes while
+still highlighting current Robot Framework constructs such as `VAR` and
+`GROUP`. Run `:TSUpdate robot` once after pulling a new parser pin.
+
 Local projects still win. For a root containing `.venv/bin/robotcode`, Neovim
 launches that exact executable. Otherwise an already activated environment wins
 through normal `$PATH` ordering, followed by mise's global RobotCode. When only

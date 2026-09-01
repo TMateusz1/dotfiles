@@ -31,6 +31,14 @@ no`, a handful of `cmd+N` tab-switching binds, and remapped `enter` combos
 (shift/alt/ctrl/ctrl+shift) sent as proper CSI-u sequences for apps that
 distinguish them.
 
+`clipboard_control` permits both writes and reads for the clipboard and primary
+selection. Writes make remote Neovim yanks reach macOS; reads make ordinary
+remote Neovim paste work through tmux without a prompt. The read half is an
+explicit convenience/security tradeoff: any program reached through this Kitty
+terminal, including over SSH, can read the macOS clipboard. Replace
+`read-clipboard`/`read-primary` with their `-ask` variants if per-read approval
+is preferred.
+
 **Known issue: font registration lag.** Even with the
 `font-jetbrains-mono-nerd-font` cask installed and its `.ttf` files present
 on disk, kitty can report `The font JetBrainsMono Nerd Font was not found,
