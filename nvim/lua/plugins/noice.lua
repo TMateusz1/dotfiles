@@ -1,7 +1,65 @@
+local function notification_history(retried)
+  local config = require("noice.config")
+  if not config.options.commands then
+    if retried then
+      vim.notify("Noice notification history is unavailable", vim.log.levels.ERROR)
+    else
+      vim.schedule(function()
+        notification_history(true)
+      end)
+    end
+    return
+  end
+
+  local integration = require("noice.integrations.fzf")
+  local messages = require("noice.message.manager").get(config.options.commands.history.filter, {
+    history = true,
+    sort = true,
+    reverse = true,
+  })
+
+  local entries = {}
+  local lines = {}
+  for _, message in ipairs(messages) do
+    local entry = integration.entry(message)
+    entries[message.id] = entry
+    table.insert(lines, entry.display)
+  end
+
+  if #lines == 0 then
+    vim.notify("No notification history")
+    return
+  end
+
+  require("fzf-lua").fzf_exec(lines, {
+    prompt = "Notifications❯ ",
+    previewer = integration.previewer(entries),
+    winopts = {
+      title = " Notifications ",
+      title_pos = "center",
+      preview = {
+        title = " Notification ",
+        title_pos = "center",
+      },
+    },
+    fzf_opts = {
+      ["--no-multi"] = "",
+      ["--no-sort"] = "",
+      ["--with-nth"] = "2..",
+    },
+    actions = {
+      default = function() end,
+    },
+  })
+end
+
 return {
   "folke/noice.nvim",
   event = "VeryLazy",
   dependencies = { "MunifTanjim/nui.nvim" },
+  keys = {
+    { "<leader>fn", notification_history, desc = "Notification history" },
+  },
   opts = {
     -- Use noice's full-width bar style for the cmdline rather than its
     -- centred popup, then lift it one row so it sits above the statusline.

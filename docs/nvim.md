@@ -738,9 +738,10 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   clipboard, below.
 - **`keymaps.lua`**: `<Esc>` in normal mode also runs `:nohlsearch`, so a
   search's highlighted matches clear without needing a separate keybind or
-  losing Esc's usual behavior. `<leader>q` closes the focused float, current
-  buffer or editor according to context; `<leader>Q` always quits the entire
-  editor. Both use the unsaved-aware flow — see
+  losing Esc's usual behavior. `<leader>w` writes the current file.
+  `<leader>q` closes the focused float, current buffer or editor according to
+  context; `<leader>Q` always quits the entire editor. Both close mappings use
+  the unsaved-aware flow — see
   [Quitting and closing with unsaved changes](#quitting-and-closing-with-unsaved-changes).
 - **`filetypes.lua`**: Helm chart detection — see [Helm](#helm).
 - **`buffers.lua`**: the shared buffer-close and quit-all flow, including the
@@ -807,37 +808,52 @@ calls `require("lspconfig").setup()`, which is the older API. Servers are turned
 on with `vim.lsp.enable{...}` and this repo's overrides are layered on with
 `vim.lsp.config(name, {...})`.
 
-### Keymaps: only what Neovim doesn't already provide
+### Keymaps: classic navigation, FZF for locations
 
-Neovim 0.12 ships LSP mappings by default. Checked against `nvim --clean`, these
-already exist and are **deliberately not redefined**:
+Location requests use short Vim-style keys and fzf-lua. A single result jumps
+directly; multiple results open the picker instead of filling quickfix:
 
-| Key         | Action                       |
-| ----------- | ---------------------------- |
-| `grn`       | Rename                       |
-| `gra`       | Code action                  |
-| `grr`       | References                   |
-| `gri`       | Implementation               |
-| `grt`       | Type definition              |
-| `gO`        | Document symbols             |
-| `]d` / `[d` | Next / previous diagnostic   |
-| `i_<C-s>`   | Signature help               |
-| `K`         | Hover (bound on `LspAttach`) |
+| Key  | Action          |
+| ---- | --------------- |
+| `gd` | Definition      |
+| `gD` | Declaration     |
+| `gr` | References      |
+| `gI` | Implementation  |
+| `gy` | Type definition |
+| `gK` | Signature help  |
+| `K`  | Hover           |
 
-Only the gaps are added, buffer-locally on `LspAttach`:
+Neovim 0.12's native `gra` / `gri` / `grn` / `grr` / `grt` / `grx` mappings
+are removed at startup. Leaving them in place would make the exact `gr` mapping
+wait for another key. Their useful LSP actions are available under the maps
+above and the Code namespace instead; `gI` intentionally replaces Vim's
+insert-at-column-one command.
 
-| Key          | Action                                                                                      |
-| ------------ | ------------------------------------------------------------------------------------------- |
-| `gd`         | Definition — via fzf-lua, so several results land in a picker rather than the quickfix list |
-| `gD`         | Declaration                                                                                 |
-| `<leader>cd` | Line diagnostics in a float                                                                 |
-| `<leader>cf` | Format buffer (works regardless of the format-on-save toggle)                               |
-| `<leader>cr` | Restart the client                                                                          |
-| `<leader>ci` | `:LspInfo`                                                                                  |
-| `<leader>uh` | Toggle inlay hints                                                                          |
+Go buffers add one deliberately separate operation: `gi` generates the methods
+needed to implement an interface selected by name. It replaces Vim's
+last-insert-position command only for Go; `gI` remains LSP navigation in every
+LSP buffer.
 
-Plus symbol search through the picker already in use: `<leader>fs` (document),
-`<leader>fS` (workspace), `<leader>fd` (document diagnostics).
+| Key          | Action                                            |
+| ------------ | ------------------------------------------------- |
+| `<leader>ca` | Code action with preview (Normal and Visual mode) |
+| `<leader>cd` | Line diagnostics in a float                       |
+| `<leader>cf` | Format buffer (independent of format-on-save)     |
+| `<leader>ci` | `:LspInfo`                                        |
+| `<leader>cl` | Run a code lens                                   |
+| `<leader>cr` | Rename symbol                                     |
+| `<leader>cR` | Restart the client                                |
+| `<leader>cs` | Toggle Aerial's document-symbol sidebar           |
+| `<leader>uh` | Toggle inlay hints                                |
+
+Code actions always open fzf-lua, including when only one action is available,
+so the proposed edit can be previewed before applying it. Visual mode passes
+the selected range to the LSP request. Neovim's useful non-conflicting defaults
+remain: `gO` for document symbols, `]d` / `[d` for diagnostics, `i_<C-s>` for
+signature help and `gx` for opening links.
+
+Picker-based search remains under Find: `<leader>fs` (document symbols),
+`<leader>fS` (workspace symbols) and `<leader>fd` (document diagnostics).
 
 ### Diagnostics
 
@@ -1152,15 +1168,30 @@ does not do are filled by [gopher.nvim](https://github.com/olexsmir/gopher.nvim)
 a thin wrapper whose own installer is switched off (`installation = false`) so
 the binaries come from mise:
 
-| Key           | Action                 | Binary          |
-| ------------- | ---------------------- | --------------- |
-| `<leader>cta` | Add `json` struct tags | `gomodifytags`  |
-| `<leader>cty` | Add `yaml` struct tags | `gomodifytags`  |
-| `<leader>ctr` | Remove struct tags     | `gomodifytags`  |
-| `<leader>cI`  | Implement an interface | `impl`          |
-| `<leader>ce`  | Expand `if err != nil` | —               |
-| `<leader>cgl` | Lint current project   | `golangci-lint` |
-| `<leader>cgL` | Lint and apply fixes   | `golangci-lint` |
+| Key                        | Action                              | Binary          |
+| -------------------------- | ----------------------------------- | --------------- |
+| `<leader>cta`              | Add `json` struct tags              | `gomodifytags`  |
+| `<leader>cty`              | Add `yaml` struct tags              | `gomodifytags`  |
+| `<leader>ctr`              | Remove struct tags                  | `gomodifytags`  |
+| `gi` / `<leader>cI`        | Pick and implement an interface     | `gopls`, `impl` |
+| `<leader>ce`               | Expand `if err != nil`              | —               |
+| `<leader>cgl`              | Lint current project                | `golangci-lint` |
+| `<leader>cgL`              | Lint and apply fixes                | `golangci-lint` |
+
+Place the cursor anywhere inside a named struct, save the buffer, then press
+`gi`. The live FZF search contains interfaces from the workspace, loaded
+dependencies and the standard library. Results are always package-qualified,
+so the same query can distinguish names such as `io.Reader` from another
+package's `Reader`. Selecting one appends only its missing pointer-receiver
+methods; selecting an interface the type already satisfies leaves the buffer
+unchanged. Generic structs retain their receiver type parameters, and selecting
+a generic interface asks for its concrete arguments. The generated buffer stays
+unsaved so the normal `goimports` plus `gofumpt` save pipeline remains in
+control.
+
+Bare `:GoImpl` opens this same picker, which also makes an older loaded
+`<leader>cI` command mapping safe. Supplying arguments keeps the original
+gopher behavior, for example `:GoImpl io.Reader`.
 
 gopher.nvim is less well known than `ray-x/go.nvim`; it was chosen because
 go.nvim is a mega-plugin, which this repo's plugin rule argues against. If it
@@ -1265,6 +1296,12 @@ than a second cmdline. `long_message_to_split` is the one preset enabled, so a
 long message opens a real split instead of being truncated. Neither
 `nvim-notify` nor `snacks.nvim` is installed; noice's `notify` view falls back
 to its built-in `mini` view, which needs no extra plugin.
+
+`<leader>fn` opens Noice's complete message history in fzf-lua, including
+notifications, errors, warnings, ordinary messages and LSP messages. The
+picker requests reverse modification-time order from Noice and disables fzf's
+own relevance sort, so the newest matching entry stays first; the preview
+retains the complete formatted message.
 
 ### Quitting and closing with unsaved changes
 
@@ -1467,7 +1504,8 @@ was read but not rewritten.
   produced the committed `lazy-lock.json`.
 - Base config: `vim.wo.relativenumber`, `vim.o.hlsearch`, and
   `vim.wo.cursorline` are all `true`; and `vim.fn.maparg("<Esc>", "n",
-  false, true).desc` returns `"Clear search highlight"`.
+  false, true).desc` returns `"Clear search highlight"`. `<leader>w` resolves
+  to `:write` with the description `Save file`.
 - Fuzzy finder: `<leader>ff`, `<leader>fg` and `<leader>fr` resolve to
   `FzfLua files`, `FzfLua live_grep` and `FzfLua oldfiles`, matching the
   dashboard's `f`, `g` and `r` actions respectively. `vim.ui.select` is
@@ -1490,6 +1528,10 @@ was read but not rewritten.
   holds `branch, diff, diagnostics`, and `vim.diagnostic.status()` is not
   added on top of it. `require("vim._extui")` fails on 0.12.5; only the
   private `vim._core.ui2` exists, and nothing here loads it.
+- Notification history, with synthetic older and newer Noice messages: the
+  lines passed to fzf-lua put the newer message first, and `--no-sort` keeps
+  fuzzy filtering from changing that chronological order. `<leader>fn` resolves
+  to the described `Notification history` callback.
 - Buffer line: `[b` and `]b` cycle in visible order, while
   `<leader><leader>` invokes `BufferLinePick` for letter-based focus. The five
   `<leader>x` mappings resolve to current, others, left, right and pick-close
@@ -1577,10 +1619,19 @@ was read but not rewritten.
   driven through a login shell so `$PATH` carries the mise tools. gopls attaches
   with `cmd = { "gopls" }`, and a real diagnostic comes back —
   `declared and not used: unused`, source `compiler`. All nine server
-  definitions resolve in nvim-lspconfig's `lsp/` directory. `grn` and `gra`
-  still report Neovim's own `vim.lsp.buf.rename()`/`code_action()`, confirming
-  the native mappings were not clobbered, while `gd`/`gD` are the ones added
-  here.
+  definitions resolve in nvim-lspconfig's `lsp/` directory. The classic
+  location maps (`gd`, `gD`, `gr`, `gI`, `gy`) and Code maps are buffer-local
+  after attachment, including `<leader>ca` in both Normal and Visual mode.
+  The conflicting native `gr*` globals are absent, while the retained native
+  hover, diagnostic, document-symbol and signature-help maps still resolve.
+- Go interface generation, against real standard-library source and scratch Go
+  packages. A `Reader` workspace-symbol query returns package-qualified
+  `io.Reader`; selecting it for `Worker[T]` generates a valid generic receiver.
+  A generic `Mapper[T]` selection accepts concrete type arguments, while
+  selecting `io.Closer` for a type that already has `Close()` leaves its buffer
+  and changed tick untouched. `gi` and `<leader>cI` share this flow only in Go
+  buffers; `gI` remains the LSP implementation map. Bare `:GoImpl` reaches the
+  picker while `:GoImpl io.Reader` still forwards the explicit argument.
 - Snippet expansion, after the accept key turned out to be the problem rather
   than the snippets. The `errw` snippet resolves from the registry with the
   right body, and `vim.snippet.expand` — the same mechanism blink drives —

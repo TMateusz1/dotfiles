@@ -87,6 +87,15 @@ end
 return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
+  init = function()
+    -- Neovim 0.12's native LSP mappings occupy the whole `gr` prefix. Remove
+    -- them before lspconfig loads so `gr` can be an immediate references map;
+    -- the useful actions are rebound below with the rest of the LSP keymaps.
+    for _, lhs in ipairs({ "gra", "gri", "grn", "grr", "grt", "grx" }) do
+      vim.keymap.del("n", lhs)
+    end
+    vim.keymap.del("x", "gra")
+  end,
   dependencies = {
     -- Pure Lua catalogue of JSON/YAML schemas; no binary, no download at runtime.
     { "b0o/SchemaStore.nvim", version = "*" },
@@ -118,6 +127,8 @@ return {
         gopls = {
           gofumpt = true,
           staticcheck = true,
+          symbolScope = "all",
+          symbolStyle = "Package",
           usePlaceholders = true,
           -- Operator repos vendor large dependency trees; indexing them makes
           -- gopls slow to start and pollutes completion with copies.
@@ -250,10 +261,9 @@ return {
     })
 
     -- Buffer-local keymaps --------------------------------------------------
-    -- Neovim 0.12 already maps grn (rename), gra (code action), grr
-    -- (references), gri (implementation), grt (type definition), gO (document
-    -- symbols), ]d/[d (diagnostics) and i_<C-s> (signature help), and binds K
-    -- to hover on attach. Only what it does *not* provide is added here.
+    -- Location requests use fzf-lua: one result jumps directly, while several
+    -- open a picker. The mappings removed in init() are deliberately rehomed
+    -- here under classic navigation keys and the <leader>c namespace.
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("dotfiles.lsp.attach", { clear = true }),
       callback = function(ev)
@@ -268,17 +278,24 @@ return {
           vim.keymap.set(mode, lhs, rhs, { buffer = ev.buf, desc = desc })
         end
 
-        -- fzf-lua rather than the built-in: multiple definitions land in a
-        -- picker instead of the quickfix list.
         map("n", "gd", "<cmd>FzfLua lsp_definitions<cr>", "Go to definition")
-        map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
+        map("n", "gD", "<cmd>FzfLua lsp_declarations<cr>", "Go to declaration")
+        map("n", "gr", "<cmd>FzfLua lsp_references<cr>", "Go to references")
+        map("n", "gI", "<cmd>FzfLua lsp_implementations<cr>", "Go to implementation")
+        map("n", "gy", "<cmd>FzfLua lsp_typedefs<cr>", "Go to type definition")
+        map("n", "gK", vim.lsp.buf.signature_help, "Signature help")
 
+        map({ "n", "x" }, "<leader>ca", function()
+          require("fzf-lua").lsp_code_actions({ jump1 = false })
+        end, "Code action")
         map("n", "<leader>cd", vim.diagnostic.open_float, "Line diagnostics")
         map("n", "<leader>cf", function()
           require("conform").format({ async = true, lsp_format = "fallback" })
         end, "Format buffer")
-        map("n", "<leader>cr", "<cmd>LspRestart<cr>", "Restart LSP")
         map("n", "<leader>ci", "<cmd>LspInfo<cr>", "LSP info")
+        map("n", "<leader>cl", vim.lsp.codelens.run, "Run code lens")
+        map("n", "<leader>cr", vim.lsp.buf.rename, "Rename symbol")
+        map("n", "<leader>cR", "<cmd>LspRestart<cr>", "Restart LSP")
 
         -- Inlay hints are configured for gopls and lua_ls above; this makes
         -- them switchable rather than permanent visual noise.

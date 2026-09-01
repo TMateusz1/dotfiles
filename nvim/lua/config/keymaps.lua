@@ -1,6 +1,8 @@
 -- Clear search highlight on Esc, in addition to Esc's usual behavior.
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 
+vim.keymap.set("n", "<leader>w", "<cmd>write<CR>", { desc = "Save file" })
+
 -- Close the focused float, the current buffer, or Neovim when no other listed
 -- buffer remains. See lua/config/buffers.lua for the unsaved-change flow.
 vim.keymap.set("n", "<leader>q", function()

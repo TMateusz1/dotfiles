@@ -13,6 +13,13 @@ return {
     { "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", desc = "Document diagnostics" },
   },
   opts = {
+    lsp = {
+      jump1 = true,
+      code_actions = {
+        jump1 = false,
+        previewer = "codeaction",
+      },
+    },
     ui_select = {},
   },
 }

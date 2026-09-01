@@ -84,6 +84,10 @@ local function run_golangci(fix)
   })
 end
 
+local function implement_interface()
+  require("config.go_impl").pick()
+end
+
 return {
   "olexsmir/gopher.nvim",
   ft = "go",
@@ -96,6 +100,20 @@ return {
       impl = "impl",
     },
   },
+  config = function(_, opts)
+    require("gopher").setup(opts)
+
+    -- Gopher's bare :GoImpl only reports a missing-arguments error. Make it
+    -- use the picker while preserving the command's explicit-argument form.
+    vim.api.nvim_del_user_command("GoImpl")
+    vim.api.nvim_create_user_command("GoImpl", function(args)
+      if #args.fargs == 0 then
+        implement_interface()
+      else
+        require("gopher").impl(unpack(args.fargs))
+      end
+    end, { nargs = "*", desc = "Go: implement interface" })
+  end,
   keys = {
     {
       "<leader>cgl",
@@ -116,7 +134,8 @@ return {
     { "<leader>cta", "<cmd>GoTagAdd json<cr>", ft = "go", desc = "Go: add json tags" },
     { "<leader>cty", "<cmd>GoTagAdd yaml<cr>", ft = "go", desc = "Go: add yaml tags" },
     { "<leader>ctr", "<cmd>GoTagRm<cr>", ft = "go", desc = "Go: remove tags" },
-    { "<leader>cI", "<cmd>GoImpl<cr>", ft = "go", desc = "Go: implement interface" },
+    { "gi", implement_interface, ft = "go", desc = "Go: implement interface" },
+    { "<leader>cI", implement_interface, ft = "go", desc = "Go: implement interface" },
     { "<leader>ce", "<cmd>GoIfErr<cr>", ft = "go", desc = "Go: expand if err" },
   },
 }
