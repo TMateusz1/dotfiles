@@ -26,6 +26,7 @@ mise only, Catppuccin theming).
 | ------------------------------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [catppuccin/nvim](https://github.com/catppuccin/nvim)                                                         | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
 | [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                                                       | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
+| [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)                                               | Code outline                       | `<leader>cs` toggles a wide symbol outline on the right while keeping focus in the source window. Uses Treesitter with LSP fallback and the configured Nerd Font — see "Code outline" below.                                                                                     |
 | [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)                                         | Git gutter + hunk operations       | Shows added/changed/deleted lines and provides preview, stage, reset, blame and diff actions under `<leader>G` — see "Git signs and hunks" below.                                                                                                                                |
 | [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
 | [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)                 | Indent guides + active scope       | Draws subtle guides with virtual text and highlights the current Treesitter scope. Uses Catppuccin's official integration.                                                                                                                                                       |
@@ -78,6 +79,27 @@ including future LSP code-action choices — therefore use the same fzf interfac
 instead of Neovim's numbered command-line menu. This requires fzf-lua to load
 on `VeryLazy`; the external `fzf` process is still only started when a picker
 is actually opened.
+
+## Code outline
+
+[aerial.nvim](https://github.com/stevearc/aerial.nvim) provides a persistent,
+hierarchical symbol outline for the current source buffer. `<leader>cs` toggles
+it on the right without moving focus away from the source window; once focused,
+the outline keeps Aerial's standard navigation, split-opening and tree-folding
+keys. It prefers Treesitter symbols and falls back to LSP and its other built-in
+backends, so it remains useful before an LSP client attaches.
+
+The outline occupies 40% of the editor, capped at 80 columns and with a
+20-column minimum. That doubles Aerial's default 20%/40-column ceiling;
+content-based resizing is disabled so short symbol names do not collapse it
+back into a narrow strip.
+
+The configured terminal uses a Nerd Font, so Aerial's symbol icons are enabled
+explicitly. Its automatic detection only recognizes nvim-web-devicons or
+lspkind, neither of which is installed because this config uses mini.icons.
+The outline complements rather than replaces fuzzy symbol search:
+`<leader>fs` remains fzf-lua's document-symbol picker and `<leader>fS` remains
+its live workspace-symbol picker.
 
 ## Git signs and hunks
 
@@ -448,10 +470,11 @@ The session file is named after the absolute path of the cwd, under
 
 Most of this is auto-session's own defaults — `auto_save` and
 `args_allow_single_directory` are already on, and `lazy_support` makes it
-wait for lazy.nvim before restoring. Three options are set here:
-`suppressed_dirs` keeps `~`, `/`, `/tmp` and `~/Downloads` from quietly
-accumulating sessions, and `auto_restore` leaves a bare `nvim` on the
-[dashboard](#dashboard).
+wait for lazy.nvim before restoring. `suppressed_dirs` keeps `~`, `/`, `/tmp`
+and `~/Downloads` from quietly accumulating sessions, while `auto_restore`
+leaves a bare `nvim` on the [dashboard](#dashboard). Pre-save window cleanup is
+disabled so every normal split reaches `mksession`; the remaining hooks
+rehydrate Aerial's generated window, as described below.
 
 This spec used to carry a third option — a `no_restore_cmds` hook that opened
 neo-tree when a directory argument found no session, plus the argv inspection
@@ -490,11 +513,24 @@ saves nothing and — importantly — **deletes nothing**. auto-session's
 when a session was actually loaded or saved this run, so an untouched
 dashboard can't clear the session that was already on disk.
 
-`close_unsupported_windows` (a default) mattered more when a neo-tree sidebar
-was in the layout, since a tree window can't be meaningfully serialised. It is
-still left on, but neither current explorer needs it: an oil buffer has a real
-path and round-trips through a session like any other buffer, and yazi's float
-is closed before you ever quit.
+Both of auto-session's pruning paths are explicitly disabled:
+`close_unsupported_windows = false` keeps unnamed/new buffers and plugin-backed
+`nofile` splits, while an empty `close_filetypes_on_save` list also keeps
+windows such as `checkhealth`. This preserves the complete normal-window split
+topology instead of silently collapsing it before `mksession`. Floating windows
+are not splits and remain outside Neovim's session model.
+
+File, help and terminal windows round-trip natively. Generated plugin buffers
+may restore as placeholders unless their plugin supports reconstruction.
+Aerial is handled explicitly: auto-session's extra-data hooks record whether
+the outline was open and replace each restored `aerial` placeholder through
+Aerial's public `open_in_win()` API. The source is the adjacent window to its
+left, matching the enforced right-side placement, and the previously focused
+source window remains focused.
+
+Sessions saved before split pruning was disabled already lost those windows.
+Open the desired layout and save or exit once to replace an older session with
+the complete topology.
 
 ### What each launch does
 
@@ -1667,7 +1703,12 @@ was read but not rewritten.
   main.go` opens just that file. A directory argument different from the
   shell's cwd was also checked: its own session restored with no tree. The
   session file is named for the absolute cwd, and a directory that was only
-  browsed produced no session file at all.
+  browsed produced no session file at all. The complete-layout path was
+  exercised separately with ordinary source splits, an unlisted `nofile`
+  plugin-style split and Aerial: every split returned, while the restored
+  Aerial window reattached to the correct source, symbols repopulated, focus
+  stayed in that source, and an 80-column editor restored the requested
+  32-column outline.
 - Dashboard: a real `nvim` in a scratch project, queried from inside a
   `VimEnter` autocommand. Plain `nvim` lands on `filetype=alpha`,
   `buftype=nofile`, one window, empty `v:errmsg`, with the banner, the cwd
