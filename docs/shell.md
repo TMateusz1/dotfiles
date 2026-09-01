@@ -30,12 +30,14 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   `tmux-256color`/`xterm-ghostty`) — same class of concern as
   [tmux.conf's own comment](./core_tools.md#tmux) about not hardcoding a
   terminal-specific `TERM`.
-- `mise activate zsh`, then oh-my-zsh (`$ZSH_THEME` empty — starship owns
-  the prompt instead, avoiding a double-prompt conflict), then starship,
-  atuin, zoxide, eza aliases, fzf, a `tc()` tmux session helper, and
-  finally `.zshrc.local` for machine-local overrides — all individually
-  guarded by `command -v`/`[[ -r ... ]]` checks, so this degrades cleanly
-  on a machine missing some of these tools.
+- Startup follows its dependency order: base environment and `PATH`, mise
+  activation, oh-my-zsh, starship, atuin, zoxide, fzf, tool aliases/helpers,
+  and finally `.zshrc.local` for machine-local overrides. Mise must precede
+  the guarded tool checks; oh-my-zsh initializes completion before zoxide and
+  fzf; atuin follows starship so it can wrap the configured prompt hooks.
+  `$ZSH_THEME` remains empty because starship owns the prompt. Every optional
+  component is individually guarded by `command -v`/`[[ -r ... ]]`, so the
+  setup degrades cleanly on a machine missing some tools.
 - `zsh-syntax-highlighting` is sourced last, after `.zshrc.local` — required
   by its own upstream docs to load after every other widget/hook is
   registered.

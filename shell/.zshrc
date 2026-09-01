@@ -1,9 +1,15 @@
 # Put machine-local overrides in ~/.zshrc.local.
 
+# ---------------------------------------------------------------------------
+# Base environment
+# ---------------------------------------------------------------------------
+
 # Several tools' configs in this dotfiles repo (fzf, ripgrep, and — on
 # macOS specifically — k9s and Go's own env file) only resolve to
 # ~/.config/<tool>/... when this is set; macOS doesn't export it by default.
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export EDITOR="nvim"
+export VISUAL="$EDITOR"
 
 path_append_if_dir() {
   [[ -d "$1" ]] && path+=("$1")
@@ -18,12 +24,18 @@ if [[ -n "${TERM:-}" ]] && ! infocmp "$TERM" >/dev/null 2>&1; then
   export TERM="xterm-256color"
 fi
 
+# ---------------------------------------------------------------------------
+# Toolchain activation
+# ---------------------------------------------------------------------------
+
+# Activate mise before checking for tools it provides below.
 if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh)"
 fi
 
-export EDITOR="nvim"
-export VISUAL="$EDITOR"
+# ---------------------------------------------------------------------------
+# Oh My Zsh
+# ---------------------------------------------------------------------------
 
 export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH/custom}"
@@ -44,10 +56,15 @@ if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
   source "$ZSH/oh-my-zsh.sh"
 fi
 
+# ---------------------------------------------------------------------------
+# Prompt, history, navigation, and completion integrations
+# ---------------------------------------------------------------------------
+
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
 
+# Atuin follows Starship so it can wrap the configured prompt hooks.
 if command -v atuin >/dev/null 2>&1; then
   eval "$(atuin init zsh --disable-up-arrow)"
 fi
@@ -55,17 +72,6 @@ fi
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
   alias cd="z"
-fi
-
-if command -v eza >/dev/null 2>&1; then
-  # LS_COLORS (set elsewhere: a system default, oh-my-zsh, .zshrc.local...)
-  # silently overrides eza's own theme.yml for file-kind colors with no
-  # warning. Unset it so the Catppuccin theme actually applies.
-  unset LS_COLORS
-  alias ls="eza"
-  alias ll="eza -al --icons=always --git -1"
-  alias la="eza -al --icons=always --git"
-  alias lt="eza --tree --level=2 --icons=always"
 fi
 
 if command -v fzf >/dev/null 2>&1; then
@@ -78,6 +84,21 @@ if command -v fzf >/dev/null 2>&1; then
   export FZF_CTRL_R_COMMAND=''
   source <(fzf --zsh)
   bindkey '^F' fzf-history-widget
+fi
+
+# ---------------------------------------------------------------------------
+# Tool configuration, aliases, and helpers
+# ---------------------------------------------------------------------------
+
+if command -v eza >/dev/null 2>&1; then
+  # LS_COLORS (set elsewhere: a system default, oh-my-zsh, .zshrc.local...)
+  # silently overrides eza's own theme.yml for file-kind colors with no
+  # warning. Unset it so the Catppuccin theme actually applies.
+  unset LS_COLORS
+  alias ls="eza"
+  alias ll="eza -al --icons=always --git -1"
+  alias la="eza -al --icons=always --git"
+  alias lt="eza --tree --level=2 --icons=always"
 fi
 
 if command -v rg >/dev/null 2>&1; then
@@ -128,6 +149,10 @@ if command -v tmux >/dev/null 2>&1; then
     fi
   }
 fi
+
+# ---------------------------------------------------------------------------
+# Machine-local overrides and final ZLE hook
+# ---------------------------------------------------------------------------
 
 if [[ -r "$HOME/.zshrc.local" ]]; then
   source "$HOME/.zshrc.local"
