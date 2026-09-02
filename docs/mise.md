@@ -1,14 +1,21 @@
 # mise
 
-This repo uses [mise](https://mise.jdx.dev) as the tool manager, in two
-separate roles — don't confuse them:
+This repo uses [mise](https://mise.jdx.dev) as the tool manager, with separate
+repo-local, global core, macOS and desktop layers:
 
-| Config     | Path                                  | Purpose                                                                                                                                                         |
-| ---------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Repo-local | `mise.toml` / `mise.lock` (repo root) | Tools/tasks needed to work *on this dotfiles repo itself*                                                                                                       |
-| Global     | `mise/config.toml` / `mise/mise.lock` | The user's global mise config — governs tool versions available in every project on the machine. **Both** files are symlinked into `~/.config/mise/`; see below |
+| Layer       | Path                                              | Activation and purpose                                                   |
+| ----------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
+| Repo-local  | `mise.toml` / `mise.lock`                         | Always in this repo; tools/tasks used to work on the dotfiles            |
+| Global core | `mise/config.toml` / `mise/mise.lock`             | Always global; portable tools available in every project                 |
+| macOS       | `mise/config.macos.toml` / `mise/mise.macos.lock` | Automatic on macOS; the local Docker CLI, Buildx and Colima/Lima runtime |
+| Desktop     | `mise.desktop.toml`                               | Opt-in via `-E desktop`; GUI packages used only by the bootstrap task    |
 
-Both configs set:
+`mise/miserc.toml` sets `auto_env = true`, so mise selects the macOS layer
+from the host platform without adding `macos` to `MISE_ENV`. The desktop
+environment remains explicit and can be combined with the automatic platform
+layer.
+
+The repo-local and global core configs both set:
 
 ```toml
 [settings]
@@ -20,13 +27,12 @@ disable_backends = ["asdf", "vfox"]
   (exact version + per-platform checksum), so setup is reproducible across
   machines.
 
-  **A lockfile only counts if it actually reaches the machine.** For the
-  global config that takes two `[dotfiles]` entries — `config.toml` *and*
-  `mise.lock` — because mise looks for the lockfile next to the config it
-  belongs to. With only `config.toml` symlinked, mise finds no lockfile at
-  `~/.config/mise/`, creates its own, and maintains it independently of
-  the one committed here: same tool list, unpinned, and free to drift.
-  Both entries are declared in `mise.toml`; see
+  **A lockfile only counts if it actually reaches the machine.** The global
+  core and macOS config files therefore each have a matching `[dotfiles]`
+  entry for their lockfile. Without those entries, mise would maintain
+  machine-local locks independently of the committed pins. All five global
+  files (`config.toml`, `mise.lock`, `config.macos.toml`, `mise.macos.lock`
+  and `miserc.toml`) are declared in `mise.toml`; see
   [bootstrap.md](./bootstrap.md#what-gets-symlinked).
 - `disable_backends = ["asdf", "vfox"]` — tools are resolved through mise's
   own backends (aqua, cargo, ubi, etc.) only; no asdf/vfox plugin resolution.
@@ -46,10 +52,9 @@ Global (`mise/config.toml`):
   [util_tools.md](./util_tools.md)
 - Core tools — `tmux`, `lazygit`, `k9s`, `bottom`, `yazi` — see
   [core_tools.md](./core_tools.md)
-- Containers and Kubernetes — the Docker CLI, Docker Buildx, Colima with its
-  required Lima VM manager, Helm, helm-ls, k9s, kind, hadolint and kubeconform.
-  Buildx is installed as a separate Docker CLI plugin; see
-  [Docker Buildx](#docker-buildx) below.
+- Containers and Kubernetes — Helm, helm-ls, k9s, kind, hadolint and
+  kubeconform. These remain portable core tools and do not assume ownership of
+  a Docker daemon.
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) and `python`; editor tooling includes basedpyright,
   Ruff, mypy, RobotCode/Robot Framework/Robocop, Helm 4/helm-ls, YAML language
@@ -64,6 +69,12 @@ Desktop (`mise.desktop.toml`, opt-in only — see [bootstrap.md](./bootstrap.md)
 
 - `kitty`, `font-jetbrains-mono-nerd-font` (via `brew-cask:`) — see
   [desktop_tools.md](./desktop_tools.md)
+
+macOS (`mise/config.macos.toml`, loaded automatically):
+
+- Docker CLI and Docker Buildx
+- Colima and its required Lima VM manager
+- The `global:docker:*` lifecycle tasks below
 
 Repo-local (`mise.toml`):
 
@@ -83,8 +94,8 @@ git-checkout provisioning, applied explicitly (never automatically) via
 
 ## Global Docker tasks
 
-The global config provides Colima-backed Docker lifecycle tasks from every
-directory:
+The automatic macOS global layer provides Colima-backed Docker lifecycle tasks
+from every directory on macOS. They are absent from core-only environments:
 
 | Task                            | Purpose                                                   |
 | ------------------------------- | --------------------------------------------------------- |
@@ -118,15 +129,21 @@ was already installed before the hook was added or changed, run
 rerun its hook. Verify discovery with `docker buildx version`; this does not
 require the Docker daemon to be running.
 
+Moving to a core-only environment deactivates mise's Docker and Buildx tools,
+but it cannot retract a plugin symlink created by an earlier post-install hook.
+If that machine's Docker distribution should own Buildx, inspect
+`~/.docker/cli-plugins/docker-buildx` and remove it only when it still points
+into mise's versioned install directory.
+
 ## A quirk worth knowing: `mise/config.toml` is also read here
 
 mise resolves config by walking up the directory tree, and `mise/config.toml`
 relative to *any* directory is one of the filenames it recognizes — not only
 `~/.config/mise/config.toml`. That means running mise anywhere in this repo
-picks up **both** `mise.toml` (repo-local tools) *and* `mise/config.toml`
-(the staged global config) as active layers, in addition to your machine's
-real `~/.config/mise/config.toml`. Run `mise config` from the repo root to
-see this for yourself.
+picks up `mise.toml` (repo-local tools), `mise/config.toml` (the staged global
+core), and—on macOS with `auto_env` enabled—`mise/config.macos.toml`, in
+addition to the machine's real global config. Run `mise config ls` from the
+repo root to see the active layers.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
 having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
@@ -136,13 +153,14 @@ problem — but it's
 worth knowing so a stray tool showing up in `mise config` output inside
 this repo doesn't come as a surprise.
 
-**Caution when testing changes to `mise/config.toml`:** never run a mise
+**Caution when testing changes to the global config layers:** never run a mise
 command with an explicit `--global` flag (e.g. `mise lock --global`, `mise
 use --global`) from inside this repo without first setting
-`MISE_GLOBAL_CONFIG_FILE` to point at `mise/config.toml`. Without that
-override, `--global` targets the machine's *real* `~/.config/mise/config.toml`,
-not this repo's staged copy — an easy way to accidentally write a lockfile
-or tool pin outside the repo.
+`MISE_GLOBAL_CONFIG_FILE` to point at `mise/config.toml` and enabling the
+staged platform environment. Without that override, `--global` targets the
+machine's *real* global config rather than this repo's staged copy—an easy way
+to write a lockfile or tool pin outside the repo accidentally. The macOS
+overlay owns `mise.macos.lock`, not `config.macos.lock`.
 
 **A second, subtler version of the same risk: even a plain `mise install
 <tool>@version`** for a tool not declared in *any* config (an ad-hoc

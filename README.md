@@ -9,10 +9,9 @@ follows.
 
 ## Status
 
-Symlinking is implemented via mise's own `[dotfiles]`/`[bootstrap.repos]`
-(see [docs/bootstrap.md](./docs/bootstrap.md)) and **fully applied on this
-machine** — every declared target is a live symlink into this repo
-(`mise run bootstrap:status` reports them all as `applied`).
+Symlinking is implemented via mise's own `[dotfiles]`/`[bootstrap.repos]`;
+`mise run bootstrap:status` is the authoritative view of what is applied on
+the current machine. See [docs/bootstrap.md](./docs/bootstrap.md).
 
 Each tool directory is named so that `<tool>/` → normally
 `~/.config/<tool>/`, except where a tool's own target path forces an
@@ -29,7 +28,7 @@ need — see [docs/shell.md](./docs/shell.md).
 ```text
 mise.toml, mise.lock   # tools/tasks for working on this repo itself
 mise.desktop.toml      # GUI/desktop apps, opt-in only (see docs/bootstrap.md)
-mise/                  # global mise config → ~/.config/mise/
+mise/                  # core + automatic macOS global mise layers → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
 atuin/                 # atuin config → ~/.config/atuin/

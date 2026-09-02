@@ -89,11 +89,14 @@ run = "mise -E desktop bootstrap packages apply"
 # symlink — means it writes into this git repo. Only the theme is managed
 # here; glow.yml stays machine-local. See docs/util_tools.md#glow.
 "~/.config/glow/glamour.json" = "glow/glamour.json"
-# Both halves of the global mise config: without the lockfile, the pinned
-# versions/checksums committed here never reach the machine and mise silently
-# maintains its own unpinned one. See docs/mise.md.
+# Every global mise config layer and its matching lockfile must reach the
+# machine, along with the early setting that enables automatic platform layers.
+# See docs/mise.md.
 "~/.config/mise/config.toml" = "mise/config.toml"
 "~/.config/mise/mise.lock" = "mise/mise.lock"
+"~/.config/mise/config.macos.toml" = "mise/config.macos.toml"
+"~/.config/mise/mise.macos.lock" = "mise/mise.macos.lock"
+"~/.config/mise/miserc.toml" = "mise/miserc.toml"
 
 [bootstrap.repos]
 # oh-my-zsh has no tagged releases (it's designed to track master via its

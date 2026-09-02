@@ -1,0 +1,42 @@
+# Automatically loaded on macOS via mise/miserc.toml. This layer owns the
+# local Docker runtime; environments that provide Docker use core alone.
+
+[tools]
+"aqua:lima-vm/lima" = "2.2.0" # VM manager required by Colima
+"aqua:abiosoft/colima" = { version = "0.10.3", depends = [
+  "aqua:lima-vm/lima",
+] } # Local container runtime
+"aqua:docker/cli" = "29.7.2" # Docker command-line client
+
+[tools."aqua:docker/buildx"]
+version = "latest"
+# Docker only discovers CLI plugins from its plugin directories, not PATH.
+postinstall = '''
+mkdir -p "$HOME/.docker/cli-plugins"
+ln -sf "$MISE_TOOL_INSTALL_PATH/docker-cli-plugin-docker-buildx" \
+  "$HOME/.docker/cli-plugins/docker-buildx"
+'''
+
+[tasks."global:docker:start"]
+description = "Start Colima's Docker runtime and activate its Docker context"
+run = "colima start --runtime docker --activate"
+
+[tasks."global:docker:stop"]
+description = "Stop Colima while preserving the Docker VM state"
+run = "colima stop"
+
+[tasks."global:docker:restart"]
+description = "Restart Colima's Docker runtime"
+run = "colima restart"
+
+[tasks."global:docker:status"]
+description = "Show Colima status, the active Docker context, and Buildx version"
+run = [
+  "colima status --extended",
+  "docker context show",
+  "docker buildx version",
+]
+
+[tasks."global:docker:ssh"]
+description = "Open an interactive shell in the Colima VM"
+run = "colima ssh"

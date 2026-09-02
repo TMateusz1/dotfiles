@@ -65,6 +65,9 @@ shorthand.
 "~/.config/glow/glamour.json" = "glow/glamour.json"
 "~/.config/mise/config.toml" = "mise/config.toml"
 "~/.config/mise/mise.lock" = "mise/mise.lock"
+"~/.config/mise/config.macos.toml" = "mise/config.macos.toml"
+"~/.config/mise/mise.macos.lock" = "mise/mise.macos.lock"
+"~/.config/mise/miserc.toml" = "mise/miserc.toml"
 ```
 
 Directory entries (`git`, `atuin`, `bat`, ...) symlink the *whole*
@@ -82,14 +85,13 @@ Two cases deliberately use **file** entries instead:
   committed here. Only the theme is symlinked; `glow.yml` stays
   machine-local and is gitignored as a backstop. See
   [util_tools.md#glow](./util_tools.md#glow).
-- **mise** — the global config is two files, and **both** are needed:
-  without `mise.lock` alongside `config.toml`, the versions and checksums
-  committed in this repo never reach the machine, and mise silently
-  maintains its own unpinned lockfile in `~/.config/mise/` instead. (That
-  had genuinely happened here before this entry existed — the machine's
-  lockfile had drifted, missing `gh`/`neovim`/`glab` and still carrying
-  entries from an older dotfiles repo.) `~/.config/mise/` is not symlinked
-  wholesale because it also holds machine-local state this repo doesn't own.
+- **mise** — the global setup is managed file-by-file: portable tools use
+  `config.toml`/`mise.lock`, the automatically selected macOS Docker layer uses
+  `config.macos.toml`/`mise.macos.lock`, and `miserc.toml` enables platform
+  environments early enough for discovery. Every config and lockfile is
+  symlinked because omitted locks silently become machine-local and can drift.
+  `~/.config/mise/` is not symlinked wholesale because it also holds
+  machine-local state this repo doesn't own.
 
 `fd`, `jq`, `yq`, `zoxide` have no entries — as documented in
 [util_tools.md](./util_tools.md), none of them has a config file to
@@ -175,11 +177,11 @@ place for an app that isn't installed yet — harmless, just inert until
 kitty is actually installed. See [desktop_tools.md](./desktop_tools.md)
 for kitty's own config.
 
-## Current state on this machine
+## Checking the current machine
 
-Fully applied — `mise run bootstrap:status` reports every declared target
-as `applied`, i.e. a live symlink into this repo. That command is the
-authoritative view; prefer it over trusting this paragraph.
+Run `mise run bootstrap:status` for the authoritative view of which declared
+targets are live symlinks into this repo. Repository changes never apply or
+replace home-directory files automatically.
 
 Three targets needed `--force` on the way there, each because it was
 *occupied* by a real file rather than absent:
@@ -215,14 +217,11 @@ symlinks to this repo's `mise/config.toml`, which declares no `[dotfiles]`
 at all — the tables live in the repo-root `mise.toml` instead, so the
 global config can never conflict with itself this way again.
 
-### Leftovers from the old repo — still active, not inert
+### One-time migration from the old repo
 
-`~/.config/mise/` also contains `config.macos.toml`, `miserc.toml`, and a
-pair of `*.backup.<timestamp>` symlinks, all still pointing into
-`~/dev/dotfiles2`. **`config.macos.toml` is not dormant:** mise
-auto-loads `config.<os>.toml` next to the global config, so it is a live
-config layer, and it carries its own `[dotfiles]` table. `mise bootstrap
-dotfiles status` shows it managing three targets this repo never declares:
+An earlier setup may still have `config.macos.toml` and `miserc.toml` symlinks
+pointing into `~/dev/dotfiles2`. They are active configuration, not inert
+leftovers: the old macOS file carries duplicate `[dotfiles]` entries for:
 
 ```text
 ~/Library/Application Support/k9s/config.yaml                  ← config.macos.toml
@@ -230,14 +229,15 @@ dotfiles status` shows it managing three targets this repo never declares:
 ~/Library/Application Support/lazygit/config.yml               ← config.macos.toml
 ```
 
-Those are the non-XDG macOS paths that this repo deliberately doesn't
-target, because `shell/.zshrc` exports `XDG_CONFIG_HOME` and
-[k9s](./core_tools.md#k9s)/lazygit therefore resolve to `~/.config/`
-instead. Their sources resolve back through `~/.config/` and so currently
-land on *this* repo's files — harmless today, but it means a second,
-unowned config is quietly duplicating them, and it would break confusingly
-if `~/dev/dotfiles2` were ever deleted while these declarations remained.
+This repo deliberately uses the XDG paths instead. Replace the two live old
+symlinks with the tracked files, then apply the newly added lockfile:
 
-Clearing out `config.macos.toml`, `miserc.toml` and the two `.backup.`
-symlinks is the last step of the migration. Not touched here — they live
-outside this repo.
+```sh
+mise bootstrap dotfiles apply --force \
+  ~/.config/mise/config.macos.toml \
+  ~/.config/mise/miserc.toml
+mise bootstrap dotfiles apply ~/.config/mise/mise.macos.lock
+```
+
+The `*.backup.<timestamp>` symlinks are ignored by mise and can be removed
+separately after verifying they are no longer needed.

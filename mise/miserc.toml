@@ -1,0 +1,2 @@
+# Load config.<platform>.toml layers, such as config.macos.toml, automatically.
+auto_env = true
