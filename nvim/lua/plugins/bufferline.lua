@@ -26,6 +26,14 @@ return {
       options = {
         close_command = buffers.close,
         right_mouse_command = buffers.close,
+        offsets = {
+          {
+            filetype = "neo-tree",
+            text = "File Explorer",
+            text_align = "center",
+            separator = true,
+          },
+        },
       },
     })
   end,

@@ -53,6 +53,7 @@ return {
         scope_color = "lavender",
       },
       mini = { enabled = true },
+      neotree = true,
       which_key = true,
     },
   },

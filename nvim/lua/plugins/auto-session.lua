@@ -44,10 +44,12 @@ return {
     suppressed_dirs = { "~/", "~/Downloads", "/", "/tmp" },
 
     -- Preserve the complete split topology, including unnamed/new buffers and
-    -- plugin-backed nofile windows. Aerial needs the extra-data hook below to
-    -- turn its restored placeholder back into a live outline; ordinary file,
-    -- help and terminal splits are handled directly by `mksession`.
-    close_filetypes_on_save = {},
+    -- plugin-backed nofile windows, except neo-tree: its generated sidebar is
+    -- transient and would restore as a dead placeholder. Aerial needs the
+    -- extra-data hook below to turn its restored placeholder back into a live
+    -- outline; ordinary file, help and terminal splits are handled directly
+    -- by `mksession`.
+    close_filetypes_on_save = { "neo-tree" },
     close_unsupported_windows = false,
     save_extra_data = function()
       if #aerial_windows() > 0 then

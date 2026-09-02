@@ -14,7 +14,7 @@ return {
       show_end = false,
     },
     exclude = {
-      filetypes = { "alpha", "fzf", "help", "lazy", "oil" },
+      filetypes = { "alpha", "fzf", "help", "lazy", "neo-tree", "oil" },
       buftypes = { "nofile", "nowrite", "prompt", "quickfix", "terminal" },
     },
   },

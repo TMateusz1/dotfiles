@@ -211,8 +211,8 @@ sep_left = { open = "", close = "" }
 sep_right = { open = "", close = "" }
 ```
 
-Neovim's yazi float is squared off to match — see
-[nvim.md](./nvim.md#file-explorers-oil-and-yazi).
+Yazi is used directly from the shell; Neovim uses
+[Neo-tree](./nvim.md#file-explorers-oil-and-neo-tree) for its sidebar.
 
 **Shell integration:** `shell/.zshrc` adds a `y()` function — the wrapper
 from yazi's own quick-start docs. yazi runs as a child process, so it can't
