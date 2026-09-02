@@ -760,10 +760,17 @@ Neovim 0.12 ships enough UI of its own that three of the four things a plugin
 would usually be added for are already covered.
 
 **Float borders.** `vim.o.winborder = "rounded"` is a global default, so every
-float that doesn't pass its own `border` picks it up — hover and diagnostic
-popups, Gitsigns' hunk preview and blame, LSP floats later. Only which-key
-still sets `border` explicitly, because its own `preset` config would otherwise
-supply one. Nothing else in this config hardcodes a border.
+float that doesn't pass its own `border` picks it up — diagnostic popups,
+Gitsigns' hunk preview and blame, LSP floats later. Which-key still sets
+`border` explicitly, because its own `preset` config would otherwise supply
+one. **Hover and signature help are the other exception**: noice replaces
+`vim.lsp.buf.hover`/`signature_help` outright (see
+[Documentation](#documentation)), so `K`/`gK` render through noice's own nui
+popup rather than Neovim's native floating preview, and don't pick up
+`winborder` on their own. Its `lsp_doc_border` preset
+(`nvim/lua/plugins/noice.lua`) gives them a matching rounded border instead —
+Catppuccin colors it automatically via the stock `NormalFloat`/`FloatBorder`
+groups, same as everything else here.
 
 **Progress.** Lualine's right section starts with Neovim's public
 `vim.ui.progress_status()`, trimmed. It summarizes running `Progress` events as
@@ -1015,10 +1022,12 @@ separate shell convenience.
 
 ### Documentation
 
-No extra plugin — `K` is enough, and noice renders the markdown gopls returns.
+No extra plugin — `K` is enough, and noice renders the markdown gopls returns,
+in a rounded, Catppuccin-colored popup (see [Float borders](#native-ui)).
 `K` again enters the hover window so it can be scrolled. `K` **on an import
 path** gives the whole package's documentation, which covers package browsing
-without a dedicated godoc plugin.
+without a dedicated godoc plugin. `gK` (signature help) shares the same popup
+styling, since noice routes both through its `hover` view.
 
 ## Completion
 

@@ -83,6 +83,11 @@ return {
     presets = {
       -- Long messages open in a split instead of being truncated.
       long_message_to_split = true,
+      -- Rounded border on K/gK's hover and signature-help popups, matching
+      -- winborder everywhere else. Noice replaces vim.lsp.buf.hover and
+      -- signature_help itself, so those two don't inherit winborder on
+      -- their own — see docs/nvim.md's "Float borders" note.
+      lsp_doc_border = true,
     },
   },
 }
