@@ -33,14 +33,17 @@ disable_backends = ["asdf", "vfox"]
 "aqua:ajeetdsouza/zoxide" = "0.10.0" # Directory jumper
 
 # Containers and Kubernetes
-"aqua:abiosoft/colima" = "0.10.3"      # Local container runtime
-"aqua:docker/cli" = "29.7.2"           # Docker command-line client
-"aqua:hadolint/hadolint" = "2.15.1"    # Dockerfile linter
-"aqua:helm/helm" = "4.2.4"             # Kubernetes package manager
-"aqua:mrjosh/helm-ls" = "0.5.4"        # Helm language server
-"aqua:derailed/k9s" = "0.51.0"         # Kubernetes TUI
+"aqua:lima-vm/lima" = "2.2.0" # VM manager required by Colima
+"aqua:abiosoft/colima" = { version = "0.10.3", depends = [
+  "aqua:lima-vm/lima",
+] } # Local container runtime
+"aqua:docker/cli" = "29.7.2" # Docker command-line client
+"aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
+"aqua:helm/helm" = "4.2.4" # Kubernetes package manager
+"aqua:mrjosh/helm-ls" = "0.5.4" # Helm language server
+"aqua:derailed/k9s" = "0.51.0" # Kubernetes TUI
 "aqua:kubernetes-sigs/kind" = "0.33.0" # Local Kubernetes clusters
-"aqua:yannh/kubeconform" = "0.8.0"     # Kubernetes schema validator
+"aqua:yannh/kubeconform" = "0.8.0" # Kubernetes schema validator
 
 # Go
 "core:go" = "1.27.0" # Go toolchain
@@ -103,3 +106,36 @@ disable_backends = ["asdf", "vfox"]
 # Rust
 "core:rust" = "1.98.0"                        # Rust toolchain
 "aqua:rust-lang/rust-analyzer" = "2026-08-24" # Rust language server
+
+[tools."aqua:docker/buildx"]
+version = "latest"
+# Docker only discovers CLI plugins from its plugin directories, not PATH.
+postinstall = '''
+mkdir -p "$HOME/.docker/cli-plugins"
+ln -sf "$MISE_TOOL_INSTALL_PATH/docker-cli-plugin-docker-buildx" \
+  "$HOME/.docker/cli-plugins/docker-buildx"
+'''
+
+[tasks."global:docker:start"]
+description = "Start Colima's Docker runtime and activate its Docker context"
+run = "colima start --runtime docker --activate"
+
+[tasks."global:docker:stop"]
+description = "Stop Colima while preserving the Docker VM state"
+run = "colima stop"
+
+[tasks."global:docker:restart"]
+description = "Restart Colima's Docker runtime"
+run = "colima restart"
+
+[tasks."global:docker:status"]
+description = "Show Colima status, the active Docker context, and Buildx version"
+run = [
+  "colima status --extended",
+  "docker context show",
+  "docker buildx version",
+]
+
+[tasks."global:docker:ssh"]
+description = "Open an interactive shell in the Colima VM"
+run = "colima ssh"

@@ -31,9 +31,9 @@ disable_backends = ["asdf", "vfox"]
 - `disable_backends = ["asdf", "vfox"]` — tools are resolved through mise's
   own backends (aqua, cargo, ubi, etc.) only; no asdf/vfox plugin resolution.
 
-Global config tasks (if/when added) are namespaced `global:<name>` so a
-convenience task defined globally never shadows a same-named task in some
-future project's own `mise.toml`.
+Global config tasks are namespaced `global:<name>` so a convenience task
+defined globally never shadows a same-named task in some future project's own
+`mise.toml`.
 
 ## Tools currently pinned
 
@@ -46,6 +46,10 @@ Global (`mise/config.toml`):
   [util_tools.md](./util_tools.md)
 - Core tools — `tmux`, `lazygit`, `k9s`, `bottom`, `yazi` — see
   [core_tools.md](./core_tools.md)
+- Containers and Kubernetes — the Docker CLI, Docker Buildx, Colima with its
+  required Lima VM manager, Helm, helm-ls, k9s, kind, hadolint and kubeconform.
+  Buildx is installed as a separate Docker CLI plugin; see
+  [Docker Buildx](#docker-buildx) below.
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) and `python`; editor tooling includes basedpyright,
   Ruff, mypy, RobotCode/Robot Framework/Robocop, Helm 4/helm-ls, YAML language
@@ -76,6 +80,43 @@ The repo-root `mise.toml` also declares `[dotfiles]` and
 git-checkout provisioning, applied explicitly (never automatically) via
 `mise bootstrap dotfiles apply`/`mise bootstrap repos apply`. See
 [bootstrap.md](./bootstrap.md).
+
+## Global Docker tasks
+
+The global config provides Colima-backed Docker lifecycle tasks from every
+directory:
+
+| Task                            | Purpose                                                   |
+| ------------------------------- | --------------------------------------------------------- |
+| `global:docker:start`           | Start the Docker runtime and activate its Docker context  |
+| `global:docker:stop`            | Stop the VM while preserving its state                    |
+| `global:docker:restart`         | Restart the runtime                                       |
+| `global:docker:status`          | Show Colima status, active context and Buildx version     |
+| `global:docker:ssh`             | Open an interactive shell in the Colima VM                |
+
+Run them with `mise run <task>`, for example
+`mise run global:docker:start`. The start task explicitly selects Colima's
+Docker runtime and relies on Colima to create and activate its Docker context.
+Lima is pinned separately because the standalone Colima release invokes
+`limactl`; Colima declares it as a mise dependency so installation order is
+deterministic.
+No delete, reset or prune task is provided because those operations can remove
+VM or image state and should remain deliberate one-off commands.
+
+## Docker Buildx
+
+`aqua:docker/buildx` installs an executable named
+`docker-cli-plugin-docker-buildx` in mise's versioned install directory.
+Docker does not discover CLI plugins from `PATH`, so the tool-level
+`postinstall` hook links that executable to
+`~/.docker/cli-plugins/docker-buildx`, the filename and user plugin directory
+the Docker CLI expects.
+
+The hook runs when mise installs or upgrades that buildx version. If the tool
+was already installed before the hook was added or changed, run
+`mise install --force aqua:docker/buildx` once to reinstall that version and
+rerun its hook. Verify discovery with `docker buildx version`; this does not
+require the Docker daemon to be running.
 
 ## A quirk worth knowing: `mise/config.toml` is also read here
 
