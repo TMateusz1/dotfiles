@@ -1,4 +1,4 @@
-# Bootstrap (symlinks, zsh plugins, desktop apps)
+# Bootstrap (symlinks, Zsh integration, desktop apps)
 
 How this repo actually gets applied to a machine, via mise's own native
 `[dotfiles]` and `[bootstrap.repos]` — not a hand-rolled install script.
@@ -11,15 +11,17 @@ mise run bootstrap:status     # what would change — read-only
 mise run bootstrap:dry-run    # preview the dotfile symlinks specifically
 mise run bootstrap:dotfiles   # apply symlinks — see "What gets symlinked" below
 mise run bootstrap:zsh-plugins  # clone/update oh-my-zsh + its 3 custom plugins
-mise run bootstrap:all        # both of the above, in one go
+mise run bootstrap:zsh-completion  # install mise's generated Zsh completion
+mise run bootstrap:all        # dotfiles + Zsh plugins/completion, in one go
 mise run bootstrap:all-desktop  # GUI/desktop apps — opt-in, see "Desktop apps" below
 ```
 
 The tasks are thin wrappers (`mise tasks ls` for the full list) — nothing
 they run couldn't be typed out as plain `mise bootstrap dotfiles ...`/
-`mise bootstrap repos ...` commands; they just save re-typing the longer
-form. Both are idempotent (safe to re-run) and refuse to clobber a real
-pre-existing file/directory at any target without `--force`.
+`mise bootstrap repos ...`/`mise completion zsh --install` commands; they just
+save re-typing the longer form. All are idempotent (safe to re-run); the
+dotfile and repo bootstrap operations refuse to clobber a real pre-existing
+file/directory at any target without `--force`.
 
 ## Why mise's own feature, not a script
 
@@ -95,6 +97,19 @@ symlink. `gh` and `glab` are deliberately excluded too: both keep
 credentials in the same directory (glab, in the very same file) as their
 settings, so neither is safe to symlink into a public repo — see
 [util_tools.md#gh](./util_tools.md#gh).
+
+## Zsh completion
+
+`bootstrap:zsh-completion` runs `mise completion zsh --install`, which writes
+the generated `_mise` function to
+`~/.local/share/zsh/site-functions/_mise`. The file is machine-local generated
+state rather than a tracked dotfile: mise owns its format and can refresh it
+when mise itself changes.
+
+`bootstrap:all` depends on this task alongside the dotfile and Zsh plugin
+tasks, so a fresh machine needs only `mise run bootstrap:all`. The matching
+`fpath` entry lives in `shell/.zshrc` before Oh My Zsh loads; Oh My Zsh already
+runs `compinit`, so bootstrap does not add a duplicate initialization.
 
 ## Zsh plugins
 

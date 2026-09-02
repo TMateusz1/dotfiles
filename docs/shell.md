@@ -31,13 +31,21 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   [tmux.conf's own comment](./core_tools.md#tmux) about not hardcoding a
   terminal-specific `TERM`.
 - Startup follows its dependency order: base environment and `PATH`, mise
-  activation, oh-my-zsh, starship, atuin, zoxide, fzf, tool aliases/helpers,
-  and finally `.zshrc.local` for machine-local overrides. Mise must precede
-  the guarded tool checks; oh-my-zsh initializes completion before zoxide and
-  fzf; atuin follows starship so it can wrap the configured prompt hooks.
+  activation and completion path, oh-my-zsh, starship, atuin, zoxide, fzf,
+  tool aliases/helpers, and finally `.zshrc.local` for machine-local
+  overrides. Mise must precede the guarded tool checks; oh-my-zsh initializes
+  completion before zoxide and fzf; atuin follows starship so it can wrap the
+  configured prompt hooks.
   `$ZSH_THEME` remains empty because starship owns the prompt. Every optional
   component is individually guarded by `command -v`/`[[ -r ... ]]`, so the
   setup degrades cleanly on a machine missing some tools.
+- `mise run bootstrap:zsh-completion` installs mise's generated Zsh completion
+  under `~/.local/share/zsh/site-functions` and is included in the one-command
+  `mise run bootstrap:all` flow. The task runs
+  `mise completion zsh --install`, which is idempotent and refreshes the
+  generated `_mise` file when needed. `.zshrc` adds its directory to `fpath`
+  before oh-my-zsh runs `compinit`, so a second explicit `compinit` is neither
+  needed nor desirable.
 - `zsh-syntax-highlighting` is sourced last, after `.zshrc.local` — required
   by its own upstream docs to load after every other widget/hook is
   registered.

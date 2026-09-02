@@ -62,7 +62,7 @@ docs/                  # notes on what's configured, and why
 | Neovim (LSP, blink.cmp, conform, neotest, Treesitter, fzf-lua, Aerial, oil/yazi, noice)  | [docs/nvim.md](./docs/nvim.md)                   |
 | languages (Rust, Go, Python, Robot Framework, Kubernetes, Helm)                          | [docs/langs.md](./docs/langs.md)                 |
 | linting / pre-commit (hk)                                                                | [docs/linting.md](./docs/linting.md)             |
-| bootstrap (symlinks, zsh plugins, desktop apps)                                          | [docs/bootstrap.md](./docs/bootstrap.md)         |
+| bootstrap (symlinks, Zsh integration, desktop apps)                                      | [docs/bootstrap.md](./docs/bootstrap.md)         |
 
 ## Contributing / working on this repo
 

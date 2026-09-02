@@ -49,9 +49,17 @@ run = "mise bootstrap dotfiles apply"
 description = "Clone/update oh-my-zsh and its custom plugins"
 run = "mise bootstrap repos apply"
 
+[tasks."bootstrap:zsh-completion"]
+description = "Install mise's generated Zsh completion"
+run = "mise completion zsh --install"
+
 [tasks."bootstrap:all"]
-description = "Run bootstrap:dotfiles and bootstrap:zsh-plugins"
-depends = ["bootstrap:dotfiles", "bootstrap:zsh-plugins"]
+description = "Bootstrap dotfiles, Zsh plugins, and mise's Zsh completion"
+depends = [
+  "bootstrap:dotfiles",
+  "bootstrap:zsh-plugins",
+  "bootstrap:zsh-completion",
+]
 
 # Desktop/GUI apps live in mise.desktop.toml, loaded only via `-E desktop` —
 # never by plain `mise install`/`mise bootstrap`/`mise run`. This is the
