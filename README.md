@@ -27,8 +27,7 @@ need — see [docs/shell.md](./docs/shell.md).
 
 ```text
 mise.toml, mise.lock   # tools/tasks for working on this repo itself
-mise.desktop.toml      # GUI/desktop apps, opt-in only (see docs/bootstrap.md)
-mise/                  # core + automatic macOS global mise layers → ~/.config/mise/
+mise/                  # core + macOS + opt-in desktop global mise layers → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
 atuin/                 # atuin config → ~/.config/atuin/

@@ -44,6 +44,7 @@ mise only, Catppuccin theming).
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
 | [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Theme is `catppuccin-nvim`, **not** `catppuccin` — see "Theme" below.                                                                                                                                                                                                            |
 | [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `<leader>o` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                 |
+| [stevearc/overseer.nvim](https://github.com/stevearc/overseer.nvim)                                           | Mise task runner                   | Its built-in Mise provider discovers the nearest `mise.toml`: `<leader>mr` selects a task and `<leader>mt` opens a half-width task panel on the left.                                                                                                                            |
 | [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | Filesystem sidebar                 | `branch = "v3.x"`. `<leader>e` opens a focused left sidebar and reveals the current file; Oil remains the directory-buffer editor — see "File explorers" below.                                                                                                                  |
 | [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)                                     | Animated cursor trail              | Pure-Lua cursor smear drawn with virtual text; no terminal support required. Defaults kept — see "Cursor" below.                                                                                                                                                                 |
 | [folke/zen-mode.nvim](https://github.com/folke/zen-mode.nvim)                                                 | Opt-in centred editing             | `<leader>uz` opens the current buffer in a distraction-free centred floating workspace.                                                                                                                                                                                          |
@@ -833,6 +834,16 @@ not enable it automatically. Flash provides labelled movement with `s` (jump)
 and `S` (Treesitter selection); in operator pending mode, `r` and `R` reach
 remote text or Treesitter ranges. During `/` or `?` search, `<C-s>` toggles its
 labelled search overlay.
+
+**Tasks.** `<leader>mr` opens Overseer's task picker, including the tasks in the
+nearest `mise.toml`; `<leader>mt` toggles its half-width left-side panel.
+Overseer runs the selected task as `mise run <task>` from that Mise project's
+directory. In its task tree, `<C-s>` opens the selected task's output in a
+horizontal split directly below the tree. To answer an interactive task, press
+`i` in the output buffer and type normally. The tree lists started tasks; Mise
+templates themselves remain in the `<leader>mr` FzfLua picker. Mise's normal
+trust policy applies, so approve a newly opened project's config with `mise
+trust` before its tasks can be listed.
 
 **`vim._extui` is not enabled.** The module doesn't exist in the pinned Neovim
 0.12.5 — the experimental TUI replacement now lives at `vim._core.ui2`. The

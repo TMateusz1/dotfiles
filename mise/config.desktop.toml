@@ -1,0 +1,9 @@
+# Only loaded via `-E desktop` (see the `bootstrap:all-desktop` task in the
+# repo-root mise.toml) — never by plain `mise install`/`mise bootstrap`/`mise run`.
+# This file is symlinked to ~/.config/mise/config.desktop.toml by the normal
+# dotfiles bootstrap. See docs/bootstrap.md.
+
+[bootstrap.packages]
+"brew-cask:kitty" = "latest"
+"brew-cask:font-jetbrains-mono-nerd-font" = "latest"
+"brew-cask:font-geist-mono-nerd-font" = "latest"

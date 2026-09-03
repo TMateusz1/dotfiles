@@ -4,8 +4,8 @@ GUI applications — a different category from
 [util_tools.md](./util_tools.md) (small CLI utilities) and
 [core_tools.md](./core_tools.md) (TUI apps you run *inside* a terminal):
 these are the host application itself. Installed opt-in via
-`mise.desktop.toml`/`bootstrap:all-desktop`, not the always-loaded global
-mise config — see [bootstrap.md](./bootstrap.md).
+`mise/config.desktop.toml`/`bootstrap:all-desktop`, not the always-loaded
+global mise config — see [bootstrap.md](./bootstrap.md).
 
 ## kitty
 
@@ -71,5 +71,5 @@ no window/GPU/display needed (unlike actually starting kitty), and is a
 handy one-liner for a manual spot-check — it's lenient on unknown keys but
 raises a real error on an invalid value for a recognized option. Not wired
 into an automated check, partly because kitty is also opt-in
-(`mise.desktop.toml`) and wouldn't reliably be on `PATH` during an ordinary
+(`mise/config.desktop.toml`) and wouldn't reliably be on `PATH` during an ordinary
 `hk check --all` anyway.

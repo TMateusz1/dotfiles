@@ -14,6 +14,7 @@ return {
       { "<leader>cp", group = "Python" },
       { "<leader>ct", group = "Go struct tags" },
       { "<leader>f", group = "Find" },
+      { "<leader>m", group = "Mise" },
       { "<leader>t", group = "Test" },
       { "<leader>u", group = "Toggle" },
       { "<leader>x", group = "Close buffers" },

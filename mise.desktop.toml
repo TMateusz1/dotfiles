@@ -1,7 +1,0 @@
-# Only loaded via `-E desktop` (see the `bootstrap:all-desktop` task in
-# mise.toml) — never by plain `mise install`/`mise bootstrap`/`mise run`.
-# See docs/bootstrap.md.
-
-[bootstrap.packages]
-"brew-cask:kitty" = "latest"
-"brew-cask:font-jetbrains-mono-nerd-font" = "latest"

@@ -61,11 +61,12 @@ depends = [
   "bootstrap:zsh-completion",
 ]
 
-# Desktop/GUI apps live in mise.desktop.toml, loaded only via `-E desktop` —
+# Desktop/GUI apps live in mise/config.desktop.toml, loaded only via `-E desktop` —
 # never by plain `mise install`/`mise bootstrap`/`mise run`. This is the
 # only task that reaches it.
 [tasks."bootstrap:all-desktop"]
-description = "Install GUI/desktop apps (kitty, fonts, ...) from mise.desktop.toml — opt-in, not part of bootstrap:all"
+description = "Bootstrap a desktop machine and install GUI/desktop apps (kitty, fonts, ...) — opt-in, not part of bootstrap:all"
+depends = ["bootstrap:all"]
 run = "mise -E desktop bootstrap packages apply"
 
 [dotfiles]
@@ -96,6 +97,7 @@ run = "mise -E desktop bootstrap packages apply"
 "~/.config/mise/mise.lock" = "mise/mise.lock"
 "~/.config/mise/config.macos.toml" = "mise/config.macos.toml"
 "~/.config/mise/mise.macos.lock" = "mise/mise.macos.lock"
+"~/.config/mise/config.desktop.toml" = "mise/config.desktop.toml"
 "~/.config/mise/miserc.toml" = "mise/miserc.toml"
 
 [bootstrap.repos]

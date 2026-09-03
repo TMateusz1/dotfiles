@@ -67,6 +67,7 @@ shorthand.
 "~/.config/mise/mise.lock" = "mise/mise.lock"
 "~/.config/mise/config.macos.toml" = "mise/config.macos.toml"
 "~/.config/mise/mise.macos.lock" = "mise/mise.macos.lock"
+"~/.config/mise/config.desktop.toml" = "mise/config.desktop.toml"
 "~/.config/mise/miserc.toml" = "mise/miserc.toml"
 ```
 
@@ -87,8 +88,9 @@ Two cases deliberately use **file** entries instead:
   [util_tools.md#glow](./util_tools.md#glow).
 - **mise** — the global setup is managed file-by-file: portable tools use
   `config.toml`/`mise.lock`, the automatically selected macOS Docker layer uses
-  `config.macos.toml`/`mise.macos.lock`, and `miserc.toml` enables platform
-  environments early enough for discovery. Every config and lockfile is
+  `config.macos.toml`/`mise.macos.lock`; `config.desktop.toml` contains the
+  opt-in desktop packages; and `miserc.toml` enables platform environments
+  early enough for discovery. Every config and lockfile this repo owns is
   symlinked because omitted locks silently become machine-local and can drift.
   `~/.config/mise/` is not symlinked wholesale because it also holds
   machine-local state this repo doesn't own.
@@ -133,10 +135,11 @@ reference rather than a fixed one.
 ## Desktop apps
 
 ```toml
-# mise.desktop.toml
+# mise/config.desktop.toml
 [bootstrap.packages]
 "brew-cask:kitty" = "latest"
 "brew-cask:font-jetbrains-mono-nerd-font" = "latest"
+"brew-cask:font-geist-mono-nerd-font" = "latest"
 ```
 
 GUI apps use the same `mise bootstrap` subsystem, via its `brew-cask:`
@@ -147,22 +150,27 @@ plan (cask, app bundle, binary links, shell completions) with no `brew`
 binary present at all. mise fetches cask definitions and performs the
 install itself.
 
-**Deliberately isolated from everything else.** `mise.desktop.toml` is
+**Deliberately isolated from everything else.** `mise/config.desktop.toml` is
 mise's own "config environment" mechanism — a file loaded *only* when
 `-E desktop` is passed, never by plain `mise install`, `mise bootstrap`, or
 any other task here. Verified directly: `mise bootstrap packages status`
 (no `-E desktop`) reports "nothing configured in `[bootstrap.packages]`" —
 the desktop entries are structurally invisible, not just conventionally
 unused. `bootstrap:all-desktop` is the only task that reaches this file
-(`mise -E desktop bootstrap packages apply`), and it isn't a dependency of
-`bootstrap:all`.
+(`mise -E desktop bootstrap packages apply`), and it remains opt-in rather
+than a dependency of `bootstrap:all`.
 
-Both package names were confirmed valid by resolving them directly against
-this machine (both already installed via real Homebrew here, unrelated to
+The normal dotfiles bootstrap symlinks this environment layer to
+`~/.config/mise/config.desktop.toml`. `bootstrap:all-desktop` depends on
+`bootstrap:all`, so it fully provisions a new desktop machine before applying
+the desktop packages.
+
+All three package names were confirmed valid by resolving them directly against
+this machine (all already installed via real Homebrew here, unrelated to
 this repo — mise refuses to touch a cask Homebrew already owns, the same
 non-clobbering stance `[dotfiles]` takes toward an occupied target).
 
-Only one file for all desktop/GUI apps for now (kitty + a font); split into
+Only one file for all desktop/GUI apps for now (kitty + two fonts); split into
 more files only if this grows unwieldy. Not yet extended to Linux
 (`flatpak:`/`flatpak-user:`) or the Mac App Store (`mas:`) — same manager
 system, addable later without restructuring.

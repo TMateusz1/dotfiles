@@ -8,7 +8,7 @@ repo-local, global core, macOS and desktop layers:
 | Repo-local  | `mise.toml` / `mise.lock`                         | Always in this repo; tools/tasks used to work on the dotfiles            |
 | Global core | `mise/config.toml` / `mise/mise.lock`             | Always global; portable tools available in every project                 |
 | macOS       | `mise/config.macos.toml` / `mise/mise.macos.lock` | Automatic on macOS; the local Docker CLI, Buildx and Colima/Lima runtime |
-| Desktop     | `mise.desktop.toml`                               | Opt-in via `-E desktop`; GUI packages used only by the bootstrap task    |
+| Desktop     | `mise/config.desktop.toml`                        | Opt-in via `-E desktop`; GUI packages used only by the bootstrap task    |
 
 `mise/miserc.toml` sets `auto_env = true`, so mise selects the macOS layer
 from the host platform without adding `macos` to `MISE_ENV`. The desktop
@@ -30,9 +30,9 @@ disable_backends = ["asdf", "vfox"]
   **A lockfile only counts if it actually reaches the machine.** The global
   core and macOS config files therefore each have a matching `[dotfiles]`
   entry for their lockfile. Without those entries, mise would maintain
-  machine-local locks independently of the committed pins. All five global
-  files (`config.toml`, `mise.lock`, `config.macos.toml`, `mise.macos.lock`
-  and `miserc.toml`) are declared in `mise.toml`; see
+  machine-local locks independently of the committed pins. All six global
+  files (`config.toml`, `mise.lock`, `config.macos.toml`, `mise.macos.lock`,
+  `config.desktop.toml`, and `miserc.toml`) are declared in `mise.toml`. See
   [bootstrap.md](./bootstrap.md#what-gets-symlinked).
 - `disable_backends = ["asdf", "vfox"]` — tools are resolved through mise's
   own backends (aqua, cargo, ubi, etc.) only; no asdf/vfox plugin resolution.
@@ -65,9 +65,10 @@ Global (`mise/config.toml`):
   runtime dependency of the Neovim config, deliberately the aqua build
   rather than npm — see [nvim.md](./nvim.md#the-tree-sitter-cli-is-a-hard-dependency)
 
-Desktop (`mise.desktop.toml`, opt-in only — see [bootstrap.md](./bootstrap.md)):
+Desktop (`mise/config.desktop.toml`, opt-in only — see [bootstrap.md](./bootstrap.md)):
 
-- `kitty`, `font-jetbrains-mono-nerd-font` (via `brew-cask:`) — see
+- `kitty`, `font-jetbrains-mono-nerd-font`, `font-geist-mono-nerd-font`
+  (via `brew-cask:`) — see
   [desktop_tools.md](./desktop_tools.md)
 
 macOS (`mise/config.macos.toml`, loaded automatically):

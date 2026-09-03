@@ -39,7 +39,7 @@ mise.toml             # repo-local mise config: tools + tasks for working on thi
                       #   itself, plus the [dotfiles]/[bootstrap.repos] tables that
                       #   define what gets symlinked where
 mise.lock             # committed lockfile for the repo-local mise config
-mise.desktop.toml     # GUI/desktop packages, loaded only via `-E desktop` (opt-in)
+mise/config.desktop.toml # GUI/desktop packages, loaded only via `-E desktop` (opt-in)
 hk.pkl                # lint/format steps + git hooks (see docs/linting.md)
 .rumdl.toml           # markdown lint config
 .yamlfmt              # YAML format config
