@@ -28,7 +28,8 @@ mise only, Catppuccin theming).
 | [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                                                       | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
 | [MagicDuck/grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim)                                         | Project find and replace           | A ripgrep-backed search-and-replace buffer, opened with `<leader>fR`; a Visual selection pre-fills its search.                                                                                                                                                                   |
 | [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)                                               | Code outline                       | `<leader>cs` toggles a wide symbol outline on the right while keeping focus in the source window. Uses Treesitter with LSP fallback and the configured Nerd Font — see "Code outline" below.                                                                                     |
-| [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)                                         | Git gutter + hunk operations       | Shows added/changed/deleted lines and provides preview, stage, reset, blame and diff actions under `<leader>G` — see "Git signs and hunks" below.                                                                                                                                |
+| [sindrets/diffview.nvim](https://github.com/sindrets/diffview.nvim)                                           | Repository diff and file history   | Reviews all changed files in a dedicated tab, replacing Gitsigns' single-buffer diffs under `<leader>G`.                                                                                                                                                                         |
+| [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)                                         | Git gutter + hunk operations       | Shows added/changed/deleted lines and provides preview, stage, reset and blame actions under `<leader>G` — see "Git signs and diffs" below.                                                                                                                                      |
 | [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
 | [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)                 | Indent guides + active scope       | Draws subtle guides with virtual text and highlights the current Treesitter scope. Uses Catppuccin's official integration.                                                                                                                                                       |
 | [nvim-mini/mini.ai](https://github.com/nvim-mini/mini.ai)                                                     | Extended text objects              | Adds arguments, function calls, tags and robust pair objects while preserving Neovim's native `an`/`in` Treesitter selection.                                                                                                                                                    |
@@ -113,7 +114,7 @@ The outline complements rather than replaces fuzzy symbol search:
 `<leader>fs` remains fzf-lua's document-symbol picker and `<leader>fS` remains
 its live workspace-symbol picker.
 
-## Git signs and hunks
+## Git signs and diffs
 
 [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) uses Neovim's
 built-in diff implementation to place Git additions, changes, deletions and
@@ -134,13 +135,23 @@ attached to a Git-backed buffer:
 | `<leader>Gr` | Reset the current hunk                            |
 | `<leader>Gb` | Full blame details for the current line           |
 | `<leader>GB` | Blame the complete buffer in a synchronized split |
-| `<leader>Gd` | Diff the buffer against the Git index             |
-| `<leader>GD` | Diff the buffer against the previous commit       |
+| `<leader>Gd` | Open a repository diff against the Git index      |
+| `<leader>GD` | Open a repository diff against the last commit    |
+| `<leader>Gh` | Show history for the current file                 |
+| `<leader>GH` | Show history for the repository                   |
+| `<leader>Gq` | Close the current Diffview                        |
 | `ih`         | Select the current hunk as a text object          |
 
 The stage/unstage and reset mappings also work on a Visual selection for
 partial hunks. `<leader>G` is registered as the **Git** group in WhichKey;
 the individual buffer-local entries come from their mapping descriptions.
+
+[diffview.nvim](https://github.com/sindrets/diffview.nvim) replaces the two
+single-buffer Gitsigns diff windows with one dedicated tab: `<leader>Gd`
+compares the working tree with the index, while `<leader>GD` compares it with
+`HEAD`. `<leader>Gh` opens the current file's history; `<leader>GH` opens the
+repository history. Catppuccin's official Diffview integration supplies the
+same Mocha palette as the rest of the editor.
 
 ## Buffer line
 
@@ -1550,10 +1561,12 @@ was read but not rewritten.
   hunk empties the index, confirming one key toggles both ways. `reset_hunk`
   restores the original line text, `vih` selects exactly the hunk's line
   range, and `preview_hunk` opens a float whose `border` is the rounded
-  box-drawing set inherited from `winborder`. Against this repo (which has
-  real history) `diffthis()` and `diffthis("~")` each open two `diff` windows,
-  and `blame_line({ full = true })` renders the commit that last touched the
-  line, with `blame()` opening a `gitsigns-blame` split.
+  box-drawing set inherited from `winborder`. `blame_line({ full = true })`
+  renders the commit that last touched the line, with `blame()` opening a
+  `gitsigns-blame` split.
+- Diffview: `<leader>Gd` resolves to `DiffviewOpen`, `<leader>GD` to
+  `DiffviewOpen HEAD`, and the file/repository history mappings to
+  `DiffviewFileHistory %` and `DiffviewFileHistory`.
 - Native UI: `vim.o.winborder` is `"rounded"`. Firing a synthetic `Progress`
   autocmd puts ` 42%(1) ` in the rendered lualine statusline — so the `%%`
   the runtime returns survives into a single literal `%` — while an idle

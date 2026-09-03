@@ -50,6 +50,7 @@ return {
       }
     end,
     integrations = {
+      diffview = true,
       gitsigns = true,
       indent_blankline = {
         enabled = true,

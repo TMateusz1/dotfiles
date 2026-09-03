@@ -42,11 +42,6 @@ return {
       end, "Blame line")
       map("n", "<leader>GB", gitsigns.blame, "Blame buffer")
 
-      map("n", "<leader>Gd", gitsigns.diffthis, "Diff against index")
-      map("n", "<leader>GD", function()
-        gitsigns.diffthis("~")
-      end, "Diff against last commit")
-
       map({ "o", "x" }, "ih", gitsigns.select_hunk, "Inside git hunk")
     end,
   },
