@@ -751,6 +751,9 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   the unsaved-aware flow — see
   [Quitting and closing with unsaved changes](#quitting-and-closing-with-unsaved-changes).
 - **`filetypes.lua`**: Helm chart detection — see [Helm](#helm).
+- **`autocmds.lua`**: reloads files changed outside Neovim and briefly uses a
+  lighter Catppuccin Mocha `surface1` highlight for yanked text, making
+  operations such as `yi"` easy to confirm.
 - **`buffers.lua`**: the shared buffer-close and quit-all flow, including the
   unsaved-changes prompt.
 
