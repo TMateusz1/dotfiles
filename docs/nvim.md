@@ -1394,7 +1394,9 @@ emitted as ordinary messages instead, which Noice's transient `mini` view hides
 after two seconds, so the question would fade while it was still being read.
 
 Escape, `Ctrl-C` and an empty answer all mean cancel. Nothing here force-deletes
-unsaved work without an explicit `n`/`d`.
+unsaved work without an explicit `n`/`d`. Pressing a recognised choice also
+submits it immediately: `y`/`n`/`c` for one buffer, or `w`/`d`/`c` when
+quitting all. Enter remains available for any typed answer.
 
 ## Clipboard
 

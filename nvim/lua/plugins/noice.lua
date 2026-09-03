@@ -2,6 +2,35 @@ return {
   "folke/noice.nvim",
   event = "VeryLazy",
   dependencies = { "MunifTanjim/nui.nvim", "ibhagwan/fzf-lua" },
+  init = function()
+    -- `vim.fn.input()` uses command-line type `@`, so Noice renders the
+    -- unsaved-change questions as editable prompts. Submit recognised choices
+    -- directly without changing normal command-line or search input.
+    local prompts = {
+      { pattern = "^Save changes to ", choices = { y = true, n = true, c = true } },
+      { pattern = "^Unsaved: ", choices = { w = true, d = true, c = true } },
+    }
+
+    local function submit_choice(key)
+      return function()
+        if vim.fn.getcmdtype() == "@" then
+          local prompt = vim.fn.getcmdprompt()
+          for _, confirmation in ipairs(prompts) do
+            if prompt:match(confirmation.pattern) and confirmation.choices[key:lower()] then
+              return key .. "<CR>"
+            end
+          end
+        end
+        return key
+      end
+    end
+
+    for _, key in ipairs({ "y", "n", "c", "w", "d" }) do
+      for _, variant in ipairs({ key, key:upper() }) do
+        vim.keymap.set("c", variant, submit_choice(variant), { expr = true, silent = true })
+      end
+    end
+  end,
   keys = {
     {
       "<leader>fn",
