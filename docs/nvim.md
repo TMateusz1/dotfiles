@@ -26,6 +26,7 @@ mise only, Catppuccin theming).
 | ------------------------------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [catppuccin/nvim](https://github.com/catppuccin/nvim)                                                         | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
 | [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                                                       | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
+| [MagicDuck/grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim)                                         | Project find and replace           | A ripgrep-backed search-and-replace buffer, opened with `<leader>fR`; a Visual selection pre-fills its search.                                                                                                                                                                   |
 | [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)                                               | Code outline                       | `<leader>cs` toggles a wide symbol outline on the right while keeping focus in the source window. Uses Treesitter with LSP fallback and the configured Nerd Font — see "Code outline" below.                                                                                     |
 | [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)                                         | Git gutter + hunk operations       | Shows added/changed/deleted lines and provides preview, stage, reset, blame and diff actions under `<leader>G` — see "Git signs and hunks" below.                                                                                                                                |
 | [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
@@ -72,13 +73,24 @@ themes, and documents (see
 [util_tools.md#fzf](./util_tools.md#fzf)) — no second fuzzy-matching
 implementation to keep track of. Bound: `<leader>ff` (files in the cwd),
 `<leader>fg` (live grep in the cwd), `<leader>fr` (recent files),
-`<leader>fb` (open buffers), and `<leader>fh` (help tags).
+`<leader>fb` (open buffers), `<leader>fh` (help tags), and `<leader>fG`
+(Git status).
 
 It also registers as the implementation of `vim.ui.select`. Plugin prompts —
 including future LSP code-action choices — therefore use the same fzf interface
 instead of Neovim's numbered command-line menu. This requires fzf-lua to load
 on `VeryLazy`; the external `fzf` process is still only started when a picker
 is actually opened.
+
+## Find and replace
+
+[grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim) is a dedicated,
+ripgrep-backed buffer for reviewing and applying project-wide replacements.
+`<leader>fR` opens it; in Visual mode the same mapping pre-fills the search
+with the selection. The tool shows a diff before its explicit replacement
+action, so opening it never changes files by itself. It uses the already-pinned
+`rg` binary and the installed `mini.icons`, with its native highlight groups
+inheriting the active Catppuccin colorscheme.
 
 ## Code outline
 

@@ -11,6 +11,7 @@ return {
     { "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", desc = "Document symbols" },
     { "<leader>fS", "<cmd>FzfLua lsp_live_workspace_symbols<cr>", desc = "Workspace symbols" },
     { "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", desc = "Document diagnostics" },
+    { "<leader>fG", "<cmd>FzfLua git_status<cr>", desc = "Git status" },
   },
   opts = {
     lsp = {
