@@ -51,6 +51,7 @@ return {
     end,
     integrations = {
       diffview = true,
+      flash = true,
       gitsigns = true,
       indent_blankline = {
         enabled = true,

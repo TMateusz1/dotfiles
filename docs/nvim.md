@@ -46,6 +46,8 @@ mise only, Catppuccin theming).
 | [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `<leader>o` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                 |
 | [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | Filesystem sidebar                 | `branch = "v3.x"`. `<leader>e` opens a focused left sidebar and reveals the current file; Oil remains the directory-buffer editor — see "File explorers" below.                                                                                                                  |
 | [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)                                     | Animated cursor trail              | Pure-Lua cursor smear drawn with virtual text; no terminal support required. Defaults kept — see "Cursor" below.                                                                                                                                                                 |
+| [shortcuts/no-neck-pain.nvim](https://github.com/shortcuts/no-neck-pain.nvim)                                 | Opt-in centred editing             | Disabled until `<leader>uz`; creates unobtrusive Catppuccin Mocha side buffers to centre the focused window.                                                                                                                                                                     |
+| [folke/flash.nvim](https://github.com/folke/flash.nvim)                                                       | Fast labelled motions              | `s` jumps by label, `S` selects Treesitter nodes, and `/`/`?` can opt into labelled search with `<C-s>`. Catppuccin styles its labels.                                                                                                                                           |
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
 | [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)                                             | LSP server definitions             | Only a data source: it puts `lsp/*.lua` on the runtimepath so `vim.lsp.enable()` can find servers. No `lspconfig.setup()` — see "LSP" below.                                                                                                                                     |
 | [saghen/blink.cmp](https://github.com/saghen/blink.cmp)                                                       | Completion                         | Rust fuzzy matcher **built from source** with the mise-pinned toolchain, never downloaded — see "Completion" below.                                                                                                                                                              |
@@ -823,6 +825,12 @@ panel when a list needs more context: `<leader>Td` toggles workspace diagnostics
 `<leader>TD` limits it to the current buffer, and `<leader>Tq` / `<leader>Tl`
 toggle quickfix and location lists. The established FzfLua navigation mappings
 remain the direct way to jump to LSP locations.
+
+**Focus and motion.** `<leader>uz` toggles no-neck-pain's centred-writing
+layout; it stays off at launch and does not add its own mappings. Flash provides
+labelled movement with `s` (jump) and `S` (Treesitter selection); in operator
+pending mode, `r` and `R` reach remote text or Treesitter ranges. During `/` or
+`?` search, `<C-s>` toggles its labelled search overlay.
 
 **`vim._extui` is not enabled.** The module doesn't exist in the pinned Neovim
 0.12.5 — the experimental TUI replacement now lives at `vim._core.ui2`. The
