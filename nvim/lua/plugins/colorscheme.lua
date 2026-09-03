@@ -56,6 +56,7 @@ return {
         enabled = true,
         scope_color = "lavender",
       },
+      lsp_trouble = true,
       mini = { enabled = true },
       neotree = true,
       which_key = true,

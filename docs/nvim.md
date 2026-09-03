@@ -51,6 +51,7 @@ mise only, Catppuccin theming).
 | [saghen/blink.cmp](https://github.com/saghen/blink.cmp)                                                       | Completion                         | Rust fuzzy matcher **built from source** with the mise-pinned toolchain, never downloaded — see "Completion" below.                                                                                                                                                              |
 | [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)                                             | Formatting                         | Format on save, switchable per buffer and globally under `<leader>u`. Formatters are mise binaries — see "Formatting".                                                                                                                                                           |
 | [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)                                           | Linting                            | Automatic linting stays narrow (hadolint); slower project/schema checks run asynchronously into quickfix on demand — see "Linting".                                                                                                                                              |
+| [folke/trouble.nvim](https://github.com/folke/trouble.nvim)                                                   | Diagnostics and lists              | Tree views for workspace or buffer diagnostics, quickfix and location lists. Its Catppuccin integration is enabled — see "Diagnostics".                                                                                                                                          |
 | [folke/lazydev.nvim](https://github.com/folke/lazydev.nvim)                                                   | Lua API completion                 | Teaches `lua_ls` the Neovim API while editing this config. `ft = "lua"`.                                                                                                                                                                                                         |
 | [b0o/SchemaStore.nvim](https://github.com/b0o/SchemaStore.nvim)                                               | JSON/YAML schema catalogue         | Pure Lua, no binary and no runtime download. Feeds `jsonls` and `yamlls`.                                                                                                                                                                                                        |
 | [olexsmir/gopher.nvim](https://github.com/olexsmir/gopher.nvim)                                               | Go struct tags / interface stubs   | Thin wrapper over `gomodifytags` and `impl`; its own installer is switched off so the binaries come from mise — see "Go".                                                                                                                                                        |
@@ -811,6 +812,12 @@ it to handle the cmdline, editor messages, and LSP documentation only.
 **Diagnostics.** `vim.diagnostic.status()` is deliberately *not* added: lualine
 already renders a colored `diagnostics` component in `lualine_b`, and both read
 the same counts. Adding it would show every count twice.
+
+[trouble.nvim](https://github.com/folke/trouble.nvim) provides an expandable
+panel when a list needs more context: `<leader>Td` toggles workspace diagnostics,
+`<leader>TD` limits it to the current buffer, and `<leader>Tq` / `<leader>Tl`
+toggle quickfix and location lists. The established FzfLua navigation mappings
+remain the direct way to jump to LSP locations.
 
 **`vim._extui` is not enabled.** The module doesn't exist in the pinned Neovim
 0.12.5 — the experimental TUI replacement now lives at `vim._core.ui2`. The
