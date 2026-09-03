@@ -38,10 +38,11 @@ mise only, Catppuccin theming).
 | [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | Syntax-aware function navigation   | Supplies maintained `@function.outer` queries for `[f` and `]f`; configured against its `main` branch API.                                                                                                                                                                       |
 | [Wansmer/treesj](https://github.com/Wansmer/treesj)                                                           | Split/join argument layouts        | `<leader>s` toggles the syntax node under the cursor between single-line and multiline forms using Treesitter.                                                                                                                                                                   |
 | [folke/noice.nvim](https://github.com/folke/noice.nvim)                                                       | Cmdline + message UI               | Renders the cmdline as a bar docked *above* the statusline, so the bottom reads tmux → lualine → commands. Pulls in `nui.nvim` — see "Bottom of the screen" below.                                                                                                               |
+| [j-hui/fidget.nvim](https://github.com/j-hui/fidget.nvim)                                                     | LSP progress + notifications       | Shows LSP progress and `vim.notify()` messages in a small bottom-right window, placed above lualine and Noice's command line. `:Fidget history` lists its `vim.notify()` notifications.                                                                                          |
 | [windwp/nvim-autopairs](https://github.com/windwp/nvim-autopairs)                                             | Auto-pairs                         | Inserts the closing bracket/quote, steps over one already there, and counts the quotes before the cursor so closing an open string does not double it — see "Pairs" below.                                                                                                       |
 | [folke/which-key.nvim](https://github.com/folke/which-key.nvim)                                               | Discoverable keymap guide          | Shows described mappings as keys are entered. Uses the modern layout preset, mini.icons and Catppuccin's official integration — see "Keymap guide" below.                                                                                                                        |
 | [mbbill/undotree](https://github.com/mbbill/undotree)                                                         | Branching undo-history browser     | `<leader>U` toggles a focused history tree and diff panel stacked on the right — see "Undo tree" below.                                                                                                                                                                          |
-| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Theme is `catppuccin-nvim`, **not** `catppuccin` — see "Theme" below. Its right section leads with Neovim 0.12's `vim.ui.progress_status()` — see "Native UI" below.                                                                                                             |
+| [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Theme is `catppuccin-nvim`, **not** `catppuccin` — see "Theme" below.                                                                                                                                                                                                            |
 | [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `<leader>o` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                 |
 | [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | Filesystem sidebar                 | `branch = "v3.x"`. `<leader>e` opens a focused left sidebar and reveals the current file; Oil remains the directory-buffer editor — see "File explorers" below.                                                                                                                  |
 | [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)                                     | Animated cursor trail              | Pure-Lua cursor smear drawn with virtual text; no terminal support required. Defaults kept — see "Cursor" below.                                                                                                                                                                 |
@@ -782,7 +783,7 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
 
 ## Native UI
 
-Neovim 0.12 ships enough UI of its own that three of the four things a plugin
+Neovim 0.12 ships enough UI of its own that two of the four things a plugin
 would usually be added for are already covered.
 
 **Float borders.** `vim.o.winborder = "rounded"` is a global default, so every
@@ -798,13 +799,14 @@ popup rather than Neovim's native floating preview, and don't pick up
 Catppuccin colors it automatically via the stock `NormalFloat`/`FloatBorder`
 groups, same as everything else here.
 
-**Progress.** Lualine's right section starts with Neovim's public
-`vim.ui.progress_status()`, trimmed. It summarizes running `Progress` events as
-`42%(1)` — average percentage and count — and returns an empty string when
-nothing is running, which lualine drops without leaving padding or a separator
-behind. That covers what fidget.nvim would be installed for once LSP arrives,
-with no extra plugin. Note this is *progress*, which is separate from messages:
-messages are noice's, below.
+**Progress and notifications.** [fidget.nvim](https://github.com/j-hui/fidget.nvim)
+owns LSP progress and `vim.notify()` notifications. It uses a compact,
+self-clearing bottom-right window, positioned two rows above the bottom so it
+does not cover lualine or Noice's raised command line. It starts with Neovim so
+it can replace `vim.notify()` and retain notification history from the start of
+the session. `:Fidget history` shows only those `vim.notify()` notifications.
+Noice's notification and LSP-progress handlers are explicitly disabled, leaving
+it to handle the cmdline, editor messages, and LSP documentation only.
 
 **Diagnostics.** `vim.diagnostic.status()` is deliberately *not* added: lualine
 already renders a colored `diagnostics` component in `lualine_b`, and both read
@@ -1332,18 +1334,13 @@ all render on the row immediately above the statusline, and lualine keeps the
 bottom row.
 `laststatus` stays at `2`, so splits still get their own statuslines.
 
-Messages are noice's now too, and land in the same place — a content-width box
-on that row rather than a full-width bar, so it reads as a notification rather
-than a second cmdline. `long_message_to_split` is the one preset enabled, so a
-long message opens a real split instead of being truncated. Neither
-`nvim-notify` nor `snacks.nvim` is installed; noice's `notify` view falls back
-to its built-in `mini` view, which needs no extra plugin.
-
-`<leader>fn` opens Noice's complete message history in fzf-lua, including
-notifications, errors, warnings, ordinary messages and LSP messages. The
-picker requests reverse modification-time order from Noice and disables fzf's
-own relevance sort, so the newest matching entry stays first; the preview
-retains the complete formatted message.
+Ordinary editor messages remain Noice's and land in the same place — a
+content-width box on that row rather than a second cmdline. `long_message_to_split`
+is the one preset enabled, so a long message opens a real split instead of being
+truncated. Fidget, not Noice, receives `vim.notify()` and LSP progress; its
+notification window stays two rows above the bottom, avoiding both lualine and
+the raised cmdline. `<leader>fn` opens Noice's FZF message history, which
+includes ordinary command output such as `:pwd`.
 
 ### Quitting and closing with unsaved changes
 
@@ -1381,9 +1378,8 @@ branch directly:
 It uses `vim.fn.input()` rather than `vim.ui.select()`, and the reason is this
 section's own layout. The whole question lives in the *cmdline prompt*, which
 noice renders for as long as the prompt is open. A `vim.ui.select()` list is
-emitted as ordinary messages instead, and with no notification backend
-installed those land in the `mini` view — which times out after two seconds, so
-the question would fade while it was still being read.
+emitted as ordinary messages instead, which Noice's transient `mini` view hides
+after two seconds, so the question would fade while it was still being read.
 
 Escape, `Ctrl-C` and an empty answer all mean cancel. Nothing here force-deletes
 unsaved work without an explicit `n`/`d`.
@@ -1574,10 +1570,10 @@ was read but not rewritten.
   holds `branch, diff, diagnostics`, and `vim.diagnostic.status()` is not
   added on top of it. `require("vim._extui")` fails on 0.12.5; only the
   private `vim._core.ui2` exists, and nothing here loads it.
-- Notification history, with synthetic older and newer Noice messages: the
-  lines passed to fzf-lua put the newer message first, and `--no-sort` keeps
-  fuzzy filtering from changing that chronological order. `<leader>fn` resolves
-  to the described `Notification history` callback.
+- Fidget starts at launch and overrides `vim.notify()`; `:Fidget history` shows
+  those notifications. `<leader>fn` opens Noice's FZF message history instead,
+  including regular editor output. Noice's notification and LSP-progress
+  settings are both disabled.
 - Buffer line: `[b` and `]b` cycle in visible order, while
   `<leader><leader>` invokes `BufferLinePick` for letter-based focus. The five
   `<leader>x` mappings resolve to current, others, left, right and pick-close
@@ -1659,8 +1655,8 @@ was read but not rewritten.
   `relative = "win"` with `row = 0` *inside* the other, so both had to be
   resolved through `screenpos()` to confirm they occupy the same screen row.
   A `vim.fn.input()` save prompt now resolves to the same cmdline view and row,
-  rather than Noice's centred `cmdline_input` popup. `:echo` and `vim.notify`
-  also render on row 39, sized to their content, so neither covers lualine.
+  rather than Noice's centred `cmdline_input` popup. `:echo` also renders on
+  row 39; Fidget owns `vim.notify()` and appears above that command-line row.
 - LSP, against a real Go module in a scratch directory (`go.mod`, a type with
   unaligned struct fields, an unused variable, a passing test and a Dockerfile),
   driven through a login shell so `$PATH` carries the mise tools. gopls attaches
