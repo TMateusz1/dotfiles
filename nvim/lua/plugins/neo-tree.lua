@@ -45,7 +45,7 @@ return {
         require("neo-tree.command").execute({
           action = "focus",
           source = "filesystem",
-          position = "left",
+          position = "right",
           reveal_file = nearest_existing_path(),
         })
       end,

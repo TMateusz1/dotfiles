@@ -129,20 +129,22 @@ window they preserve the same intent by delegating to native `[c`/`]c` change
 navigation. Hunk operations are buffer-local and only exist when Gitsigns is
 attached to a Git-backed buffer:
 
-| Key          | Action                                            |
-| ------------ | ------------------------------------------------- |
-| `[h` / `]h`  | Previous / next hunk                              |
-| `<leader>Gp` | Preview the current hunk in a rounded popup       |
-| `<leader>Gs` | Stage an unstaged hunk, or unstage a staged hunk  |
-| `<leader>Gr` | Reset the current hunk                            |
-| `<leader>Gb` | Full blame details for the current line           |
-| `<leader>GB` | Blame the complete buffer in a synchronized split |
-| `<leader>Gd` | Open a repository diff against the Git index      |
-| `<leader>GD` | Open a repository diff against the last commit    |
-| `<leader>Gh` | Show history for the current file                 |
-| `<leader>GH` | Show history for the repository                   |
-| `<leader>Gq` | Close the current Diffview                        |
-| `ih`         | Select the current hunk as a text object          |
+| Key          | Action                                                |
+| ------------ | ----------------------------------------------------- |
+| `[h` / `]h`  | Previous / next hunk                                  |
+| `<leader>Gp` | Preview the current hunk in a rounded popup           |
+| `<leader>Gs` | Stage an unstaged hunk, or unstage a staged hunk      |
+| `<leader>Gr` | Reset the current hunk                                |
+| `<leader>Gb` | Full blame details for the current line               |
+| `<leader>GB` | Blame the complete buffer in a synchronized split     |
+| `<leader>Gd` | Open a repository diff against the Git index          |
+| `<leader>GD` | Open a repository diff against the last commit        |
+| `<leader>Gh` | Show history for the current file                     |
+| `<leader>GH` | Show history for the repository                       |
+| `<leader>Gq` | Close the current Diffview                            |
+| `<leader>GR` | Review current branch changes against `origin/main`   |
+| `<leader>Gm` | Diff branch work since it diverged from `origin/main` |
+| `ih`         | Select the current hunk as a text object              |
 
 The stage/unstage and reset mappings also work on a Visual selection for
 partial hunks. `<leader>G` is registered as the **Git** group in WhichKey;
@@ -152,8 +154,11 @@ the individual buffer-local entries come from their mapping descriptions.
 single-buffer Gitsigns diff windows with one dedicated tab: `<leader>Gd`
 compares the working tree with the index, while `<leader>GD` compares it with
 `HEAD`. `<leader>Gh` opens the current file's history; `<leader>GH` opens the
-repository history. Catppuccin's official Diffview integration supplies the
-same Mocha palette as the rest of the editor.
+repository history. `<leader>GR` reviews the current branch against
+`origin/main`. `<leader>Gm` compares the merge base with the local branch,
+including uncommitted work. In a Diffview pane, `q` or `<leader>q` closes the
+view. Catppuccin's official Diffview integration supplies the same Mocha palette
+as the rest of the editor.
 
 ## Buffer line
 
