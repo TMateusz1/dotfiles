@@ -45,7 +45,7 @@ mise only, Catppuccin theming).
 | [nvim-lualine/lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)                                     | Statusline                         | Theme is `catppuccin-nvim`, **not** `catppuccin` — see "Theme" below.                                                                                                                                                                                                            |
 | [stevearc/oil.nvim](https://github.com/stevearc/oil.nvim)                                                     | Directory-as-buffer editing        | Replaces netrw. `-` opens the parent directory as an editable buffer, `<leader>o` the same in a float — see "File explorers" below. Not lazy-loaded, on the author's own advice.                                                                                                 |
 | [stevearc/overseer.nvim](https://github.com/stevearc/overseer.nvim)                                           | Mise task runner                   | Its built-in Mise provider discovers the nearest `mise.toml`: `<leader>mr` selects a task and `<leader>mt` opens a half-width task panel on the left.                                                                                                                            |
-| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | Filesystem sidebar                 | `branch = "v3.x"`. `<leader>e` opens a focused left sidebar and reveals the current file; Oil remains the directory-buffer editor — see "File explorers" below.                                                                                                                  |
+| [nvim-neo-tree/neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim)                                 | File and buffer sidebar            | `branch = "v3.x"`. `<leader>e` shows files and reveals the current one; `<leader>b` replaces that same left sidebar with open buffers. Oil remains the directory-buffer editor — see "File explorers" below.                                                                     |
 | [sphamba/smear-cursor.nvim](https://github.com/sphamba/smear-cursor.nvim)                                     | Animated cursor trail              | Pure-Lua cursor smear drawn with virtual text; no terminal support required. Defaults kept — see "Cursor" below.                                                                                                                                                                 |
 | [folke/zen-mode.nvim](https://github.com/folke/zen-mode.nvim)                                                 | Opt-in centred editing             | `<leader>uz` opens the current buffer in a distraction-free centred floating workspace.                                                                                                                                                                                          |
 | [folke/twilight.nvim](https://github.com/folke/twilight.nvim)                                                 | Opt-in context dimming             | `<leader>ux` dims inactive code around the current Treesitter context; it stays independent from Zen mode.                                                                                                                                                                       |
@@ -80,8 +80,8 @@ themes, and documents (see
 [util_tools.md#fzf](./util_tools.md#fzf)) — no second fuzzy-matching
 implementation to keep track of. Bound: `<leader>ff` (files in the cwd),
 `<leader>fg` (live grep in the cwd), `<leader>fr` (recent files),
-`<leader>fb` (open buffers), `<leader>fh` (help tags), and `<leader>fG`
-(Git status).
+`<leader>fh` (help tags), and `<leader>fG` (Git status). Open buffers have a
+dedicated persistent Neo-tree view at `<leader>b` instead of a second picker.
 
 It also registers as the implementation of `vim.ui.select`. Plugin prompts —
 including future LSP code-action choices — therefore use the same fzf interface
@@ -201,11 +201,11 @@ the consistent save/discard/cancel questions below.
 | `<leader>xl` | Close buffers right of the current buffer |
 | `<leader>xp` | Mark a displayed buffer, then close it    |
 
-All five routes use the same close function, as do Bufferline's close icon
-and right-click action. Clean buffers close immediately. A modified buffer asks
-first — Save, Discard or Cancel — and nothing force-deletes unsaved work. That
-question is a plain cmdline prompt rather than Neovim's native `:confirm`
-dialog, for the reason given under
+Those five routes use the same close function, as do Bufferline's close icon,
+right-click action, and Neo-tree's buffer-view `d` / `bd` mappings. Clean
+buffers close immediately. A modified buffer asks first — Save, Discard or
+Cancel — and nothing force-deletes unsaved work. That question is a plain
+cmdline prompt rather than Neovim's native `:confirm` dialog, for the reason given under
 [Quitting and closing with unsaved changes](#quitting-and-closing-with-unsaved-changes).
 Left and right mean Bufferline's visible ordering, not numeric buffer IDs.
 
@@ -665,11 +665,12 @@ have to be special-cased.
 Two explorers, because they answer different questions. Oil is for *editing the
 filesystem*; Neo-tree is for *navigating the project tree*.
 
-| Key         | Opens                                                         |
-| ----------- | ------------------------------------------------------------- |
-| `-`         | Oil on the parent of the current file, in that window         |
-| `<leader>o` | Oil on the same directory, in a floating window               |
-| `<leader>e` | Neo-tree on the left, focused and revealing the current file  |
+| Key         | Opens                                                              |
+| ----------- | ------------------------------------------------------------------ |
+| `-`         | Oil on the parent of the current file, in that window              |
+| `<leader>o` | Oil on the same directory, in a floating window                    |
+| `<leader>e` | Neo-tree files on the left, focused and revealing the current file |
+| `<leader>b` | Neo-tree's open-buffer list in that same left sidebar              |
 
 ### oil.nvim — the directory is a buffer
 
@@ -707,6 +708,13 @@ though ordinary `:w` still correctly requires the missing directories first;
 `<leader>W` writes it with `++p` when creating those parents is intended.
 Special and unnamed buffers fall back to the cwd.
 
+`<leader>b` uses Neo-tree's `buffers` source at the same `left` position, so it
+replaces a visible filesystem tree with the listed open buffers. Conversely,
+`<leader>e` replaces that buffer list with the filesystem tree and reveals the
+current file. Neo-tree owns one sidebar per position, so these mappings never
+open a second explorer. `buffers.show_unloaded = true` also includes the
+non-focused buffers a restored session initially leaves unloaded.
+
 The mapping is deliberately not a toggle: invoking it again from another source
 buffer updates the selection instead of closing the tree. If the reveal target
 is outside the cwd, Neo-tree keeps its normal confirmation before changing
@@ -726,12 +734,17 @@ The tree keeps its useful built-ins and customizes file opening:
 | `z`       | Collapse every directory below the displayed tree root              |
 | `q`       | Close the Neo-tree window                                           |
 
+In the buffer view, `<CR>` also opens the selected buffer and closes the
+sidebar. `d` and `bd` close its selected buffer through the same
+save/discard/cancel flow used everywhere else; they never bypass unsaved-change
+handling.
+
 `filesystem.hijack_netrw_behavior = "disabled"` makes the ownership boundary
 explicit: `nvim .`, `:edit .`, `-` and `<leader>o` remain Oil operations.
 Neo-tree is lazy-loaded only by `:Neotree`, `<leader>e` or the dashboard button.
 Its sidebar is excluded from indent guides and session files, and Bufferline
-reserves a labelled offset above it. Only the custom `<CR>` file-open path
-closes the sidebar; directory expansion and the three explicit alternate-open
+reserves a labelled offset above it. The custom `<CR>` selection path closes the
+sidebar in both views; directory expansion and the three explicit alternate-open
 mappings leave it available.
 
 The official Catppuccin Neo-tree integration provides the Mocha highlights.
@@ -1802,9 +1815,12 @@ was read but not rewritten.
   operator, while `<leader>o` resolves to Oil's floating view. In a fresh
   process, `<leader>e` opens Neo-tree as the focused leftmost window and
   selects the current file; invoking it from a second source buffer reuses the
-  sidebar and updates the selection. `<CR>` opens the selected file and closes
-  the tree; `<C-CR>` opens in the current editor window, `<C-v>` in a vertical
-  split and `<C-s>` in a horizontal split while keeping the tree open. `C`
+  sidebar and updates the selection. `<leader>b` then replaces that window with
+  Neo-tree's buffer list, and `<leader>e` switches the same window back to the
+  filesystem tree. `<CR>` opens the selected file or buffer and closes the
+  tree; `<C-CR>` opens in the current editor window, `<C-v>` in a vertical split
+  and `<C-s>` in a horizontal split while keeping the tree open. Buffer-view
+  `d` / `bd` take the same save/discard/cancel route as Bufferline. `C`
   collapses the expanded parent, `z` collapses every node below the root and
   `q` closes the sidebar. A new buffer at
   `dir/not/exists/file.md` selects the nearest existing ancestor instead of
