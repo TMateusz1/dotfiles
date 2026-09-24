@@ -8,6 +8,15 @@
 ] } # Local container runtime
 "aqua:docker/cli" = "29.7.2" # Docker command-line client
 
+[tools."github:docker/compose"]
+version = "5.5.1"
+# Docker only discovers CLI plugins from its plugin directories, not PATH.
+postinstall = '''
+mkdir -p "$HOME/.docker/cli-plugins"
+ln -sf "$MISE_TOOL_INSTALL_PATH/docker-compose" \
+  "$HOME/.docker/cli-plugins/docker-compose"
+'''
+
 [tools."aqua:docker/buildx"]
 version = "latest"
 # Docker only discovers CLI plugins from its plugin directories, not PATH.

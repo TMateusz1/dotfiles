@@ -80,3 +80,29 @@ checksum = "sha256:bbdef91774885a0d05f7b048c4eb89ae2bcf3a0c252ae7ca7934e63df76d9
 url = "https://github.com/lima-vm/lima/releases/download/v2.2.0/lima-2.2.0-Darwin-arm64.tar.gz"
 url_api = "https://api.github.com/repos/lima-vm/lima/releases/assets/484813994"
 provenance = "github-attestations"
+
+[[tools."github:docker/compose"]]
+version = "5.5.1"
+backend = "github:docker/compose"
+specifiers = ["5.5.1"]
+
+[tools."github:docker/compose"."platforms.linux-arm64"]
+checksum = "sha256:732e3a84c1a0f67256ce80bc2598a24546b10ca05f9faa97efceb1171ece2ef7"
+url = "https://github.com/docker/compose/releases/download/v5.5.1/docker-compose-linux-aarch64"
+url_api = "https://api.github.com/repos/docker/compose/releases/assets/542966295"
+
+[tools."github:docker/compose"."platforms.linux-arm64".provenance.slsa]
+url = "https://github.com/docker/compose/releases/download/v5.5.1/docker-compose-linux-aarch64.provenance.json"
+
+[tools."github:docker/compose"."platforms.linux-x64"]
+checksum = "sha256:db1889184726840f75c4f9c001048430d4f25b3be3cb084d3ddd762bc0aed576"
+url = "https://github.com/docker/compose/releases/download/v5.5.1/docker-compose-linux-x86_64"
+url_api = "https://api.github.com/repos/docker/compose/releases/assets/542966285"
+
+[tools."github:docker/compose"."platforms.linux-x64".provenance.slsa]
+url = "https://github.com/docker/compose/releases/download/v5.5.1/docker-compose-linux-x86_64.provenance.json"
+
+[tools."github:docker/compose"."platforms.macos-arm64"]
+checksum = "sha256:998735c9b6fe68a4f05895e6ea73d71ad06f9fc7046383ad89e47346781b6af5"
+url = "https://github.com/docker/compose/releases/download/v5.5.1/docker-compose-darwin-aarch64"
+url_api = "https://api.github.com/repos/docker/compose/releases/assets/542966325"
