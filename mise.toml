@@ -12,15 +12,15 @@ HK_MISE = 1
 MISE_NPM_PACKAGE_MANAGER = "npm"
 
 [tools]
-"core:node" = "24"
-"npm:@openai/codex" = { version = "0.151.0", depends = ["node"] }
-"aqua:anthropics/claude-code" = "2.1.251"
-"aqua:jdx/hk" = "1.56.1"
+"npm:@openai/codex" = { version = "0.156.1", depends = ["node"] }
+"aqua:anthropics/claude-code" = "2.1.280"
+"aqua:jdx/hk" = "2.1.0"
 "aqua:tamasfe/taplo" = "0.10.0"
-"aqua:rvben/rumdl" = "0.2.62"
+"aqua:rvben/rumdl" = "0.2.76"
 "aqua:google/yamlfmt" = "0.21.0"
 "aqua:koalaman/shellcheck" = "0.11.0"
 "aqua:JohnnyMorganz/StyLua" = "2.5.2"
+node = "26"
 
 [hooks]
 # keeps the installed git hooks (hk.pkl) in sync whenever tools are (re)installed

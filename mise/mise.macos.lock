@@ -23,40 +23,41 @@ url = "https://github.com/abiosoft/colima/releases/download/v0.10.3/colima-Darwi
 url_api = "https://api.github.com/repos/abiosoft/colima/releases/assets/438456725"
 
 [[tools."aqua:docker/buildx"]]
-version = "0.36.1"
+version = "0.37.1"
 backend = "aqua:docker/buildx"
 specifiers = ["latest"]
 
 [tools."aqua:docker/buildx"."platforms.linux-arm64"]
-checksum = "sha256:5d0cafd9d16afe1a0f0d9529885344ace2cc99efdd531b6c783c5455a6001569"
-url = "https://github.com/docker/buildx/releases/download/v0.36.1/buildx-v0.36.1.linux-arm64"
-url_api = "https://api.github.com/repos/docker/buildx/releases/assets/501521795"
+checksum = "sha256:e5cc9fe3bbff5cbc91230981f7860e06076110730a2db997082652199042a1f2"
+url = "https://github.com/docker/buildx/releases/download/v0.37.1/buildx-v0.37.1.linux-arm64"
+url_api = "https://api.github.com/repos/docker/buildx/releases/assets/557511552"
 provenance = "cosign"
 
 [tools."aqua:docker/buildx"."platforms.linux-x64"]
-checksum = "sha256:48af8a397ebd60178778bf63611dbcebe5f5e7a9be90eb9147b24b9587455778"
-url = "https://github.com/docker/buildx/releases/download/v0.36.1/buildx-v0.36.1.linux-amd64"
-url_api = "https://api.github.com/repos/docker/buildx/releases/assets/501521792"
+checksum = "sha256:9447199cdb435f25880548343c128a4b6650e8891ee598905d8d29d39a8e359b"
+url = "https://github.com/docker/buildx/releases/download/v0.37.1/buildx-v0.37.1.linux-amd64"
+url_api = "https://api.github.com/repos/docker/buildx/releases/assets/557511570"
 provenance = "cosign"
 
 [tools."aqua:docker/buildx"."platforms.macos-arm64"]
-checksum = "sha256:214cdc36788602862dbc82b523d58648b4585c7b0ff95218b0817c44db5573d7"
-url = "https://github.com/docker/buildx/releases/download/v0.36.1/buildx-v0.36.1.darwin-arm64"
-url_api = "https://api.github.com/repos/docker/buildx/releases/assets/501530579"
+checksum = "sha256:c3cbbc820d578b0aa8158dd62ef1af25a0c8a75ef53331dbe4e219471e1dbe8c"
+url = "https://github.com/docker/buildx/releases/download/v0.37.1/buildx-v0.37.1.darwin-arm64"
+url_api = "https://api.github.com/repos/docker/buildx/releases/assets/557519683"
 
 [[tools."aqua:docker/cli"]]
-version = "29.7.2"
+version = "29.8.1"
 backend = "aqua:docker/cli"
-specifiers = ["29.7.2"]
+specifiers = ["29.8.1"]
 
 [tools."aqua:docker/cli"."platforms.linux-arm64"]
-url = "https://download.docker.com/linux/static/stable/aarch64/docker-29.7.2.tgz"
+url = "https://download.docker.com/linux/static/stable/aarch64/docker-29.8.1.tgz"
 
 [tools."aqua:docker/cli"."platforms.linux-x64"]
-url = "https://download.docker.com/linux/static/stable/x86_64/docker-29.7.2.tgz"
+url = "https://download.docker.com/linux/static/stable/x86_64/docker-29.8.1.tgz"
 
 [tools."aqua:docker/cli"."platforms.macos-arm64"]
-url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.7.2.tgz"
+checksum = "blake3:6593c6a72fc3d59ba25584cde3138b450ab3c6269ff722b548bcf9ab2f46b05a"
+url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.8.1.tgz"
 
 [[tools."aqua:lima-vm/lima"]]
 version = "2.2.0"

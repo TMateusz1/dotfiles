@@ -229,7 +229,7 @@ the vendored file loads without one — `ya env` exits 0 and reports
 `Theme: .../theme.toml (41483 chars)` after the separator edit above.
 
 That the edit reaches the right keys was confirmed against the binary rather
-than assumed: yazi 26.8.15 embeds the Lua that renders the bar, and it reads
+than assumed: yazi 26.9.1 embeds the Lua that renders the bar, and it reads
 `th.status.sep_left.open` / `.close` through `ui.Span(...)`, so those key names
 are current and an empty string is a valid span that draws nothing. Note the
 rendered bar itself could not be captured here — yazi needs real terminal

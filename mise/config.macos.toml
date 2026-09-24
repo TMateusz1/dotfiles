@@ -6,7 +6,7 @@
 "aqua:abiosoft/colima" = { version = "0.10.3", depends = [
   "aqua:lima-vm/lima",
 ] } # Local container runtime
-"aqua:docker/cli" = "29.7.2" # Docker command-line client
+"aqua:docker/cli" = "29.8.1" # Docker command-line client
 
 [tools."github:docker/compose"]
 version = "5.5.1"
