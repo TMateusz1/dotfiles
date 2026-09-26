@@ -10,27 +10,24 @@ disable_backends = ["asdf", "vfox"]
 "aqua:tree-sitter/tree-sitter" = "0.27.0" # Treesitter parser compiler
 
 # Everyday CLI tools
-"aqua:atuinsh/atuin" = "18.23.0" # Shell history search
-"aqua:sharkdp/bat" = "0.26.1" # Syntax-highlighted cat
-"aqua:ClementTsang/bottom" = "0.14.9" # System monitor (btm)
-"npm:@openai/codex" = { version = "0.156.1", depends = [
-  "node",
-] } # OpenAI coding agent
-"aqua:dandavison/delta" = "0.19.2" # Git diff pager
+"aqua:atuinsh/atuin" = "18.23.0"                         # Shell history search
+"aqua:sharkdp/bat" = "0.26.1"                            # Syntax-highlighted cat
+"aqua:ClementTsang/bottom" = "0.14.9"                    # System monitor (btm)
+"aqua:dandavison/delta" = "0.19.2"                       # Git diff pager
 "cargo:eza" = { version = "0.23.5", depends = ["rust"] } # Modern ls replacement
-"aqua:sharkdp/fd" = "10.5.0" # Fast find replacement
-"aqua:junegunn/fzf" = "0.74.4" # Fuzzy finder
-"aqua:cli/cli" = "2.101.0" # GitHub CLI
-"gitlab:gitlab-org/cli" = "1.119.0" # GitLab CLI
-"aqua:charmbracelet/glow" = "3.0.0" # Markdown renderer
-"aqua:jqlang/jq" = "1.8.2" # JSON processor
-"aqua:jesseduffield/lazygit" = "0.65.1" # Git TUI
-"aqua:BurntSushi/ripgrep" = "15.2.0" # Recursive text search
-"aqua:starship/starship" = "1.26.0" # Shell prompt
-"aqua:google/yamlfmt" = "0.21.0" # YAML formatter
-"aqua:sxyazi/yazi" = "26.9.1" # File manager
-"aqua:mikefarah/yq" = "4.53.6" # YAML processor
-"aqua:ajeetdsouza/zoxide" = "0.10.0" # Directory jumper
+"aqua:sharkdp/fd" = "10.5.0"                             # Fast find replacement
+"aqua:junegunn/fzf" = "0.74.4"                           # Fuzzy finder
+"aqua:cli/cli" = "2.101.0"                               # GitHub CLI
+"gitlab:gitlab-org/cli" = "1.119.0"                      # GitLab CLI
+"aqua:charmbracelet/glow" = "3.0.0"                      # Markdown renderer
+"aqua:jqlang/jq" = "1.8.2"                               # JSON processor
+"aqua:jesseduffield/lazygit" = "0.65.1"                  # Git TUI
+"aqua:BurntSushi/ripgrep" = "15.2.0"                     # Recursive text search
+"aqua:starship/starship" = "1.26.0"                      # Shell prompt
+"aqua:google/yamlfmt" = "0.21.0"                         # YAML formatter
+"aqua:sxyazi/yazi" = "26.9.1"                            # File manager
+"aqua:mikefarah/yq" = "4.53.6"                           # YAML processor
+"aqua:ajeetdsouza/zoxide" = "0.10.0"                     # Directory jumper
 
 # Containers and Kubernetes
 "aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
@@ -84,7 +81,7 @@ disable_backends = ["asdf", "vfox"]
 "aqua:astral-sh/ruff" = "0.16.8" # Python linter, formatter, and language server
 
 # Node.js
-"core:node" = "26.10.0" # Node.js runtime for Codex and language servers
+"core:node" = "26.10.0" # Node.js runtime for language servers
 
 # Other language servers
 "aqua:LuaLS/lua-language-server" = "3.19.1" # Lua language server

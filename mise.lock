@@ -22,26 +22,6 @@ checksum = "sha256:92ff0889e16324801bc072692974bb67f8161e62010fc90f96c62a17f81f3
 url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-macos-aarch64.zip"
 url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421901102"
 
-[[tools."aqua:anthropics/claude-code"]]
-version = "2.1.280"
-backend = "aqua:anthropics/claude-code"
-specifiers = ["2.1.280"]
-
-[tools."aqua:anthropics/claude-code"."platforms.linux-arm64"]
-checksum = "sha256:e6cdd9f07fba8d181b7d6d0dedd9406f1be6ba4f5302a56a61ab4ebb43c5a569"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709747"
-
-[tools."aqua:anthropics/claude-code"."platforms.linux-x64"]
-checksum = "sha256:4239c476881f46f5bd2cccee97c10b1c8073f4ab4ae40e3c829493210e757764"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709942"
-
-[tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:872a1fa1f770165202bfa0e1771a8b02ce0a13b5f6de4f4489ec4ff268946b56"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709751"
-
 [[tools."aqua:google/yamlfmt"]]
 version = "0.21.0"
 backend = "aqua:google/yamlfmt"
@@ -160,6 +140,6 @@ checksum = "sha256:751fdf7439f115d87ee2a8f3f18c065b6151852068e3e666ac60ac2996f75
 url = "https://nodejs.org/dist/v26.10.0/node-v26.10.0-darwin-arm64.tar.gz"
 
 [[tools."npm:@openai/codex"]]
-version = "0.156.1"
+version = "0.157.1"
 backend = "npm:@openai/codex"
-specifiers = ["0.156.1"]
+specifiers = ["0.157.1"]
