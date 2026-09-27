@@ -825,11 +825,6 @@ url = "https://nodejs.org/dist/v26.10.0/node-v26.10.0-linux-x64.tar.gz"
 checksum = "sha256:751fdf7439f115d87ee2a8f3f18c065b6151852068e3e666ac60ac2996f75ac9"
 url = "https://nodejs.org/dist/v26.10.0/node-v26.10.0-darwin-arm64.tar.gz"
 
-[[tools."npm:@openai/codex"]]
-version = "0.156.1"
-backend = "npm:@openai/codex"
-specifiers = ["0.156.1"]
-
 [[tools."npm:basedpyright"]]
 version = "1.40.1"
 backend = "npm:basedpyright"

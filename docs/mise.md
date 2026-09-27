@@ -5,8 +5,8 @@ repo-local, global core, macOS and desktop layers:
 
 | Layer       | Path                                              | Activation and purpose                                                   |
 | ----------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
-| Repo-local  | `mise.toml` / `mise.lock`                         | Always in this repo; tools/tasks used to work on the dotfiles            |
-| Global core | `mise/config.toml` / `mise/mise.lock`             | Always global; portable tools available in every project                 |
+| Repo-local  | `mise.toml` / `mise.lock`                         | Repo checks, hooks, and bootstrap tasks/settings                         |
+| Global core | `mise/config.toml` / `mise/mise.lock`             | Shared languages, LSPs, editor, terminal, and CLI tools                  |
 | macOS       | `mise/config.macos.toml` / `mise/mise.macos.lock` | Automatic on macOS; the local Docker CLI, Buildx and Colima/Lima runtime |
 | Desktop     | `mise/config.desktop.toml`                        | Opt-in via `-E desktop`; GUI packages used only by the bootstrap task    |
 
@@ -79,13 +79,15 @@ macOS (`mise/config.macos.toml`, loaded automatically):
 
 Repo-local (`mise.toml`):
 
-- [`claude-code`](https://github.com/anthropics/claude-code)
 - [`hk`](https://hk.jdx.dev), [`taplo`](https://github.com/tamasfe/taplo),
   [`rumdl`](https://github.com/rvben/rumdl),
   [`yamlfmt`](https://github.com/google/yamlfmt),
   [`shellcheck`](https://github.com/koalaman/shellcheck),
   [`stylua`](https://github.com/JohnnyMorganz/StyLua) — lint/format
   tooling, see [linting.md](./linting.md)
+
+AI coding agents are not provisioned by either mise layer. The repo-local
+Node.js pin was removed with Codex; global Node.js remains for npm-based LSPs.
 
 The repo-root `mise.toml` also declares `[dotfiles]` and
 `[bootstrap.repos]` — not tools, but mise's own native symlinking and
