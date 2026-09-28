@@ -32,6 +32,9 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   checks agreement within a single table and wouldn't catch a whole new
   table written in a different style.
 - **`taplo`** / **`taplo-format`** — TOML lint and format/fix (`**/*.toml`).
+  The repo-root `.taplo.toml` keeps arrays inside inline tool definitions in
+  `mise/config.toml` on one line, including `depends`, and leaves comments
+  next to each entry instead of aligning them to the longest definition.
 - **`yamlfmt`** — YAML format check/fix (`**/*.yml`, `**/*.yaml`). Format
   only — no semantic YAML linter is wired in; see
   [core_tools.md#lazygit](./core_tools.md#lazygit) for why. `.yamlfmt` at

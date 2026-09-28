@@ -21,48 +21,22 @@ disable_backends = ["asdf", "vfox"]
 
 # Tools per language
 # Go
-"aqua:mvdan/gofumpt" = "0.12.0" # Stricter gofmt
-"aqua:golangci/golangci-lint" = "2.13.2" # Go meta-linter
-"go:golang.org/x/tools/cmd/goimports" = { version = "0.50.0", depends = [
-  "go",
-] } # Formatter/import organizer
-"go:github.com/fatih/gomodifytags" = { version = "1.17.0", depends = [
-  "go",
-] } # Struct-tag editor
-"go:golang.org/x/tools/gopls" = { version = "0.23.0", depends = [
-  "go",
-] } # Language server
-"aqua:gotestyourself/gotestsum" = "1.13.0" # Go test runner
-"go:github.com/josharian/impl" = { version = "1.5.0", depends = [
-  "go",
-] } # Interface stub generator
+"aqua:mvdan/gofumpt" = "0.12.0"                                                  # Stricter gofmt
+"aqua:golangci/golangci-lint" = "2.13.2"                                         # Go meta-linter
+"go:golang.org/x/tools/cmd/goimports" = { version = "0.50.0", depends = ["go"] } # Formatter/import organizer
+"go:github.com/fatih/gomodifytags" = { version = "1.17.0", depends = ["go"] }    # Struct-tag editor
+"go:golang.org/x/tools/gopls" = { version = "0.23.0", depends = ["go"] }         # Language server
+"aqua:gotestyourself/gotestsum" = "1.13.0"                                       # Go test runner
+"go:github.com/josharian/impl" = { version = "1.5.0", depends = ["go"] }         # Interface stub generator
 
 # Python
-"aqua:astral-sh/uv" = "0.12.18" # Package manager
-"npm:basedpyright" = { version = "1.40.1", depends = [
-  "node",
-] } # Type checker and language server
-"pipx:mypy" = { version = "2.3.1", uvx_args = "--python 3.14.7", depends = [
-  "python",
-  "aqua:astral-sh/uv",
-] } # Type checker
-"pipx:robotcode" = { version = "2.7.0", extras = [
-  "languageserver",
-  "analyze",
-  "lint",
-], uvx_args = "--python 3.14.7 --with robotframework==7.3.2 --with robotframework-robocop==9.0.0", depends = [
-  "python",
-  "aqua:astral-sh/uv",
-] } # Robot Framework language server and tools
-"pipx:robotframework" = { version = "7.5", uvx_args = "--python 3.14.7", depends = [
-  "python",
-  "aqua:astral-sh/uv",
-] }
-"pipx:robotframework-robocop" = { version = "9.0.0", uvx_args = "--python 3.14.7 --with robotframework==7.3.2", depends = [
-  "python",
-  "aqua:astral-sh/uv",
-] } # Robot Framework linter
-"aqua:astral-sh/ruff" = "0.16.8" # Linter, formatter, and language server
+"aqua:astral-sh/uv" = "0.12.18"                                                                                                                                                                                                     # Package manager
+"npm:basedpyright" = { version = "1.40.1", depends = ["node"] }                                                                                                                                                                     # Type checker and language server
+"pipx:mypy" = { version = "2.3.1", uvx_args = "--python 3.14.7", depends = ["python", "aqua:astral-sh/uv"] }                                                                                                                        # Type checker
+"pipx:robotcode" = { version = "2.7.0", extras = ["languageserver", "analyze", "lint"], uvx_args = "--python 3.14.7 --with robotframework==7.3.2 --with robotframework-robocop==9.0.0", depends = ["python", "aqua:astral-sh/uv"] } # Robot Framework language server and tools
+"pipx:robotframework" = { version = "7.5", uvx_args = "--python 3.14.7", depends = ["python", "aqua:astral-sh/uv"] }
+"pipx:robotframework-robocop" = { version = "9.0.0", uvx_args = "--python 3.14.7 --with robotframework==7.3.2", depends = ["python", "aqua:astral-sh/uv"] }                                                                         # Robot Framework linter
+"aqua:astral-sh/ruff" = "0.16.8"                                                                                                                                                                                                    # Linter, formatter, and language server
 
 # Rust
 "aqua:rust-lang/rust-analyzer" = "2026-09-21" # Language server
@@ -71,15 +45,11 @@ disable_backends = ["asdf", "vfox"]
 "aqua:LuaLS/lua-language-server" = "3.19.1" # Language server
 
 # JavaScript, JSON, HTML, CSS, YAML, and Helm
-"npm:vscode-langservers-extracted" = { version = "4.10.0", depends = [
-  "node",
-] } # JSON/HTML/CSS language servers
-"npm:yaml-language-server" = { version = "1.24.0", depends = [
-  "node",
-] } # YAML language server
-"aqua:google/yamlfmt" = "0.21.0" # YAML formatter
-"aqua:mrjosh/helm-ls" = "0.5.4" # Helm language server
-"aqua:hadolint/hadolint" = "2.15.1" # Dockerfile linter
+"npm:vscode-langservers-extracted" = { version = "4.10.0", depends = ["node"] } # JSON/HTML/CSS language servers
+"npm:yaml-language-server" = { version = "1.24.0", depends = ["node"] }         # YAML language server
+"aqua:google/yamlfmt" = "0.21.0"                                                # YAML formatter
+"aqua:mrjosh/helm-ls" = "0.5.4"                                                 # Helm language server
+"aqua:hadolint/hadolint" = "2.15.1"                                             # Dockerfile linter
 
 # Other stuff
 # Shared CLI tools
