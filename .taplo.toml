@@ -1,0 +1,5 @@
+[[rule]]
+include = ["mise/config.toml"]
+
+[rule.formatting]
+inline_table_expand = false

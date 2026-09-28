@@ -34,6 +34,16 @@ return {
       json = { "jq" },
       sh = { "shfmt" },
     },
+    formatters = {
+      taplo = {
+        -- Conform passes buffer contents on stdin. Taplo needs the filename
+        -- to apply file-scoped rules from the project's configuration.
+        args = { "format", "--stdin-filepath", "$FILENAME", "-" },
+        cwd = function(_, ctx)
+          return vim.fs.root(ctx.dirname, { ".taplo.toml", "taplo.toml" }) or ctx.dirname
+        end,
+      },
+    },
     default_format_opts = { lsp_format = "fallback" },
     -- On by default, but switchable. A buffer-local flag exists on top of the
     -- global one so a single file in someone else's repo can opt out without

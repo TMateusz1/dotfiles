@@ -1179,6 +1179,11 @@ wrapped-error returns, a parallel table-driven test, and a context with timeout.
 [conform.nvim](https://github.com/stevearc/conform.nvim). Every formatter is a
 mise binary; conform only sequences them.
 
+`<leader>w` uses `:write`, so it also runs format-on-save. For TOML, Conform
+passes the buffer's path to Taplo and runs it from the nearest directory with
+`.taplo.toml` or `taplo.toml`. This lets project-local rules, including rules
+scoped to particular files, apply when saving from Neovim.
+
 | Filetype | Formatters                 |
 | -------- | -------------------------- |
 | Go       | `goimports` then `gofumpt` |
