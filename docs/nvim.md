@@ -53,8 +53,8 @@ mise only, Catppuccin theming).
 | [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)                                             | LSP server definitions             | Only a data source: it puts `lsp/*.lua` on the runtimepath so `vim.lsp.enable()` can find servers. No `lspconfig.setup()` — see "LSP" below.                                                                                                                                     |
 | [saghen/blink.cmp](https://github.com/saghen/blink.cmp)                                                       | Completion                         | Rust fuzzy matcher **built from source** with the mise-pinned toolchain, never downloaded — see "Completion" below.                                                                                                                                                              |
 | [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)                                             | Formatting                         | Format on save, switchable per buffer and globally under `<leader>u`. Formatters are mise binaries — see "Formatting".                                                                                                                                                           |
-| [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)                                           | Linting                            | Automatic linting stays narrow (hadolint); slower project/schema checks run asynchronously into quickfix on demand — see "Linting".                                                                                                                                              |
-| [folke/trouble.nvim](https://github.com/folke/trouble.nvim)                                                   | Diagnostics and lists              | Tree views for workspace or buffer diagnostics, quickfix and location lists. Its Catppuccin integration is enabled — see "Diagnostics".                                                                                                                                          |
+| [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)                                           | Linting                            | Automatic linting stays narrow (hadolint); slower project/schema checks run asynchronously and open in Trouble on demand — see "Linting".                                                                                                                                        |
+| [folke/trouble.nvim](https://github.com/folke/trouble.nvim)                                                   | Diagnostics and lists              | Focusable bottom panel for diagnostics and result lists, with a right-side document outline. Its Catppuccin integration is enabled — see "Diagnostics".                                                                                                                          |
 | [folke/lazydev.nvim](https://github.com/folke/lazydev.nvim)                                                   | Lua API completion                 | Teaches `lua_ls` the Neovim API while editing this config. `ft = "lua"`.                                                                                                                                                                                                         |
 | [b0o/SchemaStore.nvim](https://github.com/b0o/SchemaStore.nvim)                                               | JSON/YAML schema catalogue         | Pure Lua, no binary and no runtime download. Feeds `jsonls` and `yamlls`.                                                                                                                                                                                                        |
 | [olexsmir/gopher.nvim](https://github.com/olexsmir/gopher.nvim)                                               | Go struct tags / interface stubs   | Thin wrapper over `gomodifytags` and `impl`; its own installer is switched off so the binaries come from mise — see "Go".                                                                                                                                                        |
@@ -78,9 +78,17 @@ alternative has: it drives the actual `fzf` binary this repo already pins,
 themes, and documents (see
 [util_tools.md#fzf](./util_tools.md#fzf)) — no second fuzzy-matching
 implementation to keep track of. Bound: `<leader>ff` (files in the cwd),
-`<leader>fg` (live grep in the cwd), `<leader>fr` (recent files),
-`<leader>fh` (help tags), and `<leader>fG` (Git status). Open buffers have a
-dedicated persistent Neo-tree view at `<leader>b` instead of a second picker.
+`<leader>fb` (open buffers), `<leader>fg` (live grep in the cwd),
+`<leader>fr` (recent files), `<leader>fh` (help tags), and `<leader>fG` (Git
+status). Open buffers also have a persistent Neo-tree view at `<leader>b`.
+
+In file-like pickers, including buffers and LSP locations, Enter opens a single
+result directly. When two or more entries are marked with Tab, Enter sends those
+results to Trouble. File-only results render as a clean list of icons and names,
+without synthetic `0:0` positions; search and LSP results keep their source
+locations. `<C-t>` sends the selected results to the same Trouble view, or all
+results when nothing is marked. Plain quickfix and location-list actions are
+disabled for these pickers.
 
 It also registers as the implementation of `vim.ui.select`. Plugin prompts —
 including future LSP code-action choices — therefore use the same fzf interface
@@ -835,11 +843,14 @@ it to handle the cmdline, editor messages, and LSP documentation only.
 already renders a colored `diagnostics` component in `lualine_b`, and both read
 the same counts. Adding it would show every count twice.
 
-[trouble.nvim](https://github.com/folke/trouble.nvim) provides an expandable
-panel when a list needs more context: `<leader>Td` toggles workspace diagnostics,
-`<leader>TD` limits it to the current buffer, and `<leader>Tq` / `<leader>Tl`
-toggle quickfix and location lists. The established FzfLua navigation mappings
-remain the direct way to jump to LSP locations.
+[trouble.nvim](https://github.com/folke/trouble.nvim) provides a 12-line bottom
+panel for diagnostics and result lists. It takes focus when opened, leaves the
+source buffer alone while navigating, and closes with `q` or Escape. Enter jumps
+to an item; `o` jumps and closes the panel. `<leader>Td` toggles workspace
+diagnostics, `<leader>TD` limits them to the current buffer, `<leader>Ts` opens a
+right-side document outline without moving focus, and `<leader>Tr` shows LSP
+references. `<leader>Tq` and `<leader>Tl` show quickfix and location-list data
+through Trouble.
 
 **Focus and motion.** `<leader>uz` toggles Zen mode's centred floating workspace.
 `<leader>ux` independently toggles Twilight's inactive-code dimming; Zen does
@@ -890,7 +901,8 @@ on with `vim.lsp.enable{...}` and this repo's overrides are layered on with
 ### Keymaps: classic navigation, FZF for locations
 
 Location requests use short Vim-style keys and fzf-lua. A single result jumps
-directly; multiple results open the picker instead of filling quickfix:
+directly; multiple results open the picker. Enter opens its current result
+directly, while two or more Tab-selected results open together in Trouble:
 
 | Key  | Action          |
 | ---- | --------------- |
@@ -956,7 +968,7 @@ Python intentionally attaches both basedpyright and Ruff. Basedpyright owns
 type-aware completion, navigation and hover, but its diagnostics and type
 checking are disabled. Ruff owns live lint diagnostics, import organization and
 formatting; mypy is the authoritative project-wide static checker and runs on
-demand into quickfix with `<leader>cpm`.
+demand with `<leader>cpm`. Its findings open in Trouble.
 
 RobotCode is globally pinned with its language-server, analysis and lint extras,
 alongside global Robot Framework and Robocop commands. Its launcher checks the
@@ -988,8 +1000,8 @@ yamlls receives an explicit Kubernetes schema for conventional manifest paths:
 `*.k8s.yaml`/`*.k8s.yml`. Both `.yaml` and `.yml` are covered at any
 directory depth. Other layouts can opt in per file with a YAML language-server
 schema modeline. Schema validation stays interactive in the LSP; the fuller
-kubeconform check is an on-demand quickfix command described under
-[Linting](#linting). Inside a Helm chart the schema arrives by a different
+kubeconform check runs on demand and sends its results to Trouble as described
+under [Linting](#linting). Inside a Helm chart the schema arrives by a different
 route, but it is generated from the same directory and filename lists; see
 below.
 
@@ -1227,8 +1239,8 @@ fast, file-local checks that do not duplicate a language server:
 | `hadolint` | Dockerfile | Open and write     |
 
 Potentially slower checks use the shared asynchronous runner, replace the
-quickfix list on completion, open it when findings exist and close it after a
-clean run. They never block Neovim and never run on save:
+quickfix list on completion, and display findings in Trouble. A clean run
+closes the Trouble results view. They never block Neovim and never run on save:
 
 | Key           | Check                                         |
 | ------------- | --------------------------------------------- |
@@ -1243,7 +1255,8 @@ latency on large repositories. kubeconform likewise stays explicit because
 most YAML is not Kubernetes, and a filename/path heuristic should not decide
 whether every save launches schema validation. mypy is similarly explicit: it
 walks the project and maintains `.mypy_cache`, while Ruff remains the fast live
-feedback path.
+feedback path. The quickfix list remains the shared backing store for these
+checks, so Trouble and native quickfix consumers see the same items.
 
 This is separate from `hk.pkl`, which formats and lints **this repository's own
 files** at commit time. conform and nvim-lint act in the editor, on whatever
@@ -1785,9 +1798,9 @@ was read but not rewritten.
   A string-valued `spec.replicas` is reported as `Expected "integer"`.
 - Linting, including the mappings themselves: `<leader>cgl` and
   `<leader>cgL` run the real golangci-lint JSON command asynchronously and put
-  its `govet` finding in quickfix; the uppercase mapping executes the `--fix`
-  variant. `<leader>ckl` downloads the Kubernetes schema, reports an invalid
-  `spec.replicas` as an error and uses kubeconform's actual
+  its `govet` finding in the quickfix list; the uppercase mapping executes the
+  `--fix` variant. `<leader>ckl` downloads the Kubernetes schema, reports an
+  invalid `spec.replicas` as an error and uses kubeconform's actual
   `statusValid`/`statusInvalid` JSON vocabulary. None of these batch checks is
   registered on `BufWritePost`.
 - Testing: the neotest-golang adapter loads, recognises `main_test.go` as a test

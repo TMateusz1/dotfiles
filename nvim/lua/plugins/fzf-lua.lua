@@ -4,6 +4,7 @@ return {
   cmd = "FzfLua",
   keys = {
     { "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Find files" },
+    { "<leader>fb", "<cmd>FzfLua buffers<cr>", desc = "Find buffers" },
     { "<leader>fg", "<cmd>FzfLua live_grep<cr>", desc = "Live grep" },
     { "<leader>fr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent files" },
     { "<leader>fh", "<cmd>FzfLua helptags<cr>", desc = "Help tags" },
@@ -12,14 +13,37 @@ return {
     { "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", desc = "Document diagnostics" },
     { "<leader>fG", "<cmd>FzfLua git_status<cr>", desc = "Git status" },
   },
-  opts = {
-    lsp = {
-      jump1 = true,
-      code_actions = {
-        jump1 = false,
-        previewer = "codeaction",
+  opts = function()
+    local fzf_actions = require("fzf-lua.actions")
+    local trouble_actions = require("trouble.sources.fzf").actions
+
+    return {
+      actions = {
+        files = {
+          -- Keep single-result Enter fast; send a multi-selection to Trouble.
+          ["enter"] = function(selected, opts)
+            if #selected > 1 then
+              return trouble_actions.open_selected.fn(selected, opts)
+            end
+            return fzf_actions.file_edit(selected, opts)
+          end,
+          ["ctrl-t"] = trouble_actions.open,
+          -- Do not send selected results to Neovim's plain quickfix window.
+          ["alt-q"] = false,
+          ["alt-Q"] = false,
+        },
       },
-    },
-    ui_select = {},
-  },
+      buffers = {
+        fzf_opts = { ["--multi"] = true },
+      },
+      lsp = {
+        jump1 = true,
+        code_actions = {
+          jump1 = false,
+          previewer = "codeaction",
+        },
+      },
+      ui_select = {},
+    }
+  end,
 }

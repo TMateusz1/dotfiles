@@ -1,6 +1,6 @@
 -- Run deliberate, potentially slow checks without blocking Neovim and publish
--- their results as a fresh quickfix list. Callers own command construction and
--- output parsing so this stays useful for tools with structured output.
+-- their results as a fresh quickfix list for Trouble's qflist view. Callers
+-- own command construction and output parsing for their structured output.
 local M = {}
 
 local running = {}
@@ -63,11 +63,12 @@ function M.run(opts)
       end
 
       vim.fn.setqflist({}, " ", { title = opts.title, items = items })
+      pcall(vim.cmd, "cclose")
       if #items > 0 then
-        vim.cmd("copen")
+        require("trouble").open({ mode = "qflist", focus = false })
         vim.notify(("%s finished with %d finding%s"):format(opts.title, #items, #items == 1 and "" or "s"))
       else
-        vim.cmd("cclose")
+        require("trouble").close("qflist")
         vim.notify(opts.title .. " finished cleanly")
       end
     end)

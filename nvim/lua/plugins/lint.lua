@@ -9,10 +9,11 @@
 --   stays in mise and is run deliberately — `golangci-lint run`, or in CI.
 -- * **Kubernetes manifests.** kubeconform is installed and is the right tool,
 --   but it is not wired to run on save. <leader>ckl validates the current file
---   deliberately and publishes the result to quickfix.
+--   deliberately and opens the findings in Trouble.
 -- * **Python type checking.** mypy can traverse a whole project and build an
---   incremental cache, so <leader>cpm runs it deliberately into quickfix
---   instead of blocking every write. Ruff's fast LSP diagnostics remain live.
+--   incremental cache, so <leader>cpm runs it deliberately and reports results
+--   in Trouble instead of blocking every write. Ruff's fast LSP diagnostics
+--   remain live.
 --
 -- See docs/nvim.md#linting.
 local function python_root(path)
