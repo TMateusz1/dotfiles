@@ -435,18 +435,19 @@ grammars are per-language build artifacts of a CLI that mise itself pins.
 
 ### Parsers
 
-38 are declared, in one list in `lua/plugins/treesitter.lua`:
+39 are declared, in one list in `lua/plugins/treesitter.lua`:
 
-| Group           | Parsers                                                                                                                                        |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Go              | `go`, `gomod`, `gosum`, `gowork`, `gotmpl`                                                                                                     |
-| Rust            | `rust`                                                                                                                                         |
-| JavaScript / TS | `javascript`, `jsdoc`, `typescript`, `tsx`                                                                                                     |
-| Shell           | `bash`                                                                                                                                         |
-| Python          | `python`, `robot`                                                                                                                              |
-| Data / config   | `toml`, `json`, `yaml`, `xml`, `ini`, `csv`, `sql`, `dockerfile`, `make`, `markdown`, `markdown_inline`, `regex`, `ssh_config`, `editorconfig` |
-| git             | `diff`, `gitattributes`, `gitcommit`, `gitignore`, `git_config`, `git_rebase`                                                                  |
-| Neovim itself   | `lua`, `luadoc`, `vim`, `vimdoc`, `query`                                                                                                      |
+| Group            | Parsers                                                                                                                                        |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Go               | `go`, `gomod`, `gosum`, `gowork`, `gotmpl`                                                                                                     |
+| Rust             | `rust`                                                                                                                                         |
+| JavaScript / TS  | `javascript`, `jsdoc`, `typescript`, `tsx`                                                                                                     |
+| Shell            | `bash`                                                                                                                                         |
+| Python           | `python`, `robot`                                                                                                                              |
+| Protocol Buffers | `proto`                                                                                                                                        |
+| Data / config    | `toml`, `json`, `yaml`, `xml`, `ini`, `csv`, `sql`, `dockerfile`, `make`, `markdown`, `markdown_inline`, `regex`, `ssh_config`, `editorconfig` |
+| git              | `diff`, `gitattributes`, `gitcommit`, `gitignore`, `git_config`, `git_rebase`                                                                  |
+| Neovim itself    | `lua`, `luadoc`, `vim`, `vimdoc`, `query`                                                                                                      |
 
 Robot Framework needs no custom *filetype* wiring: Neovim already resolves both
 `.robot` and `.resource` to filetype `robot` (verified), so they share the
@@ -857,7 +858,7 @@ sits. Moving the cmdline above the statusline is what noice is here for.
 
 ## LSP
 
-Nine servers, all enabled from `lua/plugins/lsp.lua`:
+Ten servers, all enabled from `lua/plugins/lsp.lua`:
 
 | Server          | Language         | Executable source                   |
 | --------------- | ---------------- | ----------------------------------- |
@@ -870,6 +871,7 @@ Nine servers, all enabled from `lua/plugins/lsp.lua`:
 | `basedpyright`  | Python           | `npm:basedpyright`                  |
 | `robotcode`     | Robot Framework  | `pipx:robotcode` global/local-first |
 | `rust_analyzer` | Rust             | `aqua:rust-lang/rust-analyzer`      |
+| `buf_ls`        | Protocol Buffers | `aqua:bufbuild/buf`                 |
 
 **No mason.nvim.** Every baseline binary is pinned in mise and resolved from
 `$PATH`; Neovim configures clients and never installs anything. RobotCode adds
@@ -1199,7 +1201,9 @@ globally available yamlfmt outside this dotfiles repo. Helm templates are not
 fed to a generic YAML formatter because Go-template expressions are not plain
 YAML. For Robot Framework, conform's LSP fallback uses whichever RobotCode
 client won the local/global selection; the separately exposed `robocop format`
-command is also available globally.
+command is also available globally. Protocol Buffers uses the same LSP fallback
+for `buf_ls` formatting, so the Buf CLI supplies formatting and live lint
+diagnostics without a second formatter or linter.
 
 **Format on save is on by default and switchable at two levels**, because the
 common failure mode is opening someone else's repo with a different style:

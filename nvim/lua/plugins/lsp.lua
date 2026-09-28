@@ -258,6 +258,7 @@ return {
       "basedpyright",
       "robotcode",
       "rust_analyzer",
+      "buf_ls",
     })
 
     -- Buffer-local keymaps --------------------------------------------------

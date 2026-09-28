@@ -57,7 +57,8 @@ Global (`mise/config.toml`):
   a Docker daemon.
 - Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
   `gofumpt`, `gotestsum`) and `python`; editor tooling includes basedpyright,
-  Ruff, mypy, RobotCode/Robot Framework/Robocop, Helm 4/helm-ls, YAML language
+  Ruff, mypy, RobotCode/Robot Framework/Robocop, Buf for Protocol Buffers,
+  Helm 4/helm-ls, YAML language
   tooling, yamlfmt and kubeconform. uv powers the isolated `pipx:` Python CLI
   installs — see [langs.md](./langs.md)
 - `neovim` — editor, see [nvim.md](./nvim.md)

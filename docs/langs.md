@@ -82,6 +82,19 @@ unconditionally `~/Library/Application Support`, not read from the
 environment at all. Nothing is set there; noted here only so a future "why
 isn't `~/.config/go/env` doing anything" doesn't cost time.
 
+## Protocol Buffers
+
+The global mise config pins [Buf](https://buf.build/docs/cli/) as
+`aqua:bufbuild/buf`. Its `buf lsp serve` command provides the `.proto` language
+server; Neovim enables nvim-lspconfig's `buf_ls` definition and the `proto`
+Treesitter parser. The server supplies completion, navigation, live lint
+diagnostics and formatting. Conform uses LSP formatting on save and for
+`<leader>cf`, so no separate Protobuf formatter is configured.
+
+Buf reads each project's own `buf.yaml` when present. This dotfiles repo has
+no Protobuf sources or Buf module, so it does not ship a `buf.yaml` or run Buf
+checks through its repo-level `hk.pkl`.
+
 ## python and Robot Framework
 
 The global config pins Python, basedpyright, Ruff and mypy. Their responsibilities

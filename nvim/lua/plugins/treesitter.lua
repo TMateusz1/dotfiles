@@ -28,6 +28,9 @@ local parsers = {
   "python",
   "robot",
 
+  -- Protocol Buffers
+  "proto",
+
   -- Data / config formats
   "toml",
   "json",

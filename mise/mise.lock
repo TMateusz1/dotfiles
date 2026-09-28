@@ -175,6 +175,29 @@ url = "https://github.com/atuinsh/atuin/releases/download/v18.23.0/atuin-aarch64
 url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/580134148"
 provenance = "github-attestations"
 
+[[tools."aqua:bufbuild/buf"]]
+version = "1.73.0"
+backend = "aqua:bufbuild/buf"
+specifiers = ["1.73.0"]
+
+[tools."aqua:bufbuild/buf"."platforms.linux-arm64"]
+checksum = "sha256:e928fa64061ddb5144d93df30fe48f3451231b0e77ea5ade684cb7b53037cc66"
+url = "https://github.com/bufbuild/buf/releases/download/v1.73.0/buf-Linux-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/557280183"
+provenance = "minisign"
+
+[tools."aqua:bufbuild/buf"."platforms.linux-x64"]
+checksum = "sha256:f8092c1be08d5606a8d22b4ae0e4079dd690154cebb4894dc5e24a5046093aff"
+url = "https://github.com/bufbuild/buf/releases/download/v1.73.0/buf-Linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/557280270"
+provenance = "minisign"
+
+[tools."aqua:bufbuild/buf"."platforms.macos-arm64"]
+checksum = "sha256:7eb1b167b729815b470e88d85cc1dbcb5d16bfbe73af248c9ed20cfbc4de060b"
+url = "https://github.com/bufbuild/buf/releases/download/v1.73.0/buf-Darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/557280123"
+provenance = "minisign"
+
 [[tools."aqua:charmbracelet/glow"]]
 version = "3.0.0"
 backend = "aqua:charmbracelet/glow"

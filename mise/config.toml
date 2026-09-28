@@ -51,6 +51,9 @@ disable_backends = ["asdf", "vfox"]
 "aqua:mrjosh/helm-ls" = "0.5.4"                                                 # Helm language server
 "aqua:hadolint/hadolint" = "2.15.1"                                             # Dockerfile linter
 
+# Protocol Buffers
+"aqua:bufbuild/buf" = "1.73.0" # Language server, formatter, and linter
+
 # Other stuff
 # Shared CLI tools
 "aqua:atuinsh/atuin" = "18.23.0"                         # Shell history search
