@@ -29,5 +29,6 @@ require("lazy").setup({
     { import = "plugins" },
   },
   install = { colorscheme = { "catppuccin" } },
+  rocks = { enabled = false }, -- none of the configured plugins need LuaRocks
   checker = { enabled = true },
 })

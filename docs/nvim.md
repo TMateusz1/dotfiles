@@ -30,11 +30,11 @@ mise only, Catppuccin theming).
 | [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)                                               | Code outline                       | `<leader>cs` toggles a wide symbol outline on the right while keeping focus in the source window. Uses Treesitter with LSP fallback and the configured Nerd Font — see "Code outline" below.                                                                                     |
 | [sindrets/diffview.nvim](https://github.com/sindrets/diffview.nvim)                                           | Repository diff and file history   | Reviews all changed files in a dedicated tab, replacing Gitsigns' single-buffer diffs under `<leader>G`.                                                                                                                                                                         |
 | [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)                                         | Git gutter + hunk operations       | Shows added/changed/deleted lines and provides preview, stage, reset and blame actions under `<leader>G` — see "Git signs and diffs" below.                                                                                                                                      |
-| [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use Neovim's native confirmation prompt.                                                                                                      |
+| [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use the shared save/discard/cancel command-bar prompt.                                                                                        |
 | [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)                 | Indent guides + active scope       | Draws subtle guides with virtual text and highlights the current Treesitter scope. Uses Catppuccin's official integration.                                                                                                                                                       |
 | [nvim-mini/mini.ai](https://github.com/nvim-mini/mini.ai)                                                     | Extended text objects              | Adds arguments, function calls, tags and robust pair objects while preserving Neovim's native `an`/`in` Treesitter selection.                                                                                                                                                    |
 | [nvim-mini/mini.icons](https://github.com/nvim-mini/mini.icons)                                               | File/directory icons               | Replaces `nvim-web-devicons`, which is no longer installed. Catppuccin themes its highlight groups; devicons' fixed brand colors were the one non-Catppuccin palette left — see "Icons" below.                                                                                   |
-| [nvim-mini/mini.surround](https://github.com/nvim-mini/mini.surround)                                         | Surround editing                   | Adds coherent `sa`/`sd`/`sr` operations with dot-repeat, counts and Catppuccin highlighting.                                                                                                                                                                                     |
+| [nvim-mini/mini.surround](https://github.com/nvim-mini/mini.surround)                                         | Surround editing                   | Adds coherent `gsa`/`gsd`/`gsr` operations with dot-repeat, counts and Catppuccin highlighting.                                                                                                                                                                                  |
 | [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) | Syntax-aware function navigation   | Supplies maintained `@function.outer` queries for `[f` and `]f`; configured against its `main` branch API.                                                                                                                                                                       |
 | [Wansmer/treesj](https://github.com/Wansmer/treesj)                                                           | Split/join argument layouts        | `<leader>s` toggles the syntax node under the cursor between single-line and multiline forms using Treesitter.                                                                                                                                                                   |
 | [folke/noice.nvim](https://github.com/folke/noice.nvim)                                                       | Cmdline + message UI               | Renders the cmdline as a bar docked *above* the statusline, so the bottom reads tmux → lualine → commands. Pulls in `nui.nvim` — see "Bottom of the screen" below.                                                                                                               |
@@ -90,6 +90,23 @@ locations. `<C-t>` sends the selected results to the same Trouble view, or all
 results when nothing is marked. Plain quickfix and location-list actions are
 disabled for these pickers.
 
+The action table inherits fzf-lua's defaults: `<C-s>` opens a horizontal split,
+`<C-v>` opens a vertical split, and `Alt-h` / `Alt-i` toggle hidden / ignored
+files. `<F1>` displays picker help, including the named Enter/Trouble action.
+
+Four shortcuts make less frequent pickers easier to reach:
+
+| Key          | Action                                              |
+| ------------ | --------------------------------------------------- |
+| `<leader>fF` | Combined files, buffers and symbol picker           |
+| `<leader>f.` | Resume the last picker with its query               |
+| `<leader>fk` | Search keymaps                                      |
+| `<leader>fq` | Search check results from the current quickfix list |
+
+In the combined picker, start the query with `$` for buffers, `@` for document
+symbols or `#` for workspace symbols. Existing dedicated picker keys remain
+available.
+
 It also registers as the implementation of `vim.ui.select`. Plugin prompts —
 including future LSP code-action choices — therefore use the same fzf interface
 instead of Neovim's numbered command-line menu. This requires fzf-lua to load
@@ -115,10 +132,9 @@ the outline keeps Aerial's standard navigation, split-opening and tree-folding
 keys. It prefers Treesitter symbols and falls back to LSP and its other built-in
 backends, so it remains useful before an LSP client attaches.
 
-The outline occupies 40% of the editor, capped at 80 columns and with a
-20-column minimum. That doubles Aerial's default 20%/40-column ceiling;
-content-based resizing is disabled so short symbol names do not collapse it
-back into a narrow strip.
+The outline uses 25% of the editor, with a 20-column minimum and a ceiling of
+the lesser of 80 columns or 40% of the editor. Content-based resizing is disabled
+so short symbol names do not collapse it into a narrow strip.
 
 The configured terminal uses a Nerd Font, so Aerial's symbol icons are enabled
 explicitly. Its automatic detection only recognizes nvim-web-devicons or
@@ -254,20 +270,21 @@ Mini AI's extended-search variants use uppercase suffixes so Neovim's native
 | `aL`/`iL` | Around/inside the previous object   |
 | `g[`/`g]` | Move to the left/right object edge  |
 
-mini.surround keeps its concise defaults:
+mini.surround uses a `gs` prefix so Flash's `s` jump does not wait for a possible
+surround action:
 
 | Key           | Action                                           |
 | ------------- | ------------------------------------------------ |
-| `sa`          | Add a surrounding around a motion or selection   |
-| `sd`          | Delete a surrounding                             |
-| `sr`          | Replace a surrounding                            |
-| `sf`/`sF`     | Find a surrounding to the right/left             |
-| `sh`          | Highlight the surrounding under the cursor       |
+| `gsa`         | Add a surrounding around a motion or selection   |
+| `gsd`         | Delete a surrounding                             |
+| `gsr`         | Replace a surrounding                            |
+| `gsf`/`gsF`   | Find a surrounding to the right/left             |
+| `gsh`         | Highlight the surrounding under the cursor       |
 | `{action}l/n` | Apply an action to the previous/next surrounding |
 
-These mappings deliberately claim the `s` prefix; use `cl` for Neovim's
-single-character substitute operation. Surround edits support counts and
-dot-repeat.
+For example, `gsaiw)` surrounds the current word with parentheses. WhichKey
+labels `gs` **Surround**. Flash owns `s`; use `cl` for Neovim's single-character
+substitute operation. Surround edits support counts and dot-repeat.
 
 Function-definition navigation is Treesitter-aware rather than based on brace
 layout. `[f` jumps to the previous function start and `]f` to the next, in
@@ -395,6 +412,11 @@ the editor. `<leader>f` is labelled **Find**, `<leader>G` **Git** and
 already attached to each keymap; `<leader>q` is the direct **Smart close**
 action and `<leader>Q` is **Smart quit all**, rather than either key forming a
 prefix group. `<leader>?` shows only mappings local to the current buffer.
+
+Use `<leader>fk` to search all keymaps by description. The main namespaces are
+`f` for finding, `c` for code, `G` for Git, `t` for tests, `T` for Trouble lists,
+`u` for toggles and `x` for closing buffers. The Go/Kubernetes/Python check keys
+remain under `cg` / `ck` / `cp` and appear only in their relevant filetypes.
 
 MiniClue was considered because Mini AI and Mini Surround are already present.
 WhichKey is a better fit here: it discovers described mappings and their prefix
@@ -800,7 +822,8 @@ Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
   search's highlighted matches clear without needing a separate keybind or
   losing Esc's usual behavior. `<leader>w` writes the current file normally;
   `<leader>W` uses Neovim's native `:write ++p` to create missing parent
-  directories before writing.
+  directories before writing. `<leader>cd` shows line diagnostics, including
+  nvim-lint findings in buffers without an LSP client.
   `<leader>q` closes the focused float, current buffer or editor according to
   context; `<leader>Q` always quits the entire editor. Both close mappings use
   the unsaved-aware flow — see
@@ -850,7 +873,36 @@ to an item; `o` jumps and closes the panel. `<leader>Td` toggles workspace
 diagnostics, `<leader>TD` limits them to the current buffer, `<leader>Ts` opens a
 right-side document outline without moving focus, and `<leader>Tr` shows LSP
 references. `<leader>Tq` and `<leader>Tl` show quickfix and location-list data
-through Trouble.
+through Trouble. `<leader>Tf` reopens the last fzf results in their appropriate
+file-only or source-location view.
+
+### Search and check results
+
+Keep Trouble for persistent result lists. fzf-lua handles querying and previewing;
+Trouble keeps selected search results and check findings available while editing.
+Its [fzf integration](https://github.com/folke/trouble.nvim#fzf-lua) supplies the
+selection actions directly.
+
+| Task                         | Action                                        |
+| ---------------------------- | --------------------------------------------- |
+| Open one search result       | Enter in fzf                                  |
+| Keep selected search results | Tab to select, then Enter or `<C-t>`          |
+| Keep all filtered results    | `<C-t>` with nothing selected                 |
+| Reopen those search results  | `<leader>Tf`                                  |
+| Run a deliberate check       | `<leader>cgl`, `<leader>ckl` or `<leader>cpm` |
+| Reopen check results         | `<leader>Tq`                                  |
+| Search check results         | `<leader>fq`                                  |
+
+Search results use Trouble's fzf source; check results use the native quickfix
+list. Sending a search to Trouble therefore preserves the most recent check
+results. Checks open their panel without moving focus from the source buffer,
+and a clean run closes that panel. A failed command preserves the previous
+results, and a failed process start can be retried.
+
+Use `<leader>cs` for the usual symbol outline. Aerial works with Treesitter before
+an LSP attaches and participates in session restoration; `<leader>Ts` retains
+Trouble's alternative LSP outline. Oil, Neo-tree, Gitsigns and Diffview likewise
+keep their existing editing/sidebar and hunk/repository roles.
 
 **Focus and motion.** `<leader>uz` toggles Zen mode's centred floating workspace.
 `<leader>ux` independently toggles Twilight's inactive-code dimming; Zen does
@@ -936,6 +988,9 @@ LSP buffer.
 | `<leader>cR` | Restart the client                                |
 | `<leader>cs` | Toggle Aerial's document-symbol sidebar           |
 | `<leader>uh` | Toggle inlay hints                                |
+
+Formatting and line diagnostics are global mappings, available before an LSP
+attaches. Conform owns `<leader>cf`; the base keymap config owns `<leader>cd`.
 
 Code actions always open fzf-lua, including when only one action is available,
 so the proposed edit can be previewed before applying it. Visual mode passes
@@ -1105,6 +1160,11 @@ in a rounded, Catppuccin-colored popup (see [Float borders](#native-ui)).
 path** gives the whole package's documentation, which covers package browsing
 without a dedicated godoc plugin. `gK` (signature help) shares the same popup
 styling, since noice routes both through its `hover` view.
+
+[Blink's signature help](https://cmp.saghen.dev/configuration/signature) owns the
+automatic popup while typing function arguments. Noice's automatic signature
+trigger is disabled to prevent two simultaneous popups; its manual `gK` renderer
+remains enabled.
 
 ## Completion
 
@@ -1432,13 +1492,11 @@ branch directly:
 | Quit, nothing unsaved   | none — quits immediately                                               |
 | Quit with unsaved work  | `Unsaved: <files>. [w]rite all and quit, [d]iscard and quit, [c]ancel` |
 
-It uses `vim.fn.input()` rather than `vim.ui.select()`, and the reason is this
-section's own layout. The whole question lives in the *cmdline prompt*, which
-noice renders for as long as the prompt is open. A `vim.ui.select()` list is
-emitted as ordinary messages instead, which Noice's transient `mini` view hides
-after two seconds, so the question would fade while it was still being read.
+It uses `vim.fn.input()` so the question stays in Noice's command bar and a
+recognised choice can be answered with one key. `vim.ui.select()` is registered
+to fzf-lua here and would open a separate picker.
 
-Escape, `Ctrl-C` and an empty answer all mean cancel. Nothing here force-deletes
+Escape, `Ctrl-C`, empty and unrecognised answers all mean cancel. Nothing here force-deletes
 unsaved work without an explicit `n`/`d`. Pressing a recognised choice also
 submits it immediately: `y`/`n`/`c` for one buffer, or `w`/`d`/`c` when
 quitting all. Enter remains available for any typed answer.
@@ -1534,6 +1592,9 @@ exact commit, machine-generated and re-written by lazy.nvim itself, not
 hand-edited), lazy-loading, and the officially documented bootstrap
 snippet used above verbatim rather than a hand-rolled installer.
 
+LuaRocks support is disabled: none of these plugins require it, so lazy.nvim
+does not need a separate Lua/hererocks toolchain.
+
 ## Theme
 
 Catppuccin Mocha via the official
@@ -1588,6 +1649,29 @@ their flavour in explicitly, which would hardcode the choice a second place and
 let the two drift apart.
 
 ## Validation
+
+The 2026-09-30 review loaded all 44 locked plugins with a real terminal UI in a
+separate tmux server. All configured tool binaries were present. Two installed
+plugin directories differed from the lockfile; their exact committed revisions
+were extracted into a temporary directory for verification. The lockfile and
+installed plugin checkouts were left untouched.
+
+Nine focused workflow checks passed: global formatting/diagnostics without an
+LSP; real Stylua formatting with save formatting disabled; typed surround edits
+and Flash's independent `s`; save/cancel/discard including unrecognised answers;
+fzf single and multiple selection; reopening both fzf result modes; asynchronous
+quickfix/Trouble results; process failure/retry; and retained navigation/Diffview
+mappings. The real `cgl`, `ckl` and `cpm` shortcuts also produced parsed findings
+from golangci-lint, kubeconform and mypy in scratch projects. The kubeconform
+check covered malformed YAML and an empty clean file, without fetching schemas.
+Typing a Go call was checked separately for a single Blink signature popup and
+manual `gK` for a Noice popup. State, caches and test files were temporary, and
+session saving was disabled. These are one-time checks, not new linting steps.
+
+Built-in plugin health checks were also reviewed. Optional DAP integrations are
+absent, Noice intentionally leaves notifications to Fidget, and WhichKey reports
+normal operator/text-object prefix overlaps. Those checks do not require adding
+debuggers, a second notification plugin or a LuaRocks toolchain.
 
 Verified against the real, installed `nvim` binary (0.12.5, via mise). The
 installation, parser and save/restore-cycle checks used scratch
@@ -1664,7 +1748,7 @@ was read but not rewritten.
   installed.
 - Mini editing: `aN`/`iN` and `aL`/`iL` provide Mini AI's extended object
   searches without replacing native `an`/`in`; Mini Surround owns the
-  `sa`/`sd`/`sr` family and uses Catppuccin's `MiniSurround` highlight.
+  `gsa`/`gsd`/`gsr` family and uses Catppuccin's `MiniSurround` highlight.
 - Pairs: fifteen cases driven as real typed keystrokes into a scratch buffer,
   comparing the resulting buffer text against an expected string. The reported
   failure is fixed and stays fixed: `"qafasf` plus `"` yields `"qafasf"`, and

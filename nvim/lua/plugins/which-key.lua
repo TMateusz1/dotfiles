@@ -7,7 +7,7 @@ return {
     delay = 250,
     spec = {
       { "<leader>G", group = "Git" },
-      { "<leader>T", group = "Trouble" },
+      { "<leader>T", group = "Trouble lists" },
       { "<leader>c", group = "Code" },
       { "<leader>cg", group = "Go" },
       { "<leader>ck", group = "Kubernetes" },
@@ -17,6 +17,7 @@ return {
       { "<leader>t", group = "Test" },
       { "<leader>u", group = "Toggle" },
       { "<leader>x", group = "Close buffers" },
+      { "gs", group = "Surround", mode = { "n", "x", "o" } },
     },
     win = {
       border = "rounded",

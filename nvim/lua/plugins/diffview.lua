@@ -1,3 +1,8 @@
+local close_keys = {
+  { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
+  { "n", "<leader>q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
+}
+
 return {
   "sindrets/diffview.nvim",
   cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },
@@ -12,26 +17,11 @@ return {
   },
   opts = {
     keymaps = {
-      view = {
-        { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-        { "n", "<leader>q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-      },
-      file_panel = {
-        { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-        { "n", "<leader>q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-      },
-      file_history_panel = {
-        { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-        { "n", "<leader>q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-      },
-      option_panel = {
-        { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-        { "n", "<leader>q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-      },
-      help_panel = {
-        { "n", "q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-        { "n", "<leader>q", "<cmd>DiffviewClose<cr>", { desc = "Close Diffview" } },
-      },
+      view = close_keys,
+      file_panel = close_keys,
+      file_history_panel = close_keys,
+      option_panel = close_keys,
+      help_panel = close_keys,
     },
   },
 }

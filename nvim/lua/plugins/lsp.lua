@@ -287,12 +287,8 @@ return {
         map("n", "gK", vim.lsp.buf.signature_help, "Signature help")
 
         map({ "n", "x" }, "<leader>ca", function()
-          require("fzf-lua").lsp_code_actions({ jump1 = false })
+          require("fzf-lua").lsp_code_actions()
         end, "Code action")
-        map("n", "<leader>cd", vim.diagnostic.open_float, "Line diagnostics")
-        map("n", "<leader>cf", function()
-          require("conform").format({ async = true, lsp_format = "fallback" })
-        end, "Format buffer")
         map("n", "<leader>ci", "<cmd>LspInfo<cr>", "LSP info")
         map("n", "<leader>cl", vim.lsp.codelens.run, "Run code lens")
         map("n", "<leader>cr", vim.lsp.buf.rename, "Rename symbol")

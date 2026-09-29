@@ -163,10 +163,26 @@ the current pane's directory. Statusline hand-rolled in Catppuccin Mocha
 plugins, just tmux's own format strings, which also means there's nothing
 here to vet for trust beyond tmux itself.
 
+`prefix w` captures the current session ID before filtering windows, including
+when several sessions are attached. `run-shell -C` executes a native tmux command
+and `##` delays the per-item format expansion; no shell command is needed.
+Terminal overrides and features use fixed array
+slots 10–12, preserving tmux's built-in entries and keeping repeated config
+reloads from appending duplicate capabilities. The status blocks use square
+edges and the same Mocha colors with fewer redundant style changes.
+
 **Validation:** there's no established third-party linter for `tmux.conf`
 (nothing comparable to `taplo`/`rumdl` exists for tmux config syntax), and
 per this repo's policy no custom step fills the gap — see
 [linting.md](./linting.md). Not checked automatically going forward.
+
+The 2026-09-30 review loaded the original and revised configs in separate
+temporary tmux 3.7c servers. Three reloads left every revised option and binding
+identical. Terminal capability values matched the original config; other options
+and bindings matched apart from the intended window-picker filter, shorter
+status formats and unused palette variables. With two attached test clients,
+the actual `prefix w` picker showed only its client's current session.
+The real desktop clipboard/SSH round trip was not repeated in this review.
 
 ## yazi
 

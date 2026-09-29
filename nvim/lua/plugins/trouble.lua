@@ -14,7 +14,14 @@ return {
       desc = "Trouble: Document symbols",
     },
     { "<leader>Tr", "<cmd>Trouble lsp_references toggle<cr>", desc = "Trouble: LSP references" },
-    { "<leader>Tq", "<cmd>Trouble qflist toggle<cr>", desc = "Trouble: Results" },
+    { "<leader>Tq", "<cmd>Trouble qflist toggle<cr>", desc = "Trouble: Check results (quickfix)" },
+    {
+      "<leader>Tf",
+      function()
+        require("trouble").toggle({ mode = require("trouble.sources.fzf").mode() })
+      end,
+      desc = "Trouble: Search results (fzf)",
+    },
     { "<leader>Tl", "<cmd>Trouble loclist toggle<cr>", desc = "Trouble: Location list" },
   },
   opts = {

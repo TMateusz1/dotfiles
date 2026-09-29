@@ -27,7 +27,11 @@ return {
 
     for _, key in ipairs({ "y", "n", "c", "w", "d" }) do
       for _, variant in ipairs({ key, key:upper() }) do
-        vim.keymap.set("c", variant, submit_choice(variant), { expr = true, silent = true })
+        vim.keymap.set("c", variant, submit_choice(variant), {
+          expr = true,
+          silent = true,
+          desc = "Answer save/quit prompt: " .. variant,
+        })
       end
     end
   end,
@@ -61,7 +65,11 @@ return {
       cmdline = { position = { row = "99%", col = 0 } },
     },
     notify = { enabled = false },
-    lsp = { progress = { enabled = false } },
+    lsp = {
+      progress = { enabled = false },
+      -- Blink owns signature help while typing; Noice still renders gK.
+      signature = { auto_open = { enabled = false } },
+    },
     presets = {
       -- Long messages open in a split instead of being truncated.
       long_message_to_split = true,

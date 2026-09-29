@@ -38,7 +38,7 @@ function M.run(opts)
   running[opts.name] = true
   vim.notify(opts.title .. " started")
 
-  vim.system(opts.cmd, { cwd = opts.cwd, text = true }, function(result)
+  local started, err = pcall(vim.system, opts.cmd, { cwd = opts.cwd, text = true }, function(result)
     vim.schedule(function()
       running[opts.name] = nil
 
@@ -73,6 +73,11 @@ function M.run(opts)
       end
     end)
   end)
+
+  if not started then
+    running[opts.name] = nil
+    vim.notify(opts.title .. " could not start: " .. tostring(err), vim.log.levels.ERROR)
+  end
 end
 
 return M

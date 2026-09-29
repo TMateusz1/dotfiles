@@ -8,6 +8,13 @@ return {
   cmd = "ConformInfo",
   keys = {
     {
+      "<leader>cf",
+      function()
+        require("conform").format({ async = true })
+      end,
+      desc = "Format buffer",
+    },
+    {
       "<leader>us",
       function()
         vim.g.disable_autoformat = not vim.g.disable_autoformat

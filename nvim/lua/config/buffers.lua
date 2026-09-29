@@ -1,16 +1,7 @@
--- Closing or quitting with unsaved changes has to ask something. Neovim's own
--- `:confirm` dialog is not usable here: since 0.11.3 the prompt reaches the UI
--- through ext_cmdline, and noice's handling of that path is broken — the
--- question renders as a centred " Confirm " box that never accepts an answer
--- (folke/noice.nvim#1136, closed as not planned; #1185 confirms `routes`
--- cannot redirect it either). Do not simplify any of this back to `:confirm`.
---
--- `vim.fn.input()` is used rather than `vim.ui.select()` because the whole
--- question lives in the *cmdline* prompt, which noice renders for as long as
--- the prompt is open. A `vim.ui.select()` list is emitted as ordinary
--- messages, and with no notification backend installed those land in noice's
--- `mini` view, which times out after two seconds — the question would fade
--- while it is still being answered.
+-- The pinned Neovim/Noice versions cannot answer native `:confirm` prompts
+-- (folke/noice.nvim#1136 and #1185). Keep this on vim.fn.input(): Noice renders
+-- the save/discard/cancel question in its persistent command bar, and choices
+-- can be submitted with one key. vim.ui.select() uses a separate fzf picker.
 -- See docs/nvim.md#quitting-and-closing-with-unsaved-changes.
 
 local M = {}
@@ -67,7 +58,7 @@ function M.close(bufnr)
   end
 
   local answer = ask(("Save changes to %s? [y]es, [n]o, [c]ancel: "):format(label(bufnr)))
-  if answer == "c" then
+  if answer ~= "y" and answer ~= "n" then
     return
   end
 

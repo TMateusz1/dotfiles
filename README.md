@@ -62,6 +62,9 @@ docs/                  # notes on what's configured, and why
 | linting / pre-commit (hk)                                                                | [docs/linting.md](./docs/linting.md)             |
 | bootstrap (symlinks, Zsh integration, desktop apps)                                      | [docs/bootstrap.md](./docs/bootstrap.md)         |
 
+For everyday editor shortcuts, see the [Neovim keymap guide](./docs/nvim.md#keymap-guide)
+and [search/check results workflow](./docs/nvim.md#search-and-check-results).
+
 ## Contributing / working on this repo
 
 `mise install` pulls the repo's own tooling (including

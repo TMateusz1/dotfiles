@@ -46,6 +46,16 @@ return {
     version = "*",
     main = "mini.surround",
     event = "VeryLazy",
-    opts = {},
+    opts = {
+      -- Flash owns `s`; a separate prefix avoids waiting for surround keys.
+      mappings = {
+        add = "gsa",
+        delete = "gsd",
+        replace = "gsr",
+        find = "gsf",
+        find_left = "gsF",
+        highlight = "gsh",
+      },
+    },
   },
 }

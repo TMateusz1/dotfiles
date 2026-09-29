@@ -4,6 +4,7 @@ return {
   cmd = "FzfLua",
   keys = {
     { "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Find files" },
+    { "<leader>fF", "<cmd>FzfLua global<cr>", desc = "Find files / buffers / symbols" },
     { "<leader>fb", "<cmd>FzfLua buffers<cr>", desc = "Find buffers" },
     { "<leader>fg", "<cmd>FzfLua live_grep<cr>", desc = "Live grep" },
     { "<leader>fr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent files" },
@@ -12,6 +13,9 @@ return {
     { "<leader>fS", "<cmd>FzfLua lsp_live_workspace_symbols<cr>", desc = "Workspace symbols" },
     { "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", desc = "Document diagnostics" },
     { "<leader>fG", "<cmd>FzfLua git_status<cr>", desc = "Git status" },
+    { "<leader>f.", "<cmd>FzfLua resume<cr>", desc = "Resume last picker" },
+    { "<leader>fk", "<cmd>FzfLua keymaps<cr>", desc = "Find keymaps" },
+    { "<leader>fq", "<cmd>FzfLua quickfix<cr>", desc = "Find check results (quickfix)" },
   },
   opts = function()
     local fzf_actions = require("fzf-lua.actions")
@@ -20,13 +24,18 @@ return {
     return {
       actions = {
         files = {
+          -- Inherit split-opening and hidden/ignored-file toggles.
+          true,
           -- Keep single-result Enter fast; send a multi-selection to Trouble.
-          ["enter"] = function(selected, opts)
-            if #selected > 1 then
-              return trouble_actions.open_selected.fn(selected, opts)
-            end
-            return fzf_actions.file_edit(selected, opts)
-          end,
+          ["enter"] = {
+            fn = function(selected, opts)
+              if #selected > 1 then
+                return trouble_actions.open_selected.fn(selected, opts)
+              end
+              return fzf_actions.file_edit(selected, opts)
+            end,
+            desc = "open-or-send-to-trouble",
+          },
           ["ctrl-t"] = trouble_actions.open,
           -- Do not send selected results to Neovim's plain quickfix window.
           ["alt-q"] = false,
@@ -37,7 +46,6 @@ return {
         fzf_opts = { ["--multi"] = true },
       },
       lsp = {
-        jump1 = true,
         code_actions = {
           jump1 = false,
           previewer = "codeaction",
