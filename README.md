@@ -64,6 +64,7 @@ docs/                  # notes on what's configured, and why
 
 For everyday editor shortcuts, see the [Neovim keymap guide](./docs/nvim.md#keymap-guide)
 and [search/check results workflow](./docs/nvim.md#search-and-check-results).
+To extend language support, follow [Add a language to Neovim](./docs/nvim-add-new-lang.md).
 
 ## Contributing / working on this repo
 

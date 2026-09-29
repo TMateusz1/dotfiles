@@ -6,6 +6,8 @@ See [AGENTS.md](../AGENTS.md#neovim-conventions-nvim) for the conventions
 this config follows (lazy.nvim, no mason.nvim, LSP server binaries from
 mise only, Catppuccin theming).
 
+For a step-by-step setup procedure, see [Add a language to Neovim](./nvim-add-new-lang.md).
+
 ## Layout
 
 - `init.lua` — sets `mapleader`/`maplocalleader` to Space (must happen
