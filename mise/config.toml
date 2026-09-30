@@ -2,6 +2,8 @@
 lockfile = true
 lockfile_platforms = ["macos-arm64", "linux-arm64", "linux-x64"]
 disable_backends = ["asdf", "vfox"]
+# Install explicitly with --locked; inspection tasks must not install tools.
+task.run_auto_install = false
 
 [tools]
 # Shared defaults for Neovim and the shell. Projects may override these pins
@@ -87,3 +89,13 @@ disable_backends = ["asdf", "vfox"]
 "aqua:starship/starship" = "1.26.0"                      # Shell prompt
 "aqua:mikefarah/yq" = "4.53.6"                           # YAML processor
 "aqua:ajeetdsouza/zoxide" = "0.10.0"                     # Directory jumper
+
+[tasks."global:tools:status"]
+description = "Show active tool versions and mise installation diagnostics"
+dir = "{{cwd}}"
+run = ["mise ls --current", "mise doctor"]
+
+[tasks."global:tools:outdated"]
+description = "Check active tools for newer releases without changing pins"
+dir = "{{cwd}}"
+run = "mise outdated --bump"

@@ -52,7 +52,7 @@ From this repository's root, refresh the staged global lockfile and install:
 
 ```sh
 MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise lock --global
-MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install
+MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install --locked
 ```
 
 The override selects this repository's global config rather than the machine's

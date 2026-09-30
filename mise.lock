@@ -42,26 +42,6 @@ checksum = "sha256:4b417ecb94339d57e4c122ecc948c1a00fe328b5853266de9806e652a9285
 url = "https://github.com/google/yamlfmt/releases/download/v0.21.0/yamlfmt_0.21.0_Darwin_arm64.tar.gz"
 url_api = "https://api.github.com/repos/google/yamlfmt/releases/assets/336650209"
 
-[[tools."aqua:jdx/hk"]]
-version = "2.1.0"
-backend = "aqua:jdx/hk"
-specifiers = ["2.1.0"]
-
-[tools."aqua:jdx/hk"."platforms.linux-arm64"]
-checksum = "sha256:7ffb155147a8a9dae1b571fb31a5d19a35d0175afb5fe3e5b2c652ebf67feb9f"
-url = "https://github.com/jdx/hk/releases/download/v2.1.0/hk-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/jdx/hk/releases/assets/583539437"
-
-[tools."aqua:jdx/hk"."platforms.linux-x64"]
-checksum = "sha256:7a7b28741d16f777d8be90fbcd8523996ee95c2d5222d5b173652d9b37e31969"
-url = "https://github.com/jdx/hk/releases/download/v2.1.0/hk-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/jdx/hk/releases/assets/583539481"
-
-[tools."aqua:jdx/hk"."platforms.macos-arm64"]
-checksum = "sha256:b30c6fb4447b5a9c24f9f80d165dca2d2e682907b8acb8222391e0527fea1ebe"
-url = "https://github.com/jdx/hk/releases/download/v2.1.0/hk-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/jdx/hk/releases/assets/583539442"
-
 [[tools."aqua:koalaman/shellcheck"]]
 version = "0.11.0"
 backend = "aqua:koalaman/shellcheck"
@@ -121,3 +101,23 @@ url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257322600"
 [tools."aqua:tamasfe/taplo"."platforms.macos-arm64"]
 url = "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-darwin-aarch64.gz"
 url_api = "https://api.github.com/repos/tamasfe/taplo/releases/assets/257323110"
+
+[[tools."packslip:github.com/jdx/hk"]]
+version = "2.1.0"
+backend = "packslip:github.com/jdx/hk"
+specifiers = ["2.1.0"]
+
+[tools."packslip:github.com/jdx/hk"."platforms.linux-arm64"]
+checksum = "sha256:7ffb155147a8a9dae1b571fb31a5d19a35d0175afb5fe3e5b2c652ebf67feb9f"
+url = "https://github.com/jdx/hk/releases/download/v2.1.0/hk-aarch64-unknown-linux-gnu.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"
+
+[tools."packslip:github.com/jdx/hk"."platforms.linux-x64"]
+checksum = "sha256:7a7b28741d16f777d8be90fbcd8523996ee95c2d5222d5b173652d9b37e31969"
+url = "https://github.com/jdx/hk/releases/download/v2.1.0/hk-x86_64-unknown-linux-gnu.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"
+
+[tools."packslip:github.com/jdx/hk"."platforms.macos-arm64"]
+checksum = "sha256:b30c6fb4447b5a9c24f9f80d165dca2d2e682907b8acb8222391e0527fea1ebe"
+url = "https://github.com/jdx/hk/releases/download/v2.1.0/hk-aarch64-apple-darwin.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/hk/.github/workflows/release.yml"

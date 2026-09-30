@@ -7,12 +7,13 @@ Declared in the repo-root `mise.toml`. **Nothing here runs automatically**
 
 ```sh
 cd ~/dev/dotfiles          # or wherever this repo is cloned
+mise run bootstrap:tools      # install tools from the committed lockfiles
 mise run bootstrap:status     # what would change — read-only
 mise run bootstrap:dry-run    # preview the dotfile symlinks specifically
 mise run bootstrap:dotfiles   # apply symlinks — see "What gets symlinked" below
 mise run bootstrap:zsh-plugins  # clone/update oh-my-zsh + its 3 custom plugins
 mise run bootstrap:zsh-completion  # install mise's generated Zsh completion
-mise run bootstrap:all        # dotfiles + Zsh plugins/completion, in one go
+mise run bootstrap:all        # locked tools, then dotfiles + Zsh plugins/completion
 mise run bootstrap:all-desktop  # GUI/desktop apps — opt-in, see "Desktop apps" below
 ```
 
@@ -22,6 +23,18 @@ they run couldn't be typed out as plain `mise bootstrap dotfiles ...`/
 save re-typing the longer form. All are idempotent (safe to re-run); the
 dotfile and repo bootstrap operations refuse to clobber a real pre-existing
 file/directory at any target without `--force`.
+
+`bootstrap:all` first completes `bootstrap:tools` (`mise install --locked`),
+then runs the dotfile and Zsh provisioning tasks. A failed tool install stops
+provisioning. Automatic tool installation before tasks is disabled in the
+repo-local and global core settings, so status tasks can report missing tools
+and provisioning uses the explicit locked installation step.
+
+Use `mise install --locked` for a fresh checkout or a CI job as well. Missing
+lock metadata should be fixed by updating the appropriate committed lockfile,
+then retrying installation. Locked installs still download artifacts; they
+are not an offline mode. The desktop package provider and Zsh repository
+checkouts use their own provisioning declarations, rather than `mise.lock`.
 
 ## Why mise's own feature, not a script
 
@@ -110,8 +123,9 @@ the generated `_mise` function to
 state rather than a tracked dotfile: mise owns its format and can refresh it
 when mise itself changes.
 
-`bootstrap:all` depends on this task alongside the dotfile and Zsh plugin
-tasks, so a fresh machine needs only `mise run bootstrap:all`. The matching
+`bootstrap:all` runs this task alongside the dotfile and Zsh plugin tasks
+after installing locked tools, so a fresh machine needs only
+`mise run bootstrap:all`. The matching
 `fpath` entry lives in `shell/.zshrc` before Oh My Zsh loads; Oh My Zsh already
 runs `compinit`, so bootstrap does not add a duplicate initialization.
 

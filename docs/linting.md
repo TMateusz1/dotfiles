@@ -15,11 +15,15 @@ their shell.
 postinstall = "hk install --mise"
 ```
 
-So simply running `mise install` in the repo (which you need anyway, to get
+So simply running `mise install --locked` in the repo (which you need anyway, to get
 `hk`/`taplo`/`rumdl`/`yamlfmt`/`shellcheck`/`stylua` themselves) installs
 the `pre-commit` git hook too. No separate setup step.
 
 ## What's checked
+
+The repo-local mise config installs hk through `packslip:github.com/jdx/hk`,
+the backend recommended by mise's registry. Its exact version remains pinned
+in `mise.toml`, with platform metadata recorded in `mise.lock`.
 
 Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
 --all`, and `hk fix --all`:

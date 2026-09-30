@@ -2,6 +2,8 @@
 lockfile = true
 lockfile_platforms = ["macos-arm64", "linux-arm64", "linux-x64"]
 disable_backends = ["asdf", "vfox"]
+# Bootstrap installs tools explicitly with --locked before provisioning.
+task.run_auto_install = false
 # Relative dotfile sources below resolve against this file's own directory
 # (the repo root), not against dotfiles.root — so dotfiles.root is
 # deliberately left unset. See docs/bootstrap.md.
@@ -13,7 +15,7 @@ HK_MISE = 1
 [tools]
 # These pins keep repository checks self-contained. Tools also used by Neovim
 # are declared in mise/config.toml at matching versions for use in any project.
-"aqua:jdx/hk" = "2.1.0"
+"packslip:github.com/jdx/hk" = "2.1.0"
 "aqua:tamasfe/taplo" = "0.10.0"
 "aqua:rvben/rumdl" = "0.2.76"
 "aqua:google/yamlfmt" = "0.21.0"
@@ -43,6 +45,10 @@ run = "mise bootstrap dotfiles apply --dry-run"
 description = "Symlink this repo's configs into place"
 run = "mise bootstrap dotfiles apply"
 
+[tasks."bootstrap:tools"]
+description = "Install configured tools using the committed lockfiles"
+run = "mise install --locked"
+
 [tasks."bootstrap:zsh-plugins"]
 description = "Clone/update oh-my-zsh and its custom plugins"
 run = "mise bootstrap repos apply"
@@ -52,12 +58,9 @@ description = "Install mise's generated Zsh completion"
 run = "mise completion zsh --install"
 
 [tasks."bootstrap:all"]
-description = "Bootstrap dotfiles, Zsh plugins, and mise's Zsh completion"
-depends = [
-  "bootstrap:dotfiles",
-  "bootstrap:zsh-plugins",
-  "bootstrap:zsh-completion",
-]
+description = "Install locked tools, then bootstrap dotfiles, Zsh plugins, and completion"
+depends = ["bootstrap:tools"]
+run = "mise run bootstrap:dotfiles ::: bootstrap:zsh-plugins ::: bootstrap:zsh-completion"
 
 # Desktop/GUI apps live in mise/config.desktop.toml, loaded only via `-E desktop` —
 # never by plain `mise install`/`mise bootstrap`/`mise run`. This is the

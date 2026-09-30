@@ -70,7 +70,7 @@ Shared editor executables are managed by mise; see
 
 ## Contributing / working on this repo
 
-`mise install` pulls the repo's own tooling (including
+`mise install --locked` pulls the repo's own tooling (including
 [hk](https://hk.jdx.dev)) and installs a pre-commit hook automatically — see
 [docs/linting.md](./docs/linting.md).
 

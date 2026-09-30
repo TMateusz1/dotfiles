@@ -21,6 +21,7 @@ The repo-local and global core configs both set:
 [settings]
 lockfile = true
 disable_backends = ["asdf", "vfox"]
+task.run_auto_install = false
 ```
 
 - `lockfile = true` — tool resolutions are pinned by a committed `mise.lock`
@@ -36,6 +37,10 @@ disable_backends = ["asdf", "vfox"]
   [bootstrap.md](./bootstrap.md#what-gets-symlinked).
 - `disable_backends = ["asdf", "vfox"]` — tools are resolved through mise's
   own backends (aqua, cargo, ubi, etc.) only; no asdf/vfox plugin resolution.
+- `task.run_auto_install = false` — task execution does not implicitly install
+  missing tools. Install explicitly with `mise install --locked` or this repo's
+  `bootstrap:tools` task. This also affects tasks in projects inheriting the
+  global setting: install their declared tools before running them.
 
 Global config tasks are namespaced `global:<name>` so a convenience task
 defined globally never shadows a same-named task in some future project's own
@@ -87,6 +92,12 @@ macOS (`mise/config.macos.toml`, loaded automatically):
 
 Repo-local (`mise.toml`):
 
+hk uses the registry-recommended `packslip:github.com/jdx/hk` backend; Neovim
+uses `aqua:neovim/neovim`. Old shorthand installations can retain a previous
+backend even after the tracked config changes. Inspect `mise ls` and use a
+targeted `mise uninstall <tool>@<version>` to remove obsolete installations
+after verifying the configured replacement works.
+
 - [`hk`](https://hk.jdx.dev), [`taplo`](https://github.com/tamasfe/taplo),
   [`rumdl`](https://github.com/rvben/rumdl),
   [`yamlfmt`](https://github.com/google/yamlfmt),
@@ -105,6 +116,33 @@ git-checkout provisioning, applied explicitly (never automatically) via
 
 ## Maintaining editor tools
 
+The global core config provides two maintenance tasks, available from any
+project after the global config is provisioned:
+
+```sh
+mise run global:tools:status
+mise run global:tools:outdated
+```
+
+`status` runs `mise ls --current` and `mise doctor`. `outdated` runs
+`mise outdated --bump`, comparing exact pins against newer releases. Both use
+the caller's directory, so project overrides are included. They do not install
+or upgrade tools or rewrite pins; the outdated check can fetch release metadata
+and update mise's cache. To inspect shared defaults without project overrides,
+run them from a directory outside a project.
+
+You can pass tool keys to limit the outdated check, for example:
+
+```sh
+mise run global:tools:outdated aqua:mvdan/sh aqua:tamasfe/taplo
+```
+
+Verified both tasks against the real mise binary outside this repository,
+including a filtered outdated check. Config files and lockfiles were unchanged
+after execution. The bootstrap dependency order was checked with mise's dry run;
+a temporary task fixture confirmed that a failed tool-install dependency stops
+`bootstrap:all` before any provisioning command runs.
+
 Use `mise/config.toml` for shared defaults and a project's own `mise.toml`
 for project requirements. The root `mise.toml` retains the tools needed to
 check this dotfiles repository independently; overlapping pins should match
@@ -118,13 +156,55 @@ repository root, refresh only that tool's global lock entry, for example:
 
 ```sh
 MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise lock --global aqua:mvdan/sh
-MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install aqua:mvdan/sh
+MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install --locked aqua:mvdan/sh
 ```
 
 If the root declaration also changed, refresh its lock with `mise lock <tool>`.
 Review the config and lockfile diffs and verify the new tool in a real file.
 Keep exact pins: refreshing a lock alone does not upgrade an exact version.
 Use the same procedure for other tools by replacing the fully qualified key.
+
+### Update one group at a time
+
+Use the language sections in `mise/config.toml` as update units. Treat shared
+runtime changes as separate decisions: a Node upgrade affects several servers,
+and a Python upgrade also requires checking the `uvx_args` runtime references.
+
+1. Check available releases with `global:tools:outdated`, or limit the native
+   command to selected keys, for example:
+
+   ```sh
+   mise outdated --bump go:golang.org/x/tools/gopls go:golang.org/x/tools/cmd/goimports aqua:mvdan/gofumpt aqua:golangci/golangci-lint
+   ```
+
+2. Review the tools' release notes and change only the intended exact pins.
+   Update matching repo-local declarations when applicable. Leave other
+   language groups and Neovim plugin versions for separate changes.
+3. Refresh only the selected global lock entries, then install those tools:
+
+   ```sh
+   MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise lock --global go:golang.org/x/tools/gopls go:golang.org/x/tools/cmd/goimports aqua:mvdan/gofumpt aqua:golangci/golangci-lint
+   MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install --locked go:golang.org/x/tools/gopls go:golang.org/x/tools/cmd/goimports aqua:mvdan/gofumpt aqua:golangci/golangci-lint
+   ```
+
+4. Restart Neovim for editor tool changes and verify one representative project.
+   For Go, check LSP attachment/navigation, formatting, lint results, and a test
+   run. For Python/Robot, check imports, diagnostics, formatting, and a test.
+   For configuration languages, check schema diagnostics and formatting.
+5. Review the config and lockfile diff before starting another group. Keep the
+   prior pins available so a regression can be resolved by restoring those
+   declarations and lock entries and reinstalling their locked versions.
+
+Update terminal tools separately from language tooling: tmux, lazygit, k9s,
+bottom, yazi, and glow form a useful group. Verify configuration loading and a
+normal workflow in each changed tool. Start a separate tmux server when testing
+a new binary against an existing running server. CLI utilities can be another
+small group. Neovim itself and its plugins deserve a separate update because
+API changes can affect several integrations at once.
+
+For reproducible setup and CI, use `mise install --locked` after checking out
+the config and matching lockfiles. This repository has no CI workflow; the
+existing checks can be run with `hk check --all` after the locked installation.
 
 ### Project-specific versions
 
