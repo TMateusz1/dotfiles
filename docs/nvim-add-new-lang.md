@@ -43,6 +43,11 @@ if necessary. For tools used only in one project, declare them in that
 project's mise config instead. Neovim must still be launched with those
 executables on its `PATH`.
 
+Use the same fully qualified tool key as the global declaration when pinning
+a different version in a project. Generate that project's own lockfile and
+launch Neovim from its mise environment; see
+[project-specific versions](./mise.md#project-specific-versions).
+
 From this repository's root, refresh the staged global lockfile and install:
 
 ```sh

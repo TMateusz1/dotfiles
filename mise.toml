@@ -11,6 +11,8 @@ dotfiles.default_mode = "symlink"
 HK_MISE = 1
 
 [tools]
+# These pins keep repository checks self-contained. Tools also used by Neovim
+# are declared in mise/config.toml at matching versions for use in any project.
 "aqua:jdx/hk" = "2.1.0"
 "aqua:tamasfe/taplo" = "0.10.0"
 "aqua:rvben/rumdl" = "0.2.76"

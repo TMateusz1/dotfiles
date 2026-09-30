@@ -1255,6 +1255,11 @@ wrapped-error returns, a parallel table-driven test, and a context with timeout.
 [conform.nvim](https://github.com/stevearc/conform.nvim). Every formatter is a
 mise binary; conform only sequences them.
 
+All configured standalone formatters are declared in the global
+`mise/config.toml`, including StyLua, Taplo, and shfmt. Shared defaults and
+project-specific version overrides are described in
+[Maintaining editor tools](./mise.md#maintaining-editor-tools).
+
 `<leader>w` uses `:write`, so it also runs format-on-save. For TOML, Conform
 passes the buffer's path to Taplo and runs it from the nearest directory with
 `.taplo.toml` or `taplo.toml`. This lets project-local rules, including rules

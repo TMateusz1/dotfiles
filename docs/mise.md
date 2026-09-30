@@ -23,9 +23,9 @@ lockfile = true
 disable_backends = ["asdf", "vfox"]
 ```
 
-- `lockfile = true` — every tool install is pinned by a committed `mise.lock`
-  (exact version + per-platform checksum), so setup is reproducible across
-  machines.
+- `lockfile = true` — tool resolutions are pinned by a committed `mise.lock`
+  (exact versions, plus artifact URLs and checksums where the backend supplies
+  them), so other machines can use the same resolutions.
 
   **A lockfile only counts if it actually reaches the machine.** The global
   core and macOS config files therefore each have a matching `[dotfiles]`
@@ -62,6 +62,13 @@ Global (`mise/config.toml`):
   tooling, yamlfmt and kubeconform. uv powers the isolated `pipx:` Python CLI
   installs — see [langs.md](./langs.md)
 - `neovim` — editor, see [nvim.md](./nvim.md)
+- Shared editor executables are grouped by language: each group keeps its
+  language servers, formatters, linters, and utilities together. Python and
+  Robot Framework share a group, as do YAML, Helm, and Kubernetes. Shared
+  runtimes, editor infrastructure, and general CLI tools have their own groups.
+  StyLua, Taplo, and shfmt are global tools, so Lua, TOML, and shell formatting
+  work outside this dotfiles repository too. Tools with several roles, such
+  as Ruff and Buf, are declared once in their language's group.
 - `tree-sitter` — the CLI nvim-treesitter needs to compile parsers; a hard
   runtime dependency of the Neovim config, deliberately the aqua build
   rather than npm — see [nvim.md](./nvim.md#the-tree-sitter-cli-is-a-hard-dependency)
@@ -95,6 +102,70 @@ The repo-root `mise.toml` also declares `[dotfiles]` and
 git-checkout provisioning, applied explicitly (never automatically) via
 `mise bootstrap dotfiles apply`/`mise bootstrap repos apply`. See
 [bootstrap.md](./bootstrap.md).
+
+## Maintaining editor tools
+
+Use `mise/config.toml` for shared defaults and a project's own `mise.toml`
+for project requirements. The root `mise.toml` retains the tools needed to
+check this dotfiles repository independently; overlapping pins should match
+the global defaults unless this repository deliberately needs a different
+version. Neovim config selects tools and supplies editor settings; mise owns
+their installation and versions.
+
+To change a shared tool, edit its exact version in `mise/config.toml`. For an
+overlapping repository check tool, also update the root declaration. From the
+repository root, refresh only that tool's global lock entry, for example:
+
+```sh
+MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise lock --global aqua:mvdan/sh
+MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install aqua:mvdan/sh
+```
+
+If the root declaration also changed, refresh its lock with `mise lock <tool>`.
+Review the config and lockfile diffs and verify the new tool in a real file.
+Keep exact pins: refreshing a lock alone does not upgrade an exact version.
+Use the same procedure for other tools by replacing the fully qualified key.
+
+### Project-specific versions
+
+Add only the overrides a project needs, using the same fully qualified tool
+keys as the global config. For example, in that project's `mise.toml`:
+
+```toml
+[settings]
+lockfile = true
+disable_backends = ["asdf", "vfox"]
+
+[tools]
+"aqua:mvdan/sh" = "3.14.1" # Replace with the exact version this project requires.
+```
+
+From the project directory, run `mise lock` and `mise install --locked`, then
+track both `mise.toml` and `mise.lock` in the project. Other tools inherit their
+global defaults. Project configuration takes precedence according to
+[mise's configuration hierarchy](https://mise.jdx.dev/configuration.html#configuration-hierarchy).
+Rules and style settings belong in the tool's project configuration file;
+the mise pin selects the executable version.
+
+Launch `nvim` from the project after mise has activated its environment, or
+use `mise exec -- nvim`. Verify a tool's selected version with `mise which
+shfmt` and `shfmt --version`. Inside Neovim, `:lua print(vim.fn.exepath("shfmt"))`
+shows the executable visible to the editor. A running Neovim process retains
+its launch environment: restart it after changing tool pins or switching to
+a project with different requirements. Explicit project virtualenv selection
+in a language integration can take precedence over the general PATH lookup.
+
+For adding another language, follow
+[Add a language to Neovim](./nvim-add-new-lang.md).
+
+Verified on macOS ARM64 from a temporary directory outside this repository,
+starting with a clean system PATH: mise resolved all 23 checked editor
+executables, and the real Neovim configuration formatted Lua, TOML, and shell
+buffers through Conform using the globally declared binaries. A temporary
+project pin selected shfmt 3.14.0 over the global 3.14.1 default; this checked
+configuration precedence without installing that alternate version. Existing
+tool pins and lock entries were preserved. The three added global tools have
+lock entries for macOS ARM64 and Linux ARM64/x64; Linux execution was not tested.
 
 ## Global Docker tasks
 
