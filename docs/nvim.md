@@ -820,6 +820,13 @@ until the first cursor move after the UI is up.
 
 ## Base config (`lua/config/`)
 
+The base modules favor native APIs and upstream plugin behavior. Go interface
+generation uses Gopher directly, Helm root detection uses `vim.fs.root()`, and
+listed buffers come from `getbufinfo()`. The reload events share one callback.
+Custom logic remains where it preserves a concrete workflow: Noice-compatible
+unsaved prompts, SSH/tmux clipboard synchronization and the shared asynchronous
+quickfix runner for Go, Python and Kubernetes checks.
+
 Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
 
 - **`options.lua`**: `termguicolors` (required for Catppuccin's true-color
@@ -1003,7 +1010,7 @@ above and the Code namespace instead; `gI` intentionally replaces Vim's
 insert-at-column-one command.
 
 Go buffers add one deliberately separate operation: `gi` generates the methods
-needed to implement an interface selected by name. It replaces Vim's
+needed to implement a named interface through Gopher's `:GoImpl` command. It replaces Vim's
 last-insert-position command only for Go; `gI` remains LSP navigation in every
 LSP buffer.
 
@@ -1359,35 +1366,33 @@ project is open. See [linting.md](./linting.md).
 
 ## Go
 
-gopls covers completion, navigation, refactoring and code actions. Two things it
-does not do are filled by [gopher.nvim](https://github.com/olexsmir/gopher.nvim),
-a thin wrapper whose own installer is switched off (`installation = false`) so
+gopls covers completion, navigation, refactoring and code actions, including
+missing-method fixes for interface diagnostics.
+[gopher.nvim](https://github.com/olexsmir/gopher.nvim) supplies explicit struct-tag
+and named-interface commands. Its installer stays off (`installation = false`);
 the binaries come from mise:
 
-| Key                        | Action                              | Binary          |
-| -------------------------- | ----------------------------------- | --------------- |
-| `<leader>cta`              | Add `json` struct tags              | `gomodifytags`  |
-| `<leader>cty`              | Add `yaml` struct tags              | `gomodifytags`  |
-| `<leader>ctr`              | Remove struct tags                  | `gomodifytags`  |
-| `gi` / `<leader>cI`        | Pick and implement an interface     | `gopls`, `impl` |
-| `<leader>ce`               | Expand `if err != nil`              | —               |
-| `<leader>cgl`              | Lint current project                | `golangci-lint` |
-| `<leader>cgL`              | Lint and apply fixes                | `golangci-lint` |
+| Key                 | Action                           | Binary          |
+| ------------------- | -------------------------------- | --------------- |
+| `<leader>cta`       | Add `json` struct tags           | `gomodifytags`  |
+| `<leader>cty`       | Add `yaml` struct tags           | `gomodifytags`  |
+| `<leader>ctr`       | Remove struct tags               | `gomodifytags`  |
+| `gi` / `<leader>cI` | Implement interface (enter name) | `impl`          |
+| `<leader>ce`        | Expand `if err != nil`           | —               |
+| `<leader>cgl`       | Lint current project             | `golangci-lint` |
+| `<leader>cgL`       | Lint and apply fixes             | `golangci-lint` |
 
-Place the cursor anywhere inside a named struct, save the buffer, then press
-`gi`. The live FZF search contains interfaces from the workspace, loaded
-dependencies and the standard library. Results are always package-qualified,
-so the same query can distinguish names such as `io.Reader` from another
-package's `Reader`. Selecting one appends only its missing pointer-receiver
-methods; selecting an interface the type already satisfies leaves the buffer
-unchanged. Generic structs retain their receiver type parameters, and selecting
-a generic interface asks for its concrete arguments. The generated buffer stays
-unsaved so the normal `goimports` plus `gofumpt` save pipeline remains in
-control.
+Place the cursor inside a named struct and press `gi` or `<leader>cI`.
+The mapping leaves `:GoImpl` in the command line: type a qualified interface
+such as `io.Reader` and press Enter. Gopher's standard command generates the
+methods; `<leader>ca` remains available for gopls code actions on an interface
+diagnostic. Generated changes remain unsaved until the usual formatter pipeline
+runs on save.
 
-Bare `:GoImpl` opens this same picker, which also makes an older loaded
-`<leader>cI` command mapping safe. Supplying arguments keeps the original
-gopher behavior, for example `:GoImpl io.Reader`.
+This uses Gopher's upstream behavior, without a custom command override or
+interface picker. Bare `:GoImpl` requires arguments; use `:GoImpl io.Reader`
+or an explicit receiver such as `:GoImpl r Reader io.Reader`. Receiver inference
+and generic-type support follow the installed Gopher/impl versions.
 
 gopher.nvim is less well known than `ray-x/go.nvim`; it was chosen because
 go.nvim is a mega-plugin, which this repo's plugin rule argues against. If it
@@ -1852,14 +1857,10 @@ was read but not rewritten.
   after attachment, including `<leader>ca` in both Normal and Visual mode.
   The conflicting native `gr*` globals are absent, while the retained native
   hover, diagnostic, document-symbol and signature-help maps still resolve.
-- Go interface generation, against real standard-library source and scratch Go
-  packages. A `Reader` workspace-symbol query returns package-qualified
-  `io.Reader`; selecting it for `Worker[T]` generates a valid generic receiver.
-  A generic `Mapper[T]` selection accepts concrete type arguments, while
-  selecting `io.Closer` for a type that already has `Close()` leaves its buffer
-  and changed tick untouched. `gi` and `<leader>cI` share this flow only in Go
-  buffers; `gI` remains the LSP implementation map. Bare `:GoImpl` reaches the
-  picker while `:GoImpl io.Reader` still forwards the explicit argument.
+- Go interface generation: Gopher's standard `:GoImpl io.Reader` appends a real
+  `Read` method to a scratch struct. `gi` and `<leader>cI` resolve to the
+  editable `:GoImpl` command line in Go buffers; there is no command override
+  or bespoke interface-selection implementation. `gI` remains LSP navigation.
 - Snippet expansion, after the accept key turned out to be the problem rather
   than the snippets. The `errw` snippet resolves from the registry with the
   right body, and `vim.snippet.expand` — the same mechanism blink drives —
@@ -2055,6 +2056,16 @@ official Catppuccin peach. The status-local `<leader>q` closes that tab and
 returns to the source. The repository index stayed unchanged during the check.
 Neogit stores its remembered settings under `stdpath("state")/neogit/`, outside
 this repository; its transient status tab is excluded from saved sessions.
+
+## Config simplification verification
+
+The config modules went from 813 to 497 lines, primarily by removing the custom
+Go interface picker and replacing Helm root traversal with native APIs. Seventeen
+chart/non-chart fixtures, including subcharts, hidden paths, CRDs, values files
+and template partials, resolve exactly as before. Real Gopher interface generation
+works through the standard command, and both shortcuts expose its editable prompt.
+The buffer-close checks still pass for save/discard/cancel, split preservation,
+utility windows and final-buffer quitting. StyLua and rumdl checks pass.
 
 ## Applied
 

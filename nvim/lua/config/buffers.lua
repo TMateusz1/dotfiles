@@ -14,14 +14,6 @@ local function unsaved()
   end, vim.api.nvim_list_bufs())
 end
 
---- Buffers that appear in ordinary buffer navigation (and Bufferline).
----@return integer[]
-local function listed()
-  return vim.tbl_filter(function(bufnr)
-    return vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].buflisted
-  end, vim.api.nvim_list_bufs())
-end
-
 ---@param bufnr integer
 ---@return string
 local function label(bufnr)
@@ -52,29 +44,19 @@ function M.close(bufnr)
     return
   end
 
-  if not vim.bo[bufnr].modified then
-    require("mini.bufremove").delete(bufnr)
-    return
+  local force = false
+  if vim.bo[bufnr].modified then
+    local answer = ask(("Save changes to %s? [y]es, [n]o, [c]ancel: "):format(label(bufnr)))
+    if (answer ~= "y" and answer ~= "n") or not vim.api.nvim_buf_is_valid(bufnr) then
+      return
+    end
+    if answer == "y" then
+      vim.api.nvim_buf_call(bufnr, vim.cmd.write)
+    else
+      force = true
+    end
   end
-
-  local answer = ask(("Save changes to %s? [y]es, [n]o, [c]ancel: "):format(label(bufnr)))
-  if answer ~= "y" and answer ~= "n" then
-    return
-  end
-
-  -- Answering took time; the buffer may be gone by now.
-  if not vim.api.nvim_buf_is_valid(bufnr) then
-    return
-  end
-
-  if answer == "y" then
-    vim.api.nvim_buf_call(bufnr, function()
-      vim.cmd("write")
-    end)
-    require("mini.bufremove").delete(bufnr)
-  else
-    require("mini.bufremove").delete(bufnr, true)
-  end
+  require("mini.bufremove").delete(bufnr, force)
 end
 
 --- Quit everything, asking what to do about unsaved changes first.
@@ -122,8 +104,7 @@ function M.smart_close()
     return
   end
 
-  local visible = listed()
-  if #visible == 0 or (#visible == 1 and visible[1] == bufnr) then
+  if #vim.fn.getbufinfo({ buflisted = 1 }) <= 1 then
     M.quit_all()
     return
   end
