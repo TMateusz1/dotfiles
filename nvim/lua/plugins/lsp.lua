@@ -1,6 +1,5 @@
--- Language servers. No mason.nvim: every binary comes from the global mise
--- config and is expected on $PATH; Neovim only configures clients. See
--- docs/nvim.md#lsp.
+-- Language servers. Mason installs the baseline binaries and prepends its
+-- bin directory to PATH; this file configures and enables native LSP clients.
 --
 -- Neovim 0.11+ reads `lsp/<name>.lua` from the runtimepath, and nvim-lspconfig
 -- is on that path purely to supply those definitions. `vim.lsp.enable()` turns
@@ -97,6 +96,7 @@ return {
     vim.keymap.del("x", "gra")
   end,
   dependencies = {
+    "mason-org/mason.nvim",
     -- Pure Lua catalogue of JSON/YAML schemas; no binary, no download at runtime.
     { "b0o/SchemaStore.nvim", version = "*" },
   },
@@ -244,7 +244,7 @@ return {
     vim.lsp.config("robotcode", {
       -- Prefer a conventional project-local installation without requiring
       -- shell activation, then fall back to the first `robotcode` on PATH
-      -- (normally the globally pinned mise binary).
+      -- (the pinned Mason binary).
       cmd = start_robotcode,
     })
 
@@ -259,6 +259,7 @@ return {
       "robotcode",
       "rust_analyzer",
       "buf_ls",
+      "kotlin_lsp",
     })
 
     -- Buffer-local keymaps --------------------------------------------------

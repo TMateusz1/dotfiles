@@ -1,8 +1,9 @@
--- Formatting. Every formatter is a binary from the global mise config; conform
+-- Formatting. Every formatter is a binary managed by Mason; conform
 -- only orchestrates them. This is separate from hk.pkl, which formats *this
 -- repo's own* files at commit time — see docs/linting.md.
 return {
   "stevearc/conform.nvim",
+  dependencies = { "mason-org/mason.nvim" },
   version = "*",
   event = { "BufWritePre" },
   cmd = "ConformInfo",

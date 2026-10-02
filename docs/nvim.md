@@ -3,8 +3,8 @@
 `nvim/` maps to `~/.config/nvim` — the standard XDG target, no exception
 needed (unlike [tmux](./core_tools.md#tmux)/[starship](./util_tools.md#starship)/[k9s](./core_tools.md#k9s)).
 See [AGENTS.md](../AGENTS.md#neovim-conventions-nvim) for the conventions
-this config follows (lazy.nvim, no mason.nvim, LSP server binaries from
-mise only, Catppuccin theming).
+this config follows (lazy.nvim, Mason-managed editor tools, native LSP clients,
+Catppuccin theming).
 
 For a step-by-step setup procedure, see [Add a language to Neovim](./nvim-add-new-lang.md).
 
@@ -55,12 +55,12 @@ For a step-by-step setup procedure, see [Add a language to Neovim](./nvim-add-ne
 | [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
 | [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)                                             | LSP server definitions             | Only a data source: it puts `lsp/*.lua` on the runtimepath so `vim.lsp.enable()` can find servers. No `lspconfig.setup()` — see "LSP" below.                                                                                                                                     |
 | [saghen/blink.cmp](https://github.com/saghen/blink.cmp)                                                       | Completion                         | Rust fuzzy matcher **built from source** with the mise-pinned toolchain, never downloaded — see "Completion" below.                                                                                                                                                              |
-| [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)                                             | Formatting                         | Format on save, switchable per buffer and globally under `<leader>u`. Formatters are mise binaries — see "Formatting".                                                                                                                                                           |
+| [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)                                             | Formatting                         | Format on save, switchable per buffer and globally under `<leader>u`. Formatters are Mason binaries — see "Formatting".                                                                                                                                                          |
 | [mfussenegger/nvim-lint](https://github.com/mfussenegger/nvim-lint)                                           | Linting                            | Automatic linting stays narrow (hadolint); slower project/schema checks run asynchronously and open in Trouble on demand — see "Linting".                                                                                                                                        |
 | [folke/trouble.nvim](https://github.com/folke/trouble.nvim)                                                   | Diagnostics and lists              | Focusable bottom panel for diagnostics and result lists, with a right-side document outline. Its Catppuccin integration is enabled — see "Diagnostics".                                                                                                                          |
 | [folke/lazydev.nvim](https://github.com/folke/lazydev.nvim)                                                   | Lua API completion                 | Teaches `lua_ls` the Neovim API while editing this config. `ft = "lua"`.                                                                                                                                                                                                         |
 | [b0o/SchemaStore.nvim](https://github.com/b0o/SchemaStore.nvim)                                               | JSON/YAML schema catalogue         | Pure Lua, no binary and no runtime download. Feeds `jsonls` and `yamlls`.                                                                                                                                                                                                        |
-| [olexsmir/gopher.nvim](https://github.com/olexsmir/gopher.nvim)                                               | Go struct tags / interface stubs   | Thin wrapper over `gomodifytags` and `impl`; its own installer is switched off so the binaries come from mise — see "Go".                                                                                                                                                        |
+| [olexsmir/gopher.nvim](https://github.com/olexsmir/gopher.nvim)                                               | Go struct tags / interface stubs   | Thin wrapper over `gomodifytags` and `impl`; its own installer is switched off so the binaries come from Mason — see "Go".                                                                                                                                                       |
 | [nvim-neotest/neotest](https://github.com/nvim-neotest/neotest)                                               | Test runner                        | With `neotest-golang`; drives `go test` directly, so it needs no binary beyond the Go toolchain — see "Testing".                                                                                                                                                                 |
 | [nvim-treesitter/nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)                         | Syntax parsing + highlighting      | `branch = "main"` (the rewrite, now upstream's default). Needs the `tree-sitter` CLI from the global mise config. 38 parsers — see "Treesitter" below.                                                                                                                           |
 | [rmagatti/auto-session](https://github.com/rmagatti/auto-session)                                             | Per-directory session persistence  | Restores buffers, window layout and buffer-local options on reopen. Almost entirely defaults — see "Sessions" below.                                                                                                                                                             |
@@ -433,7 +433,7 @@ prefix group. `<leader>?` shows only mappings local to the current buffer.
 
 Use `<leader>fk` to search all keymaps by description. The main namespaces are
 `f` for finding, `c` for code, `G` for Git, `g` for the Git UI, `t` for tests, `cx` for code lists,
-`u` for toggles and `x` for closing buffers. The Go/Kubernetes/Python check keys
+`u` for toggles and `x` for closing buffers. The Go/Python check keys
 remain under `cg` / `ck` / `cp` and appear only in their relevant filetypes.
 
 MiniClue was considered because Mini AI and Mini Surround are already present.
@@ -476,10 +476,8 @@ preference for static binaries over npm dependency trees (see
 [linting.md](./linting.md#why-rumdl-not-markdownlint) for the same
 reasoning applied to a linter).
 
-This is *not* a violation of [AGENTS.md](../AGENTS.md)'s "Neovim never
-installs binaries" rule — see the carve-out there. The rule exists to keep
-LSP/formatter/linter *executables* under mise's control; treesitter
-grammars are per-language build artifacts of a CLI that mise itself pins.
+Treesitter grammars compile locally using the CLI pinned in mise. Mason owns
+LSP, formatter and linter executables; compiler toolchains stay in mise.
 
 ### Parsers
 
@@ -825,7 +823,7 @@ generation uses Gopher directly, Helm root detection uses `vim.fs.root()`, and
 listed buffers come from `getbufinfo()`. The reload events share one callback.
 Custom logic remains where it preserves a concrete workflow: Noice-compatible
 unsaved prompts, SSH/tmux clipboard synchronization and the shared asynchronous
-quickfix runner for Go, Python and Kubernetes checks.
+quickfix runner for Go and Python checks.
 
 Config that doesn't depend on any plugin, loaded before lazy.nvim bootstraps:
 
@@ -920,15 +918,15 @@ Trouble keeps selected search results and check findings available while editing
 Its [fzf integration](https://github.com/folke/trouble.nvim#fzf-lua) supplies the
 selection actions directly.
 
-| Task                         | Action                                        |
-| ---------------------------- | --------------------------------------------- |
-| Open one search result       | Enter in fzf                                  |
-| Keep selected search results | Tab to select, then Enter or `<C-t>`          |
-| Keep all filtered results    | `<C-t>` with nothing selected                 |
-| Reopen those search results  | `<leader>cxf`                                 |
-| Run a deliberate check       | `<leader>cgl`, `<leader>ckl` or `<leader>cpm` |
-| Reopen check results         | `<leader>cxq`                                 |
-| Search check results         | `<leader>fq`                                  |
+| Task                         | Action                               |
+| ---------------------------- | ------------------------------------ |
+| Open one search result       | Enter in fzf                         |
+| Keep selected search results | Tab to select, then Enter or `<C-t>` |
+| Keep all filtered results    | `<C-t>` with nothing selected        |
+| Reopen those search results  | `<leader>cxf`                        |
+| Run a deliberate check       | `<leader>cgl` or `<leader>cpm`       |
+| Reopen check results         | `<leader>cxq`                        |
+| Search check results         | `<leader>fq`                         |
 
 Search results use Trouble's fzf source; check results use the native quickfix
 list. Sending a search to Trouble therefore preserves the most recent check
@@ -958,26 +956,46 @@ sits. Moving the cmdline above the statusline is what noice is here for.
 
 ## LSP
 
-Ten servers, all enabled from `lua/plugins/lsp.lua`:
+The Mason migration was verified on macOS ARM64 with Neovim 0.12.5: all 22
+packages were installed at their declared versions and all exposed executables
+resolved through Mason. All ten LSPs initialized and answered requests in
+scratch projects; RobotCode and Buf also answered formatting requests. Conform
+formatted Go, Lua, Python, YAML, TOML, JSON and shell buffers. Hadolint emitted
+buffer diagnostics, mypy and golangci-lint returned JSON findings, and both Go
+editing utilities executed.
+These checks passed again from a clean PATH after reducing mise and pruning.
+Repository `hk check --all` passed. Linux execution was not tested.
 
-| Server          | Language         | Executable source                   |
-| --------------- | ---------------- | ----------------------------------- |
-| `gopls`         | Go               | `go:golang.org/x/tools/gopls`       |
-| `lua_ls`        | Lua              | `aqua:LuaLS/lua-language-server`    |
-| `yamlls`        | YAML, Kubernetes | `npm:yaml-language-server`          |
-| `jsonls`        | JSON             | `npm:vscode-langservers-extracted`  |
-| `helm_ls`       | Helm charts      | `aqua:mrjosh/helm-ls`               |
-| `ruff`          | Python           | `aqua:astral-sh/ruff`               |
-| `basedpyright`  | Python           | `npm:basedpyright`                  |
-| `robotcode`     | Robot Framework  | `pipx:robotcode` global/local-first |
-| `rust_analyzer` | Rust             | `aqua:rust-lang/rust-analyzer`      |
-| `buf_ls`        | Protocol Buffers | `aqua:bufbuild/buf`                 |
+Eleven servers, all enabled from `lua/plugins/lsp.lua`:
 
-**No mason.nvim.** Every baseline binary is pinned in mise and resolved from
-`$PATH`; Neovim configures clients and never installs anything. RobotCode adds
-one local-first rule: a project's `.venv/bin/robotcode` is selected before the
-global binary. An activated nonstandard environment still wins through normal
-`$PATH` ordering.
+| Server          | Language         | Mason package           |
+| --------------- | ---------------- | ----------------------- |
+| `gopls`         | Go               | `gopls`                 |
+| `lua_ls`        | Lua              | `lua-language-server`   |
+| `yamlls`        | YAML, Kubernetes | `yaml-language-server`  |
+| `jsonls`        | JSON             | `json-lsp`              |
+| `helm_ls`       | Helm charts      | `helm-ls`               |
+| `ruff`          | Python           | `ruff`                  |
+| `basedpyright`  | Python           | `basedpyright`          |
+| `robotcode`     | Robot Framework  | `robotcode` local-first |
+| `rust_analyzer` | Rust             | `rust-analyzer`         |
+| `buf_ls`        | Protocol Buffers | `buf`                   |
+| `kotlin_lsp`    | Kotlin           | `kotlin-lsp`            |
+
+**Mason installs all baseline editor tools.** `lua/plugins/mason.lua` pins the
+23 packages and ensures installation at startup. Mason loads eagerly and
+prepends its bin directory to Neovim's PATH before other integrations resolve
+commands. Install explicitly with `:MasonToolsInstall`, inspect with `:Mason`,
+and diagnose failures with `:MasonLog` / `:checkhealth mason`. Automatic version
+upgrades are disabled. Native LSP configuration stays here; mason-lspconfig is
+unnecessary. All configured tools use Mason's official registry.
+
+Mise retains runtimes, compiler toolchains, Helm, and the Treesitter CLI.
+Repository hk tools remain independently pinned in repo-local mise. Mason
+packages live in Neovim's data directory and are not added to the outside
+shell PATH. Project mise pins alone do not supersede Mason's PATH; configure
+an explicit command override when a project needs a different executable.
+RobotCode and mypy retain their project-local virtualenv preference.
 
 ### Configured natively, not through a framework
 
@@ -1062,13 +1080,16 @@ checking are disabled. Ruff owns live lint diagnostics, import organization and
 formatting; mypy is the authoritative project-wide static checker and runs on
 demand with `<leader>cpm`. Its findings open in Trouble.
 
-RobotCode is globally pinned with its language-server, analysis and lint extras,
-alongside global Robot Framework and Robocop commands. Its launcher checks the
-project root in this order:
+RobotCode is pinned in Mason with its `all` extra, including Robot Framework
+and Robocop in its isolated environment. These are not separate mise tools or
+commands on the outside shell PATH. Its launcher checks the project root in
+this order:
 
 1. `.venv/bin/robotcode` (or `venv/bin/robotcode`), even without activation;
-2. the first `robotcode` on `$PATH`, so an activated custom environment wins;
-3. mise's global RobotCode fallback.
+2. the first `robotcode` on `$PATH`, normally Mason's pinned fallback.
+
+For a nonstandard project environment, configure an explicit command override
+because Mason prepends its bin directory to PATH.
 
 If a conventional project `.venv` contains libraries but not RobotCode, its
 `site-packages` is passed to the global server through `PYTHONPATH`. Completion
@@ -1084,6 +1105,18 @@ distinct. The separator/terminator tokens that only cover layout whitespace
 stay intentionally unstyled. These semantic highlights layer on top of
 Treesitter and are available for both `.robot` and `.resource` buffers.
 
+### Kotlin
+
+The official [JetBrains Kotlin LSP](https://github.com/Kotlin/kotlin-lsp) uses
+IntelliJ IDEA's implementation. Mason installs `kotlin-lsp`, which exposes
+`intellij-server`; nvim-lspconfig's `kotlin_lsp` runs it with `--stdio`.
+Gradle settings/build files, Maven's `pom.xml`, and `workspace.json` are project
+root markers. The package bundles its Java runtime; each project's build JDK
+and build tools remain its own dependencies. Formatting uses Conform's LSP
+fallback. Verified on macOS ARM64: Mason installed the pinned package, Neovim
+attached `kotlin_lsp` to a `.kt` file in a scratch Gradle project, and the server
+returned document symbols and answered a formatting request.
+
 ### Kubernetes
 
 yamlls receives an explicit Kubernetes schema for conventional manifest paths:
@@ -1091,9 +1124,8 @@ yamlls receives an explicit Kubernetes schema for conventional manifest paths:
 `deployments/**`, `manifests/**`, `base/**`, `overlays/**`, and
 `*.k8s.yaml`/`*.k8s.yml`. Both `.yaml` and `.yml` are covered at any
 directory depth. Other layouts can opt in per file with a YAML language-server
-schema modeline. Schema validation stays interactive in the LSP; the fuller
-kubeconform check runs on demand and sends its results to Trouble as described
-under [Linting](#linting). Inside a Helm chart the schema arrives by a different
+schema modeline. Schema validation stays interactive in the LSP. Inside a
+Helm chart the schema arrives by a different
 route, but it is generated from the same directory and filename lists; see
 below.
 
@@ -1180,11 +1212,6 @@ completes, `kind: Service` returns nothing. That behaves identically for a plain
 manifest outside any chart, so it is the server's schema handling, not the
 filetype or glob wiring.
 
-`<leader>ckl` (kubeconform, under [Linting](#linting)) is registered for
-filetype `yaml` only, so it does not appear on `helm` buffers. Checking a
-template properly would mean rendering the chart with `helm template` first,
-which is a separate feature rather than a filetype list to extend.
-
 helm-ls has its built-in `helm lint` and yamlls integrations enabled. The
 globally pinned Helm 4 CLI is therefore a runtime dependency, not merely a
 separate shell convenience.
@@ -1208,13 +1235,10 @@ remains enabled.
 [blink.cmp](https://github.com/saghen/blink.cmp), sources `lsp`, `path`,
 `snippets`, `buffer`, using Neovim's native `vim.snippet`.
 
-**The fuzzy matcher is built from source, not downloaded.** blink ships a Rust
-library and by default fetches a prebuilt copy from GitHub releases — which
-AGENTS.md forbids. `build = "cargo build --release"` compiles it locally with
-the `rust` toolchain already pinned in the global mise config. That is the same
-carve-out, for the same reason, as nvim-treesitter compiling its parsers: the
-artifact is built here, and the toolchain that builds it is pinned and never
-fetched by Neovim. AGENTS.md records both exceptions explicitly.
+**The fuzzy matcher is built from source.** `build = "cargo build --release"`
+compiles blink's Rust library locally with the toolchain pinned in global mise.
+Treesitter parsers likewise compile locally; installing editor binaries through
+Mason does not change ownership of these compiler toolchains.
 
 ### Keys
 
@@ -1287,13 +1311,9 @@ wrapped-error returns, a parallel table-driven test, and a context with timeout.
 
 ## Formatting
 
-[conform.nvim](https://github.com/stevearc/conform.nvim). Every formatter is a
-mise binary; conform only sequences them.
-
-All configured standalone formatters are declared in the global
-`mise/config.toml`, including StyLua, Taplo, and shfmt. Shared defaults and
-project-specific version overrides are described in
-[Maintaining editor tools](./mise.md#maintaining-editor-tools).
+[conform.nvim](https://github.com/stevearc/conform.nvim) sequences the
+Mason-managed formatter binaries. Package pins live in `lua/plugins/mason.lua`;
+see [Maintaining editor tools](./mise.md#maintaining-editor-tools).
 
 `<leader>w` uses `:write`, so it also runs format-on-save. For TOML, Conform
 passes the buffer's path to Taplo and runs it from the nearest directory with
@@ -1311,11 +1331,10 @@ scoped to particular files, apply when saving from Neovim.
 | Shell    | `shfmt`                    |
 
 `yaml.helm-values` inherits the YAML formatter, so values files use the same
-globally available yamlfmt outside this dotfiles repo. Helm templates are not
+Mason-managed yamlfmt in any project. Helm templates are not
 fed to a generic YAML formatter because Go-template expressions are not plain
 YAML. For Robot Framework, conform's LSP fallback uses whichever RobotCode
-client won the local/global selection; the separately exposed `robocop format`
-command is also available globally. Protocol Buffers uses the same LSP fallback
+client won the local/global selection. Protocol Buffers uses the same LSP fallback
 for `buf_ls` formatting, so the Buf CLI supplies formatting and live lint
 diagnostics without a second formatter or linter.
 
@@ -1348,14 +1367,11 @@ closes the Trouble results view. They never block Neovim and never run on save:
 | ------------- | --------------------------------------------- |
 | `<leader>cgl` | `golangci-lint run` for the current Go module |
 | `<leader>cgL` | The same project check with `--fix`           |
-| `<leader>ckl` | kubeconform for the current YAML file         |
 | `<leader>cpm` | mypy for the current Python project           |
 
 gopls already runs staticcheck and the unusedparams/shadow/nilness analyses,
 so running golangci-lint on every write would duplicate messages and add
-latency on large repositories. kubeconform likewise stays explicit because
-most YAML is not Kubernetes, and a filename/path heuristic should not decide
-whether every save launches schema validation. mypy is similarly explicit: it
+latency on large repositories. mypy is similarly explicit: it
 walks the project and maintains `.mypy_cache`, while Ruff remains the fast live
 feedback path. The quickfix list remains the shared backing store for these
 checks, so Trouble and native quickfix consumers see the same items.
@@ -1370,7 +1386,7 @@ gopls covers completion, navigation, refactoring and code actions, including
 missing-method fixes for interface diagnostics.
 [gopher.nvim](https://github.com/olexsmir/gopher.nvim) supplies explicit struct-tag
 and named-interface commands. Its installer stays off (`installation = false`);
-the binaries come from mise:
+the binaries come from Mason:
 
 | Key                 | Action                           | Binary          |
 | ------------------- | -------------------------------- | --------------- |
@@ -1708,9 +1724,8 @@ LSP; real Stylua formatting with save formatting disabled; typed surround edits
 and Flash's independent `s`; save/cancel/discard including unrecognised answers;
 fzf single and multiple selection; reopening both fzf result modes; asynchronous
 quickfix/Trouble results; process failure/retry; and retained navigation/Diffview
-mappings. The real `cgl`, `ckl` and `cpm` shortcuts also produced parsed findings
-from golangci-lint, kubeconform and mypy in scratch projects. The kubeconform
-check covered malformed YAML and an empty clean file, without fetching schemas.
+mappings. The real `cgl` and `cpm` shortcuts also produced parsed findings
+from golangci-lint and mypy in scratch projects.
 Typing a Go call was checked separately for a single Blink signature popup and
 manual `gK` for a Noice popup. State, caches and test files were temporary, and
 session saving was disabled. These are one-time checks, not new linting steps.
@@ -1849,7 +1864,7 @@ was read but not rewritten.
   row 39; Fidget owns `vim.notify()` and appears above that command-line row.
 - LSP, against a real Go module in a scratch directory (`go.mod`, a type with
   unaligned struct fields, an unused variable, a passing test and a Dockerfile),
-  driven through a login shell so `$PATH` carries the mise tools. gopls attaches
+  driven through a login shell for runtimes; Mason supplies editor tools. gopls attaches
   with `cmd = { "gopls" }`, and a real diagnostic comes back —
   `declared and not used: unused`, source `compiler`. All nine server
   definitions resolve in nvim-lspconfig's `lsp/` directory. The classic
@@ -1912,7 +1927,7 @@ was read but not rewritten.
   inspection. basedpyright and Ruff attach while basedpyright publishes no
   diagnostics; `<leader>cpm` uses a project-local mypy when present and parses
   its JSON type error into the correct quickfix line and column. RobotCode
-  attaches once from the global mise binary and once through an executable
+  attaches once from the Mason binary and once through an executable
   marker proving `.venv/bin/robotcode` takes precedence. Both `.robot` and
   `.resource` receive RobotCode semantic tokens, whose custom highlight groups
   resolve through Catppuccin. The pinned parser handles comment sections,
@@ -1926,9 +1941,7 @@ was read but not rewritten.
 - Linting, including the mappings themselves: `<leader>cgl` and
   `<leader>cgL` run the real golangci-lint JSON command asynchronously and put
   its `govet` finding in the quickfix list; the uppercase mapping executes the
-  `--fix` variant. `<leader>ckl` downloads the Kubernetes schema, reports an
-  invalid `spec.replicas` as an error and uses kubeconform's actual
-  `statusValid`/`statusInvalid` JSON vocabulary. None of these batch checks is
+  `--fix` variant. None of these batch checks is
   registered on `BufWritePost`.
 - Testing: the neotest-golang adapter loads, recognises `main_test.go` as a test
   file and resolves the module root correctly. Discovery and a full run could

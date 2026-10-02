@@ -164,25 +164,15 @@ Rule specific to the **global** config:
   [lazy.nvim](https://github.com/folke/lazy.nvim) as the plugin manager,
   with plugin specs and their config split across `lua/` (e.g.
   `lua/plugins/*.lua`, `lua/config/*.lua`) rather than one giant `init.lua`.
-- **No mason.nvim** (or mason-lspconfig, mason-tool-installer, etc.) and no
-  auto-downloading of LSP/formatter/linter binaries from within Neovim.
-  LSP server binaries are expected to already be on `$PATH`, provided by
-  mise (global config or a per-project mise config) or installed manually by
-  the user. Neovim config only *configures* LSP clients (e.g. via
-  `nvim-lspconfig` / native `vim.lsp.config`), it never installs them.
-  - **Two carve-outs, both for locally compiled artifacts** — never for
-    fetched executables. In each case the rule still binds where it counts:
-    the toolchain doing the compiling is pinned in the global mise config,
-    never fetched by Neovim.
-    - **Treesitter parsers**: nvim-treesitter compiles per-language grammars
-      locally from source. The `tree-sitter` CLI that compiles them is a
-      pinned mise tool, and never the npm build. See
-      [docs/nvim.md](./docs/nvim.md#treesitter).
-    - **blink.cmp's fuzzy matcher**: blink ships a Rust library and by
-      default *downloads* a prebuilt copy from GitHub releases, which this
-      rule forbids. It is therefore built from source (`cargo build
-      --release`) with the `rust` toolchain pinned in the global mise
-      config. See [docs/nvim.md](./docs/nvim.md#completion).
+- **Mason owns Neovim's LSP, formatter, linter, and editing utility binaries.**
+  Declare exact Mason package versions in `nvim/lua/plugins/mason.lua`.
+  Mason loads at startup and prepends its bin directory to Neovim's PATH;
+  native `vim.lsp.config` / `vim.lsp.enable` still configure clients.
+  Keep project-local RobotCode and mypy virtualenv overrides.
+  Runtimes and compilers remain pinned in global mise. Treesitter parsers
+  compile locally using the mise-pinned `tree-sitter` CLI; blink.cmp's fuzzy
+  matcher builds with the mise-pinned Rust toolchain. See [docs/nvim.md](./docs/nvim.md).
+  Repository hk check tools remain independently pinned in repo-local mise.
 - Trusted, actively maintained plugins only (see "General config
   philosophy" above) — favor small, focused, well-known plugins over
   mega-plugins or obscure ones, and only add a plugin when a real gap

@@ -1,15 +1,12 @@
 -- Linting for what no language server already covers.
 --
--- Deliberately narrow — currently just Dockerfile. Three things are absent on
+-- Deliberately narrow — currently just Dockerfile. Two things are absent on
 -- purpose:
 --
 -- * **Go.** gopls runs staticcheck plus the unusedparams/shadow/nilness
 --   analysers (see lsp.lua), so golangci-lint on every write would duplicate
 --   those messages and add seconds of latency on a large repo. The binary
---   stays in mise and is run deliberately — `golangci-lint run`, or in CI.
--- * **Kubernetes manifests.** kubeconform is installed and is the right tool,
---   but it is not wired to run on save. <leader>ckl validates the current file
---   deliberately and opens the findings in Trouble.
+--   is installed by Mason and run deliberately with <leader>cgl/cgL.
 -- * **Python type checking.** mypy can traverse a whole project and build an
 --   incremental cache, so <leader>cpm runs it deliberately and reports results
 --   in Trouble instead of blocking every write. Ruff's fast LSP diagnostics
@@ -74,55 +71,9 @@ local function run_mypy()
   })
 end
 
-local function parse_kubeconform(output)
-  if vim.trim(output) == "" then
-    return {}
-  end
-
-  local decoded = vim.json.decode(output)
-  local items = {}
-  for _, resource in ipairs(decoded.resources or {}) do
-    local status = (resource.status or ""):lower()
-    if status ~= "valid" and status ~= "statusvalid" then
-      local message = resource.msg or resource.status or "validation failed"
-      local identity = table.concat(
-        vim.tbl_filter(function(value)
-          return value and value ~= ""
-        end, { resource.kind, resource.version }),
-        " "
-      )
-      table.insert(items, {
-        filename = resource.filename,
-        lnum = 1,
-        col = 1,
-        text = identity ~= "" and (identity .. ": " .. message) or message,
-        type = status:find("invalid", 1, true) and "E" or "W",
-      })
-    end
-  end
-  return items
-end
-
-local function run_kubeconform()
-  local path = vim.api.nvim_buf_get_name(0)
-  if path == "" then
-    vim.notify("Kubeconform requires a file on disk", vim.log.levels.ERROR)
-    return
-  end
-
-  require("config.quickfix").run({
-    name = "kubeconform",
-    title = "kubeconform",
-    cmd = { "kubeconform", "-output", "json", path },
-    cwd = vim.fs.dirname(path),
-    parse = parse_kubeconform,
-    accepted_exit_codes = { [0] = true, [1] = true },
-    save = true,
-  })
-end
-
 return {
   "mfussenegger/nvim-lint",
+  dependencies = { "mason-org/mason.nvim" },
   event = { "BufReadPost", "BufNewFile", "BufWritePost" },
   keys = {
     {
@@ -130,12 +81,6 @@ return {
       run_mypy,
       ft = "python",
       desc = "Python: type-check project",
-    },
-    {
-      "<leader>ckl",
-      run_kubeconform,
-      ft = "yaml",
-      desc = "Kubernetes: validate file",
     },
   },
   config = function()

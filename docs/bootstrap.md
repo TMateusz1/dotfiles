@@ -36,6 +36,16 @@ then retrying installation. Locked installs still download artifacts; they
 are not an offline mode. The desktop package provider and Zsh repository
 checkouts use their own provisioning declarations, rather than `mise.lock`.
 
+Neovim installs its pinned editor tooling through Mason at first startup.
+`bootstrap:tools` supplies runtimes and compilers, not LSP/formatter/linter
+packages. To complete editor provisioning explicitly after bootstrap:
+
+```sh
+nvim --headless '+MasonToolsInstallSync' '+qa'
+```
+
+See [Neovim tool maintenance](./mise.md#maintaining-editor-tools).
+
 ## Why mise's own feature, not a script
 
 `mise bootstrap` is a whole declarative provisioning subsystem (accounts,

@@ -11,7 +11,6 @@ return {
       { "<leader>c", group = "Code" },
       { "<leader>cx", group = "Code lists" },
       { "<leader>cg", group = "Go" },
-      { "<leader>ck", group = "Kubernetes" },
       { "<leader>cp", group = "Python" },
       { "<leader>ct", group = "Go struct tags" },
       { "<leader>f", group = "Find" },

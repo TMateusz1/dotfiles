@@ -20,7 +20,7 @@ Record these separately; they are not necessarily the same name:
   [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig/tree/master/lsp).
 - **Executable:** the command that starts the server, formatter, or linter.
 - **Adapter:** the formatter/linter name supported by Conform or nvim-lint.
-- **Package:** the mise backend and package that supplies the executable.
+- **Package:** the Mason registry name that supplies the executable.
 
 Check the server's documentation for supported filetypes, required command
 arguments, and project root markers. Check whether it requires a runtime or
@@ -28,46 +28,29 @@ compiler as well.
 
 ## 2. Install and pin the executables
 
-Add shared tools under `[tools]` in [mise/config.toml](../mise/config.toml).
-Use explicit versions and supported backends; keep asdf and vfox disabled.
-Declare runtime dependencies when the backend needs them.
+Add each required Mason package with an explicit version to `ensure_installed`
+in [mason.lua](../nvim/lua/plugins/mason.lua). Use Mason package names here,
+not nvim-lspconfig or Conform adapter names. Check availability with `:Mason`.
+A package that supplies several roles is declared once.
 
-For example, an npm package entry has this shape:
-
-```toml
-"npm:package-name" = { version = "<exact-version>", depends = ["node"] }
-```
-
-Use the package and version you actually selected. Add its required runtime
-if necessary. For tools used only in one project, declare them in that
-project's mise config instead. Neovim must still be launched with those
-executables on its `PATH`.
-
-Use the same fully qualified tool key as the global declaration when pinning
-a different version in a project. Generate that project's own lockfile and
-launch Neovim from its mise environment; see
-[project-specific versions](./mise.md#project-specific-versions).
-
-From this repository's root, refresh the staged global lockfile and install:
+Run `:MasonToolsInstall` or, for headless provisioning:
 
 ```sh
-MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise lock --global
-MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install --locked
+nvim --headless '+MasonToolsInstallSync' '+qa'
 ```
 
-The override selects this repository's global config rather than the machine's
-separate global config. Keep `mise/config.toml` and `mise/mise.lock` together
-when recording the change. If changing a platform overlay, also select that
-environment and refresh its lockfile; see [mise conventions](./mise.md).
+Confirm installation in `:Mason`, then inspect resolution inside Neovim:
 
-Confirm the command resolves in the shell used to launch Neovim:
-
-```sh
-command -v server-binary
+```vim
+:lua print(vim.fn.exepath("server-binary"))
 ```
 
-Use the tool's documented version command to verify the installed version.
-Do not add Mason or executable downloads to Neovim's configuration.
+Mason prepends its bin directory to Neovim's PATH. Its tools are not added to
+the shell PATH. Keep runtimes/compilers in global mise and preserve its matching
+lockfile if adding a runtime. For project-specific executable versions,
+configure an explicit command override; a project mise pin alone does not
+supersede Mason's PATH. RobotCode and mypy already prefer conventional project
+virtualenv executables.
 
 ## 3. Check filetype detection
 

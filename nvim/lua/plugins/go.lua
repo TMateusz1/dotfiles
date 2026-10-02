@@ -1,5 +1,5 @@
 -- Standard Gopher commands and deliberate project-wide golangci-lint runs.
--- The binaries (gomodifytags, impl) come from the global mise config, so
+-- The binaries (gomodifytags, impl) come from Mason, so
 -- gopher's own installer is switched off — see docs/nvim.md#go.
 local function go_root()
   local path = vim.api.nvim_buf_get_name(0)
@@ -86,7 +86,7 @@ end
 return {
   "olexsmir/gopher.nvim",
   ft = "go",
-  dependencies = { "nvim-lua/plenary.nvim" },
+  dependencies = { "nvim-lua/plenary.nvim", "mason-org/mason.nvim" },
   opts = {
     installation = false,
     commands = {

@@ -6,7 +6,7 @@ repo-local, global core, macOS and desktop layers:
 | Layer       | Path                                              | Activation and purpose                                                   |
 | ----------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
 | Repo-local  | `mise.toml` / `mise.lock`                         | Repo checks, hooks, and bootstrap tasks/settings                         |
-| Global core | `mise/config.toml` / `mise/mise.lock`             | Shared languages, LSPs, editor, terminal, and CLI tools                  |
+| Global core | `mise/config.toml` / `mise/mise.lock`             | Language runtimes, editor, terminal, and CLI tools                       |
 | macOS       | `mise/config.macos.toml` / `mise/mise.macos.lock` | Automatic on macOS; the local Docker CLI, Buildx and Colima/Lima runtime |
 | Desktop     | `mise/config.desktop.toml`                        | Opt-in via `-E desktop`; GUI packages used only by the bootstrap task    |
 
@@ -57,23 +57,13 @@ Global (`mise/config.toml`):
   [util_tools.md](./util_tools.md)
 - Core tools — `tmux`, `lazygit`, `k9s`, `bottom`, `yazi` — see
   [core_tools.md](./core_tools.md)
-- Containers and Kubernetes — Helm, helm-ls, k9s, kind, hadolint and
-  kubeconform. These remain portable core tools and do not assume ownership of
-  a Docker daemon.
-- Languages — `rust`, `go` (+ `gopls`, `goimports`, `golangci-lint`,
-  `gofumpt`, `gotestsum`) and `python`; editor tooling includes basedpyright,
-  Ruff, mypy, RobotCode/Robot Framework/Robocop, Buf for Protocol Buffers,
-  Helm 4/helm-ls, YAML language
-  tooling, yamlfmt and kubeconform. uv powers the isolated `pipx:` Python CLI
-  installs — see [langs.md](./langs.md)
+- Containers and Kubernetes — Helm, k9s and kind. Helm remains a runtime
+  dependency for Mason's helm-ls chart linting.
+- Languages — Rust, Go, Python and Node; uv remains for package management.
+  Neovim's language servers, formatters,
+  linters and Go editing utilities are installed by Mason instead; see
+  [langs.md](./langs.md).
 - `neovim` — editor, see [nvim.md](./nvim.md)
-- Shared editor executables are grouped by language: each group keeps its
-  language servers, formatters, linters, and utilities together. Python and
-  Robot Framework share a group, as do YAML, Helm, and Kubernetes. Shared
-  runtimes, editor infrastructure, and general CLI tools have their own groups.
-  StyLua, Taplo, and shfmt are global tools, so Lua, TOML, and shell formatting
-  work outside this dotfiles repository too. Tools with several roles, such
-  as Ruff and Buf, are declared once in their language's group.
 - `tree-sitter` — the CLI nvim-treesitter needs to compile parsers; a hard
   runtime dependency of the Neovim config, deliberately the aqua build
   rather than npm — see [nvim.md](./nvim.md#the-tree-sitter-cli-is-a-hard-dependency)
@@ -116,136 +106,49 @@ git-checkout provisioning, applied explicitly (never automatically) via
 
 ## Maintaining editor tools
 
-The global core config provides two maintenance tasks, available from any
-project after the global config is provisioned:
+Neovim's editor tools are pinned in
+[nvim/lua/plugins/mason.lua](../nvim/lua/plugins/mason.lua), installed by
+[mason.nvim](https://github.com/mason-org/mason.nvim) and ensured by
+[mason-tool-installer.nvim](https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim).
+They live in Neovim's data directory, outside this public repository.
+
+Edit the selected package's exact version, then run `:MasonToolsInstall` to
+apply the pin. For a fresh machine or headless installation:
+
+```sh
+nvim --headless '+MasonToolsInstallSync' '+qa'
+```
+
+Automatic installation of missing or differently pinned packages runs at
+startup. Automatic version upgrades are disabled. `:Mason` shows installation
+status and `:MasonLog` shows failures. `:MasonToolsClean` removes Mason packages
+not declared in the list; use it only when those extra packages are unwanted.
+Native LSP configuration and enablement remain in `lsp.lua`; mason-lspconfig is
+not required. All configured packages use Mason's official registry.
+
+Mason prepends its bin directory to Neovim's PATH. Verify selection with
+`:lua print(vim.fn.exepath("shfmt"))`, `:ConformInfo`, and `:LspInfo`.
+A project's mise tool pin alone does not override Mason in the editor; use an
+explicit client/formatter command for that case. RobotCode and mypy already
+prefer conventional project virtualenv binaries.
+
+Mise continues to own runtimes, compilers, Neovim, terminal and shell tools,
+Helm, the Treesitter CLI, and independent repository hk checks. Keep their
+config and lockfiles together and install with `mise install --locked`.
+The global maintenance commands still inspect mise tools:
 
 ```sh
 mise run global:tools:status
 mise run global:tools:outdated
 ```
 
-`status` runs `mise ls --current` and `mise doctor`. `outdated` runs
-`mise outdated --bump`, comparing exact pins against newer releases. Both use
-the caller's directory, so project overrides are included. They do not install
-or upgrade tools or rewrite pins; the outdated check can fetch release metadata
-and update mise's cache. To inspect shared defaults without project overrides,
-run them from a directory outside a project.
-
-You can pass tool keys to limit the outdated check, for example:
-
-```sh
-mise run global:tools:outdated aqua:mvdan/sh aqua:tamasfe/taplo
-```
-
-Verified both tasks against the real mise binary outside this repository,
-including a filtered outdated check. Config files and lockfiles were unchanged
-after execution. The bootstrap dependency order was checked with mise's dry run;
-a temporary task fixture confirmed that a failed tool-install dependency stops
-`bootstrap:all` before any provisioning command runs.
-
-Use `mise/config.toml` for shared defaults and a project's own `mise.toml`
-for project requirements. The root `mise.toml` retains the tools needed to
-check this dotfiles repository independently; overlapping pins should match
-the global defaults unless this repository deliberately needs a different
-version. Neovim config selects tools and supplies editor settings; mise owns
-their installation and versions.
-
-To change a shared tool, edit its exact version in `mise/config.toml`. For an
-overlapping repository check tool, also update the root declaration. From the
-repository root, refresh only that tool's global lock entry, for example:
-
-```sh
-MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise lock --global aqua:mvdan/sh
-MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install --locked aqua:mvdan/sh
-```
-
-If the root declaration also changed, refresh its lock with `mise lock <tool>`.
-Review the config and lockfile diffs and verify the new tool in a real file.
-Keep exact pins: refreshing a lock alone does not upgrade an exact version.
-Use the same procedure for other tools by replacing the fully qualified key.
-
-### Update one group at a time
-
-Use the language sections in `mise/config.toml` as update units. Treat shared
-runtime changes as separate decisions: a Node upgrade affects several servers,
-and a Python upgrade also requires checking the `uvx_args` runtime references.
-
-1. Check available releases with `global:tools:outdated`, or limit the native
-   command to selected keys, for example:
-
-   ```sh
-   mise outdated --bump go:golang.org/x/tools/gopls go:golang.org/x/tools/cmd/goimports aqua:mvdan/gofumpt aqua:golangci/golangci-lint
-   ```
-
-2. Review the tools' release notes and change only the intended exact pins.
-   Update matching repo-local declarations when applicable. Leave other
-   language groups and Neovim plugin versions for separate changes.
-3. Refresh only the selected global lock entries, then install those tools:
-
-   ```sh
-   MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise lock --global go:golang.org/x/tools/gopls go:golang.org/x/tools/cmd/goimports aqua:mvdan/gofumpt aqua:golangci/golangci-lint
-   MISE_GLOBAL_CONFIG_FILE="$PWD/mise/config.toml" mise install --locked go:golang.org/x/tools/gopls go:golang.org/x/tools/cmd/goimports aqua:mvdan/gofumpt aqua:golangci/golangci-lint
-   ```
-
-4. Restart Neovim for editor tool changes and verify one representative project.
-   For Go, check LSP attachment/navigation, formatting, lint results, and a test
-   run. For Python/Robot, check imports, diagnostics, formatting, and a test.
-   For configuration languages, check schema diagnostics and formatting.
-5. Review the config and lockfile diff before starting another group. Keep the
-   prior pins available so a regression can be resolved by restoring those
-   declarations and lock entries and reinstalling their locked versions.
-
-Update terminal tools separately from language tooling: tmux, lazygit, k9s,
-bottom, yazi, and glow form a useful group. Verify configuration loading and a
-normal workflow in each changed tool. Start a separate tmux server when testing
-a new binary against an existing running server. CLI utilities can be another
-small group. Neovim itself and its plugins deserve a separate update because
-API changes can affect several integrations at once.
-
-For reproducible setup and CI, use `mise install --locked` after checking out
-the config and matching lockfiles. This repository has no CI workflow; the
-existing checks can be run with `hk check --all` after the locked installation.
-
-### Project-specific versions
-
-Add only the overrides a project needs, using the same fully qualified tool
-keys as the global config. For example, in that project's `mise.toml`:
-
-```toml
-[settings]
-lockfile = true
-disable_backends = ["asdf", "vfox"]
-
-[tools]
-"aqua:mvdan/sh" = "3.14.1" # Replace with the exact version this project requires.
-```
-
-From the project directory, run `mise lock` and `mise install --locked`, then
-track both `mise.toml` and `mise.lock` in the project. Other tools inherit their
-global defaults. Project configuration takes precedence according to
-[mise's configuration hierarchy](https://mise.jdx.dev/configuration.html#configuration-hierarchy).
-Rules and style settings belong in the tool's project configuration file;
-the mise pin selects the executable version.
-
-Launch `nvim` from the project after mise has activated its environment, or
-use `mise exec -- nvim`. Verify a tool's selected version with `mise which
-shfmt` and `shfmt --version`. Inside Neovim, `:lua print(vim.fn.exepath("shfmt"))`
-shows the executable visible to the editor. A running Neovim process retains
-its launch environment: restart it after changing tool pins or switching to
-a project with different requirements. Explicit project virtualenv selection
-in a language integration can take precedence over the general PATH lookup.
+After migrating tools, preview `mise prune --dry-run <tool> ...`, then use
+`mise prune <tool> ...` for only the migrated tool keys. Versions referenced
+by other tracked project configs remain installed. Repo-local StyLua, Taplo
+and yamlfmt remain required for hk; jq remains a general shell utility.
 
 For adding another language, follow
 [Add a language to Neovim](./nvim-add-new-lang.md).
-
-Verified on macOS ARM64 from a temporary directory outside this repository,
-starting with a clean system PATH: mise resolved all 23 checked editor
-executables, and the real Neovim configuration formatted Lua, TOML, and shell
-buffers through Conform using the globally declared binaries. A temporary
-project pin selected shfmt 3.14.0 over the global 3.14.1 default; this checked
-configuration precedence without installing that alternate version. Existing
-tool pins and lock entries were preserved. The three added global tools have
-lock entries for macOS ARM64 and Linux ARM64/x64; Linux execution was not tested.
 
 ## Global Docker tasks
 
