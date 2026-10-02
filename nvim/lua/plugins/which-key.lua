@@ -6,9 +6,10 @@ return {
     preset = "modern",
     delay = 250,
     spec = {
+      { "<leader>g", group = "Git UI" },
       { "<leader>G", group = "Git" },
-      { "<leader>T", group = "Trouble lists" },
       { "<leader>c", group = "Code" },
+      { "<leader>cx", group = "Code lists" },
       { "<leader>cg", group = "Go" },
       { "<leader>ck", group = "Kubernetes" },
       { "<leader>cp", group = "Python" },

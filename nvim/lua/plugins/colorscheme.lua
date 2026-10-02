@@ -12,6 +12,15 @@ return {
     custom_highlights = function(colors)
       return {
         YankHighlight = { bg = colors.surface1 },
+        -- Match Trouble's panels to the existing Neo-tree sidebar rather than
+        -- Catppuccin's darker Trouble background and green body text.
+        TroubleNormal = { link = "NeoTreeNormal" },
+        TroubleNormalNC = { link = "NeoTreeNormalNC" },
+        TroubleText = { fg = colors.text },
+        TroubleCount = { fg = colors.lavender, bg = colors.surface0 },
+        TroubleIndent = { link = "NeoTreeIndentMarker" },
+        TroubleIndentFoldClosed = { link = "NeoTreeExpander" },
+        TroubleIndentFoldOpen = { link = "NeoTreeExpander" },
         ["@lsp.type.settingImport.robot"] = { link = "@keyword.import" },
         ["@lsp.type.setting.robot"] = { link = "@keyword" },
         ["@lsp.type.header.robot"] = { link = "@markup.heading" },
@@ -60,6 +69,7 @@ return {
       lsp_trouble = true,
       mini = { enabled = true },
       neotree = true,
+      neogit = true,
       which_key = true,
     },
   },

@@ -12,6 +12,15 @@ opt.cmdheight = 0
 opt.number = true
 opt.relativenumber = true
 
+-- Keep undo history across restarts in Neovim's machine-local state directory.
+opt.undofile = true
+
+-- Syntax-aware folds, open initially; use za/zc/zo/zM/zR to control them.
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldlevel = 99
+opt.foldlevelstart = 99
+
 -- Search
 opt.hlsearch = true
 opt.incsearch = true

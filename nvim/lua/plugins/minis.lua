@@ -1,5 +1,12 @@
 return {
   {
+    "nvim-mini/mini.bufremove",
+    version = "*",
+    main = "mini.bufremove",
+    lazy = true, -- loaded by the shared buffer-close helper on demand
+    opts = {},
+  },
+  {
     "nvim-mini/mini.ai",
     version = "*",
     main = "mini.ai",

@@ -29,11 +29,12 @@ For a step-by-step setup procedure, see [Add a language to Neovim](./nvim-add-ne
 | [catppuccin/nvim](https://github.com/catppuccin/nvim)                                                         | Colorscheme (Mocha)                | Official Catppuccin port; no accent override — see "Theme" below.                                                                                                                                                                                                                |
 | [ibhagwan/fzf-lua](https://github.com/ibhagwan/fzf-lua)                                                       | Fuzzy finder                       | Shells out to the real `fzf` binary already in this repo's global mise config, rather than reimplementing matching in Lua (unlike Telescope). Auto-adapts to the active colorscheme; no manual theme config.                                                                     |
 | [MagicDuck/grug-far.nvim](https://github.com/MagicDuck/grug-far.nvim)                                         | Project find and replace           | A ripgrep-backed search-and-replace buffer, opened with `<leader>fR`; a Visual selection pre-fills its search.                                                                                                                                                                   |
-| [stevearc/aerial.nvim](https://github.com/stevearc/aerial.nvim)                                               | Code outline                       | `<leader>cs` toggles a wide symbol outline on the right while keeping focus in the source window. Uses Treesitter with LSP fallback and the configured Nerd Font — see "Code outline" below.                                                                                     |
+| [NeogitOrg/neogit](https://github.com/NeogitOrg/neogit)                                                       | Magit-style Git interface          | `<leader>gg` opens a Git status tab with fzf-lua and Diffview integration, themed by the official Catppuccin port.                                                                                                                                                               |
 | [sindrets/diffview.nvim](https://github.com/sindrets/diffview.nvim)                                           | Repository diff and file history   | Reviews all changed files in a dedicated tab, replacing Gitsigns' single-buffer diffs under `<leader>G`.                                                                                                                                                                         |
 | [lewis6991/gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim)                                         | Git gutter + hunk operations       | Shows added/changed/deleted lines and provides preview, stage, reset and blame actions under `<leader>G` — see "Git signs and diffs" below.                                                                                                                                      |
 | [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim)                                         | Buffer line                        | Shows listed buffers with the official Catppuccin component theme. `<leader>x` is the close-operations namespace; modified buffers use the shared save/discard/cancel command-bar prompt.                                                                                        |
 | [lukas-reineke/indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim)                 | Indent guides + active scope       | Draws subtle guides with virtual text and highlights the current Treesitter scope. Uses Catppuccin's official integration.                                                                                                                                                       |
+| [nvim-mini/mini.bufremove](https://github.com/nvim-mini/mini.bufremove)                                       | Split-preserving buffer deletion   | Shared close helper keeps save/discard/cancel prompts and removes buffers without collapsing windows.                                                                                                                                                                            |
 | [nvim-mini/mini.ai](https://github.com/nvim-mini/mini.ai)                                                     | Extended text objects              | Adds arguments, function calls, tags and robust pair objects while preserving Neovim's native `an`/`in` Treesitter selection.                                                                                                                                                    |
 | [nvim-mini/mini.icons](https://github.com/nvim-mini/mini.icons)                                               | File/directory icons               | Replaces `nvim-web-devicons`, which is no longer installed. Catppuccin themes its highlight groups; devicons' fixed brand colors were the one non-Catppuccin palette left — see "Icons" below.                                                                                   |
 | [nvim-mini/mini.surround](https://github.com/nvim-mini/mini.surround)                                         | Surround editing                   | Adds coherent `gsa`/`gsd`/`gsr` operations with dot-repeat, counts and Catppuccin highlighting.                                                                                                                                                                                  |
@@ -127,23 +128,15 @@ inheriting the active Catppuccin colorscheme.
 
 ## Code outline
 
-[aerial.nvim](https://github.com/stevearc/aerial.nvim) provides a persistent,
-hierarchical symbol outline for the current source buffer. `<leader>cs` toggles
-it on the right without moving focus away from the source window; once focused,
-the outline keeps Aerial's standard navigation, split-opening and tree-folding
-keys. It prefers Treesitter symbols and falls back to LSP and its other built-in
-backends, so it remains useful before an LSP client attaches.
+[Trouble](https://github.com/folke/trouble.nvim) supplies the document-symbol
+outline. `<leader>cs` toggles a 45-column sidebar on the right without moving
+focus away from the source. Symbols come from the attached LSP server; a buffer
+without a symbol-capable LSP has no outline. Once focused, Enter jumps to a
+symbol, `o` jumps and closes, and `q`, Escape or `<leader>q` closes the panel.
 
-The outline uses 25% of the editor, with a 20-column minimum and a ceiling of
-the lesser of 80 columns or 40% of the editor. Content-based resizing is disabled
-so short symbol names do not collapse it into a narrow strip.
-
-The configured terminal uses a Nerd Font, so Aerial's symbol icons are enabled
-explicitly. Its automatic detection only recognizes nvim-web-devicons or
-lspkind, neither of which is installed because this config uses mini.icons.
-The outline complements rather than replaces fuzzy symbol search:
 `<leader>fs` remains fzf-lua's document-symbol picker and `<leader>fS` remains
-its live workspace-symbol picker.
+its live workspace-symbol picker. Trouble panels are transient: sessions save
+the source layout, and the outline can be reopened with `<leader>cs`.
 
 ## Git signs and diffs
 
@@ -188,6 +181,29 @@ repository history. `<leader>GR` reviews the current branch against
 including uncommitted work. In a Diffview pane, `q` or `<leader>q` closes the
 view. Catppuccin's official Diffview integration supplies the same Mocha palette
 as the rest of the editor.
+
+## Git interface: Neogit
+
+`<leader>gg` opens [Neogit](https://github.com/NeogitOrg/neogit) in a dedicated
+status tab. It is inspired by Emacs Magit and combines status sections, inline
+hunks and action popups in native Neovim buffers. The existing fzf-lua handles
+selection menus and Diffview handles expanded diff views; Catppuccin's official
+`neogit` integration provides the Mocha palette. No additional Git binary or
+picker is needed. The plugin is lazy-loaded and pinned in `lazy-lock.json`.
+
+For a first look, use Tab to expand a section/file/hunk, `?` for help, `l` for
+the log menu and `d` for the diff menu. `q` or `<leader>q` closes the status tab
+and returns to editing. For deliberate Git changes, `s` stages, `u` unstages,
+`c` opens the commit menu and `b` opens the branch menu. Those actions belong
+to the user; opening the UI does not stage, commit or push.
+
+The alternatives reviewed were [Fugitive](https://github.com/tpope/vim-fugitive),
+a command-oriented Git wrapper, and
+[lazygit.nvim](https://github.com/kdheepak/lazygit.nvim), which opens the existing
+standalone Lazygit TUI inside Neovim. Neogit is the closest fit for the requested
+Magit workflow and reuses the editor's existing picker and diff viewer. Lazygit
+remains available as a standalone tool. `<leader>g` is the **Git UI** group in
+WhichKey; existing hunk and Diffview actions remain under `<leader>G`.
 
 ## Buffer line
 
@@ -409,14 +425,14 @@ available after a prefix, so pressing Space and pausing shows the leader map.
 The `modern` preset, rounded border, mini.icons (which which-key prefers over
 devicons on its own) and
 Catppuccin's official integration keep it visually consistent with the rest of
-the editor. `<leader>f` is labelled **Find**, `<leader>G` **Git** and
+the editor. `<leader>f` is labelled **Find**, `<leader>G` **Git**, `<leader>g` **Git UI** and
 `<leader>x` **Close buffers**; individual entries come directly from the `desc`
 already attached to each keymap; `<leader>q` is the direct **Smart close**
 action and `<leader>Q` is **Smart quit all**, rather than either key forming a
 prefix group. `<leader>?` shows only mappings local to the current buffer.
 
 Use `<leader>fk` to search all keymaps by description. The main namespaces are
-`f` for finding, `c` for code, `G` for Git, `t` for tests, `T` for Trouble lists,
+`f` for finding, `c` for code, `G` for Git, `g` for the Git UI, `t` for tests, `cx` for code lists,
 `u` for toggles and `x` for closing buffers. The Go/Kubernetes/Python check keys
 remain under `cg` / `ck` / `cp` and appear only in their relevant filetypes.
 
@@ -435,9 +451,9 @@ focus into it. Both its history tree and live diff are stacked in a 36-column
 sidebar on the right; timestamps are compact and `?` opens its built-in help.
 
 The plugin only visualizes and navigates Neovim's own undo history; it does not
-write the edited file. Persistent undo is deliberately unchanged, so history
-retention still follows Neovim's current `undofile` setting rather than being
-silently broadened by installing a UI.
+write the edited file. `undofile` is enabled, so saved files retain their undo
+history across editor restarts. Neovim uses its default machine-local
+`stdpath("state")/undo/` directory; undo files are outside this repository.
 
 ## Treesitter
 
@@ -527,6 +543,14 @@ whose grammar isn't installed here (`tex` → `latex`, for one), and
 `vim.treesitter.start` *raises* for those — without the guard, opening a
 `.tex` file prints a parse error. Verified both directions.
 
+### Folding
+
+Native `vim.treesitter.foldexpr()` supplies syntax-aware folds with
+`foldmethod=expr`. `foldlevel` and `foldlevelstart` are 99, so files initially
+open unfolded. Use `za` to toggle the fold at the cursor, `zc`/`zo` to close/open
+it, and `zM`/`zR` to close/open all folds. No folding plugin is needed; buffers
+without an installed parser or fold queries have no syntax folds.
+
 ## Sessions
 
 Sessions are keyed by working directory: quit inside a project, come back to
@@ -540,9 +564,9 @@ wait for lazy.nvim before restoring. `suppressed_dirs` keeps `~`, `/`, `/tmp`
 and `~/Downloads` from quietly accumulating sessions, while `auto_restore`
 leaves a bare `nvim` on the [dashboard](#dashboard). General pre-save window
 cleanup is disabled so normal, help and terminal splits reach `mksession`.
-Neo-tree alone is listed in `close_filetypes_on_save`: its generated sidebar is
-transient and would otherwise restore as a dead placeholder. The remaining
-hooks rehydrate Aerial's generated window, as described below.
+Neo-tree, Trouble and Neogit status are listed in `close_filetypes_on_save`: their generated
+sidebars and result panels are transient and would otherwise restore as dead
+placeholders.
 
 The old `no_restore_cmds` hook and its argv inspection remain gone. Neo-tree is
 an explicit sidebar and has netrw hijacking disabled; Oil replaces netrw, so
@@ -580,20 +604,17 @@ saves nothing and — importantly — **deletes nothing**. auto-session's
 when a session was actually loaded or saved this run, so an untouched
 dashboard can't clear the session that was already on disk.
 
-Both of auto-session's pruning paths are explicitly disabled:
 `close_unsupported_windows = false` keeps unnamed/new buffers and plugin-backed
-`nofile` splits, while an empty `close_filetypes_on_save` list also keeps
-windows such as `checkhealth`. This preserves the complete normal-window split
-topology instead of silently collapsing it before `mksession`. Floating windows
+`nofile` splits. The narrow `close_filetypes_on_save` list excludes only
+Neo-tree, Trouble and Neogit status, keeping utility windows such as `checkhealth`. Source
+splits retain their layout when `mksession` saves it. Floating windows
 are not splits and remain outside Neovim's session model.
 
 File, help and terminal windows round-trip natively. Generated plugin buffers
 may restore as placeholders unless their plugin supports reconstruction.
-Aerial is handled explicitly: auto-session's extra-data hooks record whether
-the outline was open and replace each restored `aerial` placeholder through
-Aerial's public `open_in_win()` API. The source is the adjacent window to its
-left, matching the enforced right-side placement, and the previously focused
-source window remains focused.
+Neo-tree, Trouble and Neogit status are closed before saving;
+reopen them with `<leader>e`, `<leader>cs` and `<leader>gg`. No plugin-window reconstruction
+hooks are needed.
 
 Sessions saved before split pruning was disabled already lost those windows.
 Open the desired layout and save or exit once to replace an older session with
@@ -868,14 +889,21 @@ it to handle the cmdline, editor messages, and LSP documentation only.
 already renders a colored `diagnostics` component in `lualine_b`, and both read
 the same counts. Adding it would show every count twice.
 
+Trouble keeps Catppuccin's official integration, with small overrides in the
+colorscheme config to match the existing Neo-tree panels: the same mantle
+background, normal text color, muted indent/expander guides and lavender count
+badges on surface0. Diagnostic severity and syntax-colored symbol icons remain
+owned by the official theme. The overrides follow the active Catppuccin flavor
+and are reapplied on colorscheme changes.
+
 [trouble.nvim](https://github.com/folke/trouble.nvim) provides a 12-line bottom
 panel for diagnostics and result lists. It takes focus when opened, leaves the
 source buffer alone while navigating, and closes with `q` or Escape. Enter jumps
-to an item; `o` jumps and closes the panel. `<leader>Td` toggles workspace
-diagnostics, `<leader>TD` limits them to the current buffer, `<leader>Ts` opens a
-right-side document outline without moving focus, and `<leader>Tr` shows LSP
-references. `<leader>Tq` and `<leader>Tl` show quickfix and location-list data
-through Trouble. `<leader>Tf` reopens the last fzf results in their appropriate
+to an item; `o` jumps and closes the panel. `<leader>cxd` toggles workspace
+diagnostics, `<leader>cxD` limits them to the current buffer, `<leader>cs` opens a
+right-side document outline without moving focus, and `<leader>cxr` shows LSP
+references. `<leader>cxq` and `<leader>cxl` show quickfix and location-list data
+through Trouble. `<leader>cxf` reopens the last fzf results in their appropriate
 file-only or source-location view.
 
 ### Search and check results
@@ -890,9 +918,9 @@ selection actions directly.
 | Open one search result       | Enter in fzf                                  |
 | Keep selected search results | Tab to select, then Enter or `<C-t>`          |
 | Keep all filtered results    | `<C-t>` with nothing selected                 |
-| Reopen those search results  | `<leader>Tf`                                  |
+| Reopen those search results  | `<leader>cxf`                                 |
 | Run a deliberate check       | `<leader>cgl`, `<leader>ckl` or `<leader>cpm` |
-| Reopen check results         | `<leader>Tq`                                  |
+| Reopen check results         | `<leader>cxq`                                 |
 | Search check results         | `<leader>fq`                                  |
 
 Search results use Trouble's fzf source; check results use the native quickfix
@@ -901,9 +929,9 @@ results. Checks open their panel without moving focus from the source buffer,
 and a clean run closes that panel. A failed command preserves the previous
 results, and a failed process start can be retried.
 
-Use `<leader>cs` for the usual symbol outline. Aerial works with Treesitter before
-an LSP attaches and participates in session restoration; `<leader>Ts` retains
-Trouble's alternative LSP outline. Oil, Neo-tree, Gitsigns and Diffview likewise
+Use `<leader>cs` for Trouble's symbol outline. The other Trouble views live
+under `<leader>cx` (**Code lists**) in WhichKey, keeping format, rename and
+other existing Code mappings available. Oil, Neo-tree, Gitsigns and Diffview
 keep their existing editing/sidebar and hunk/repository roles.
 
 **Focus and motion.** `<leader>uz` toggles Zen mode's centred floating workspace.
@@ -988,7 +1016,7 @@ LSP buffer.
 | `<leader>cl` | Run a code lens                                   |
 | `<leader>cr` | Rename symbol                                     |
 | `<leader>cR` | Restart the client                                |
-| `<leader>cs` | Toggle Aerial's document-symbol sidebar           |
+| `<leader>cs` | Toggle Trouble's document-symbol sidebar          |
 | `<leader>uh` | Toggle inlay hints                                |
 
 Formatting and line diagnostics are global mappings, available before an LSP
@@ -1467,6 +1495,13 @@ the raised cmdline. `<leader>fn` opens Noice's FZF message history, which
 includes ordinary command output such as `:pwd`.
 
 ### Quitting and closing with unsaved changes
+
+The shared buffer-close helper uses mini.bufremove to preserve the split layout.
+`<leader>q` closes a focused float or utility window first (including Trouble);
+in a source window it closes the current buffer while keeping splits, or quits
+when it is the final listed buffer. `<leader>Q` quits the whole editor. The
+save/discard/cancel flow below still protects modified files. Bufferline and
+Neo-tree buffer deletion use the same helper.
 
 **Neovim's native `:confirm` dialog cannot be used while noice is active.**
 Since Neovim 0.11.3 the dialog is delivered to the UI through `ext_cmdline`,
@@ -1959,11 +1994,9 @@ was read but not rewritten.
   shell's cwd was also checked: its own session restored with no tree. The
   session file is named for the absolute cwd, and a directory that was only
   browsed produced no session file at all. The complete-layout path was
-  exercised separately with ordinary source splits, an unlisted `nofile`
-  plugin-style split and Aerial: every split returned, while the restored
-  Aerial window reattached to the correct source, symbols repopulated, focus
-  stayed in that source, and an 80-column editor restored the requested
-  32-column outline.
+  exercised separately with ordinary source splits and an unlisted `nofile`
+  plugin-style split: each source and generic utility split returned. Neo-tree
+  and Trouble panels are now excluded from saved layouts.
 - Dashboard: a real `nvim` in a scratch project, queried from inside a
   `VimEnter` autocommand. Plain `nvim` lands on `filetype=alpha`,
   `buftype=nofile`, one window, empty `v:errmsg`, with the banner, the cwd
@@ -1993,6 +2026,35 @@ was read but not rewritten.
   `:<C-U>TmuxNavigateLeft<CR>`, confirming the arrow-key mappings register
   alongside vim-tmux-navigator's `<C-h/j/k/l>` defaults rather than
   replacing them.
+
+## UX verification
+
+Checked with the real Neovim 0.12.5 binary and the pinned mini.bufremove release:
+clean buffer deletion and save/discard/cancel each preserved two source splits;
+saving wrote the expected file. Smart close dismissed utility windows and
+floats, and routed the final source buffer or sole utility window through the
+existing quit flow.
+A populated Trouble quickfix panel closed through `<leader>q` and returned focus
+to its source. The new Code mappings resolve and the old Trouble prefix is gone.
+The symbol outline rendered real gopls symbols without moving source focus;
+saving a session removed Trouble and retained two source splits.
+Lua folds started open, closed with `zM` and reopened with `zR`. A file saved in
+one Neovim process recovered its prior contents through undo in a fresh process.
+StyLua, rumdl and `git diff --check` passed.
+
+## Git UI and panel-theme verification
+
+Verified with the real Neovim binary: Trouble's active/inactive backgrounds
+resolve to Neo-tree's highlight groups, body text uses Mocha's normal text,
+count badges use lavender, and indent guides match the sidebar. These values
+survive loading Trouble and reapplying the colorscheme.
+
+Neogit opens a dedicated tab containing the repository's actual unstaged status;
+its fzf-lua/Diffview options are enabled and branch highlights resolve to the
+official Catppuccin peach. The status-local `<leader>q` closes that tab and
+returns to the source. The repository index stayed unchanged during the check.
+Neogit stores its remembered settings under `stdpath("state")/neogit/`, outside
+this repository; its transient status tab is excluded from saved sessions.
 
 ## Applied
 

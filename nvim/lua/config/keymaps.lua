@@ -5,8 +5,8 @@ vim.keymap.set("n", "<leader>w", "<cmd>write<CR>", { desc = "Save file" })
 vim.keymap.set("n", "<leader>W", "<cmd>write ++p<CR>", { desc = "Save file (create parent dirs)" })
 vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 
--- Close the focused float, the current buffer, or Neovim when no other listed
--- buffer remains. See lua/config/buffers.lua for the unsaved-change flow.
+-- Close the focused float/utility window, the current buffer, or Neovim when
+-- no other listed buffer remains. See lua/config/buffers.lua for the unsaved-change flow.
 vim.keymap.set("n", "<leader>q", function()
   require("config.buffers").smart_close()
 end, { desc = "Smart close" })

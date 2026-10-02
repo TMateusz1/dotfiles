@@ -53,7 +53,7 @@ function M.close(bufnr)
   end
 
   if not vim.bo[bufnr].modified then
-    vim.cmd(("bdelete %d"):format(bufnr))
+    require("mini.bufremove").delete(bufnr)
     return
   end
 
@@ -71,9 +71,9 @@ function M.close(bufnr)
     vim.api.nvim_buf_call(bufnr, function()
       vim.cmd("write")
     end)
-    vim.cmd(("bdelete %d"):format(bufnr))
+    require("mini.bufremove").delete(bufnr)
   else
-    vim.cmd(("bdelete! %d"):format(bufnr))
+    require("mini.bufremove").delete(bufnr, true)
   end
 end
 
@@ -95,7 +95,7 @@ function M.quit_all()
   end
 end
 
---- Close the focused UI layer: float, current buffer, or Neovim itself.
+--- Close the focused UI layer: float/utility window, buffer, or Neovim itself.
 function M.smart_close()
   local winid = vim.api.nvim_get_current_win()
   local win_config = vim.api.nvim_win_get_config(winid)
@@ -105,6 +105,23 @@ function M.smart_close()
   end
 
   local bufnr = vim.api.nvim_get_current_buf()
+  if vim.bo[bufnr].filetype == "trouble" then
+    vim.cmd("Trouble close")
+    return
+  end
+  if vim.bo[bufnr].buftype ~= "" or not vim.bo[bufnr].buflisted then
+    local ordinary_windows = vim.tbl_filter(function(win)
+      local config = vim.api.nvim_win_get_config(win)
+      return config.relative == "" and not config.external
+    end, vim.api.nvim_list_wins())
+    if #ordinary_windows == 1 then
+      M.quit_all()
+    else
+      vim.api.nvim_win_close(winid, false)
+    end
+    return
+  end
+
   local visible = listed()
   if #visible == 0 or (#visible == 1 and visible[1] == bufnr) then
     M.quit_all()
