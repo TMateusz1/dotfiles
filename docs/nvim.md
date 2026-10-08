@@ -52,7 +52,7 @@ For a step-by-step setup procedure, see [Add a language to Neovim](./nvim-add-ne
 | [folke/zen-mode.nvim](https://github.com/folke/zen-mode.nvim)                                                 | Opt-in centred editing             | `<leader>uz` opens the current buffer in a distraction-free centred floating workspace.                                                                                                                                                                                          |
 | [folke/twilight.nvim](https://github.com/folke/twilight.nvim)                                                 | Opt-in context dimming             | `<leader>ux` dims inactive code around the current Treesitter context; it stays independent from Zen mode.                                                                                                                                                                       |
 | [folke/flash.nvim](https://github.com/folke/flash.nvim)                                                       | Fast labelled motions              | `s` jumps by label, `S` selects Treesitter nodes, and `/`/`?` can opt into labelled search with `<C-s>`. Catppuccin styles its labels.                                                                                                                                           |
-| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded — it defines its own `<C-h/j/k/l>` and `<C-\>` maps at load time. Arrow-key equivalents are added in `config`. Pairs with `tmux/.tmux.conf`, which forwards all three spellings to whichever app owns the pane — see [core_tools.md#tmux](./core_tools.md#tmux). |
+| [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)                           | Seamless tmux/nvim pane navigation | Not lazy-loaded. Direction keys use its tmux handoff plus the local Kitty edge watcher, including for remote tmux; `<C-\\>` retains its previous-pane mapping. See [core_tools.md#tmux](./core_tools.md#tmux).                                                                   |
 | [neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)                                             | LSP server definitions             | Only a data source: it puts `lsp/*.lua` on the runtimepath so `vim.lsp.enable()` can find servers. No `lspconfig.setup()` — see "LSP" below.                                                                                                                                     |
 | [saghen/blink.cmp](https://github.com/saghen/blink.cmp)                                                       | Completion                         | Rust fuzzy matcher **built from source** with the mise-pinned toolchain, never downloaded — see "Completion" below.                                                                                                                                                              |
 | [stevearc/conform.nvim](https://github.com/stevearc/conform.nvim)                                             | Formatting                         | Format on save, switchable per buffer and globally under `<leader>u`. Formatters are Mason binaries — see "Formatting".                                                                                                                                                          |
@@ -2035,11 +2035,11 @@ was read but not rewritten.
   returned the old buffer. The macOS/SSH round trip still needs an attached
   Kitty client because reading a real desktop clipboard is deliberately not an
   automated test.
-- `vim.fn.maparg("<C-Left>", "n")` resolves to `<Cmd>TmuxNavigateLeft<CR>`
-  and `maparg("<C-h>", "n")` to the plugin's own
-  `:<C-U>TmuxNavigateLeft<CR>`, confirming the arrow-key mappings register
-  alongside vim-tmux-navigator's `<C-h/j/k/l>` defaults rather than
-  replacing them.
+- `vim.fn.maparg("<C-Left>", "n", false, true)` and the corresponding
+  `<C-h>` map both resolve to the Lua navigation wrapper with the expected
+  `Move to left split/pane` description. `TmuxNavigateLeft` remains available
+  for the middle-layer handoff and `g:tmux_navigator_no_wrap` is enabled so a
+  layout race cannot wrap to the opposite tmux edge.
 
 ## UX verification
 

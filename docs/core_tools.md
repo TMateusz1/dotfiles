@@ -153,10 +153,13 @@ enough not to fight Neovim's `<Esc>`. Smart pane navigation (`C-h/j/k/l`) that f
 to Neovim/fzf when one of those is running in the current pane, otherwise
 moves between tmux panes. The same treatment covers the arrow-key
 equivalents (`C-Left/Down/Up/Right`) and `C-\` (jump to the previously used
-pane), so all three spellings behave identically whether or not Neovim owns
-the pane — see [nvim.md](./nvim.md#plugins) for the Neovim-side
-counterpart, vim-tmux-navigator, which binds the matching keys inside
-Neovim's own splits. `prefix g` opens a [lazygit](#lazygit) popup in
+pane). At an outside edge the directional keys emit a tmux passthrough sequence
+containing the narrowly scoped `tmux_kitty_navigate` Kitty user variable. The
+local watcher described in
+[desktop_tools.md](./desktop_tools.md#seamless-kitty-tmux-and-neovim-navigation)
+moves to the adjacent Kitty split, including when tmux is reached over SSH;
+there is no local control socket for the remote VM to access or forward. See
+[nvim.md](./nvim.md#plugins) for the Neovim-side counterpart. `prefix g` opens a [lazygit](#lazygit) popup in
 the current pane's directory. Statusline hand-rolled in Catppuccin Mocha
 (blue accent, matching [git.md](./git.md) and
 [atuin](./util_tools.md#atuin)) — no plugin manager, no third-party
@@ -182,7 +185,10 @@ identical. Terminal capability values matched the original config; other options
 and bindings matched apart from the intended window-picker filter, shorter
 status formats and unused palette variables. With two attached test clients,
 the actual `prefix w` picker showed only its client's current session.
-The real desktop clipboard/SSH round trip was not repeated in this review.
+The 2026-10-08 navigation change was reviewed against tmux 3.7c's
+`command-alias`, `pane_at_*` and passthrough syntax. The sandbox used for the
+change prohibited creating a tmux server socket, so config loading and the real
+desktop/SSH navigation round trip still need an attached client check.
 
 ## yazi
 
