@@ -170,6 +170,10 @@ used memory and combined disk read/write throughput in a separate Catppuccin
 green block beside the clock. The values refresh every five seconds through
 [`status-metrics.sh`](../tmux/status-metrics.sh); it uses macOS or Linux system
 tools and reflects the machine running the tmux server.
+Beside the current pane directory, the current Git branch appears with the
+same `` symbol and Catppuccin peach color as Starship. The Git query uses the
+pane directory with shell quoting, including for paths containing spaces.
+The branch label is hidden outside repositories or when HEAD is detached.
 On macOS, MEM uses `vm_stat` page counters and `sysctl hw.memsize`, excluding
 file-backed and purgeable cache while including wired memory and the physical
 compressor footprint. This follows the [Stats RAM reader](https://github.com/exelban/stats/blob/master/Modules/RAM/readers.swift)
@@ -196,10 +200,6 @@ Session and title shortcuts: `prefix C` prompts for a new session name and
 starts it in the current pane's directory; `prefix S` renames the session,
 `prefix W` renames the window, and `prefix T` renames the pane. These use
 uppercase letters (`Shift+C/S/W/T`), distinct from Control-letter keys.
-Each pane shows its number and title along its top border, using Catppuccin
-blue for the active pane and muted text for the others. This uses one row per
-pane. `prefix T` changes the displayed title; applications such as Neovim may
-also update it through their terminal-title sequences.
 The built-in `prefix $` and `prefix ,` rename-session and rename-window
 bindings remain available too.
 With `status-keys vi`, these prompts use vi-style editing: `h`/`l` move the
@@ -252,6 +252,11 @@ counters and the installed RAM size: the helper reported about 60% usage,
 excluding reclaimable cache, where the earlier PhysMem-based reading was
 near full. The revised script passed ShellCheck and requires no tmux reload:
 the status command reads it again on each refresh.
+
+The Git branch status command was checked in a temporary tmux server for a
+repository, its subdirectory, a non-Git directory, and a path containing spaces
+and quotes. The label matched the branch or was hidden as appropriate. The
+updated status format was applied to the live server.
 
 ## yazi
 
