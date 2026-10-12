@@ -163,9 +163,8 @@ there is no local control socket for the remote VM to access or forward. See
 [nvim.md](./nvim.md#plugins) for the Neovim-side counterpart. `prefix g` opens a [lazygit](#lazygit) popup in
 the current pane's directory. Statusline hand-rolled in Catppuccin Mocha
 (blue accent, matching [git.md](./git.md) and
-[atuin](./util_tools.md#atuin)) — no plugin manager, no third-party
-plugins, just tmux's own format strings, which also means there's nothing
-here to vet for trust beyond tmux itself. The right side also shows host CPU,
+[atuin](./util_tools.md#atuin)), using tmux's own format strings.
+The right side also shows host CPU,
 used memory and combined disk read/write throughput in a separate Catppuccin
 green block beside the clock. The values refresh every five seconds through
 [`status-metrics.sh`](../tmux/status-metrics.sh); it uses macOS or Linux system
@@ -204,6 +203,35 @@ The built-in `prefix $` and `prefix ,` rename-session and rename-window
 bindings remain available too.
 With `status-keys vi`, these prompts use vi-style editing: `h`/`l` move the
 cursor, `b`/`w` move by word, and `0`/`$` jump to the start/end of the input.
+
+`prefix s` opens [SessionX](https://github.com/omerxx/tmux-sessionx), replacing
+the native session picker with fuzzy search and a pane preview. Enter selects
+a session or creates one from a new name; within the popup, `Ctrl+r` renames,
+`Alt+Backspace` deletes, `Ctrl+w` lists windows, and Escape closes the picker.
+It uses the existing mise-managed fzf and bat, fzf's built-in tmux popup mode,
+and the shared Catppuccin colors. The shell's `tc [name]` helper still creates
+or attaches to a session from outside tmux (default: `core`).
+
+[Resurrect](https://github.com/tmux-plugins/tmux-resurrect) and
+[Continuum](https://github.com/tmux-plugins/tmux-continuum) save the environment
+automatically every 15 minutes and restore the latest snapshot when the tmux
+server starts. Saves live in `~/.local/share/tmux/resurrect/`, outside this
+public repository. `prefix Ctrl+s` saves immediately; `prefix Ctrl+r` restores
+manually. These are Control-letter keys, distinct from `prefix S` for renaming.
+Snapshots restore sessions, windows, pane layouts and working directories;
+supported programs can be restarted, but process memory is not preserved.
+Pane-content capture remains disabled by default.
+
+All three plugin checkouts live under `~/.local/share/tmux/plugins/` and are
+pinned to exact upstream revisions in `mise.toml`'s `[bootstrap.repos]`.
+`mise run bootstrap:plugins` provisions them; no TPM is needed. Provision the
+plugins before the first config reload. Continuum loads after Resurrect and
+the statusline, so its invisible autosave job survives config reloads.
+Its upstream debug trace goes to `~/.local/share/tmux/plugins/tmux-continuum.log`
+instead of appearing in a pane when the config loads.
+Autosave needs an attached client refreshing the statusline; it does not run
+on a timer while every client is detached. Continuum also suppresses automatic
+save/restore when it detects another tmux server, to avoid mixing snapshots.
 
 `prefix [` / `prefix ]` select the previous/next window and can be repeated
 for one second after a single prefix. Ctrl-bracket variants work too; in legacy
@@ -257,6 +285,16 @@ The Git branch status command was checked in a temporary tmux server for a
 repository, its subdirectory, a non-Git directory, and a path containing spaces
 and quotes. The label matched the branch or was hidden as appropriate. The
 updated status format was applied to the live server.
+
+The 2026-10-12 session plugins were checked on an isolated tmux 3.7c server
+with an attached PTY client: both prefixes opened SessionX and selected the
+requested session. Continuum saved when its interval was due; after killing
+that test server, Resurrect recovered two sessions, three windows, four panes
+and their directories. The live server was reloaded twice, with one autosave
+status job retained, and that job created the first machine-local snapshot.
+Automatic startup restoration is enabled; the kill/restore test exercised
+Resurrect manually because Continuum suppresses automatic restoration while
+the user's separate live server exists. TOML and Markdown checks passed.
 
 ## yazi
 

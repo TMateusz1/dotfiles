@@ -31,7 +31,7 @@ mise/                  # shared tools + macOS + opt-in desktop layers → ~/.con
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
 atuin/                 # atuin config → ~/.config/atuin/
-tmux/                  # tmux config + status metrics helper (see docs/core_tools.md#tmux)
+tmux/                  # config + metrics; SessionX and session persistence (see docs/core_tools.md#tmux)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
 eza/                   # eza theme → ~/.config/eza/

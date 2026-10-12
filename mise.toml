@@ -49,18 +49,22 @@ run = "mise bootstrap dotfiles apply"
 description = "Install configured tools using the committed lockfiles"
 run = "mise install --locked"
 
-[tasks."bootstrap:zsh-plugins"]
-description = "Clone/update oh-my-zsh and its custom plugins"
+[tasks."bootstrap:plugins"]
+description = "Provision oh-my-zsh, Zsh plugins, and pinned tmux plugins"
 run = "mise bootstrap repos apply"
+
+[tasks."bootstrap:zsh-plugins"]
+description = "Compatibility alias for bootstrap:plugins"
+depends = ["bootstrap:plugins"]
 
 [tasks."bootstrap:zsh-completion"]
 description = "Install mise's generated Zsh completion"
 run = "mise completion zsh --install"
 
 [tasks."bootstrap:all"]
-description = "Install locked tools, then bootstrap dotfiles, Zsh plugins, and completion"
+description = "Install locked tools, then bootstrap dotfiles, plugins, and completion"
 depends = ["bootstrap:tools"]
-run = "mise run bootstrap:dotfiles ::: bootstrap:zsh-plugins ::: bootstrap:zsh-completion"
+run = "mise run bootstrap:dotfiles ::: bootstrap:plugins ::: bootstrap:zsh-completion"
 
 # Desktop/GUI apps live in mise/config.desktop.toml, loaded only via `-E desktop` —
 # never by plain `mise install`/`mise bootstrap`/`mise run`. This is the
@@ -109,3 +113,7 @@ run = "mise -E desktop bootstrap packages apply"
 "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions" = { url = "https://github.com/zsh-users/zsh-autosuggestions.git", ref = "v0.7.1" }
 "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" = { url = "https://github.com/zsh-users/zsh-syntax-highlighting.git", ref = "0.8.0" }
 "~/.oh-my-zsh/custom/plugins/you-should-use" = { url = "https://github.com/MichaelAquilina/zsh-you-should-use.git", ref = "1.11.1" }
+# Exact upstream revisions keep tmux plugin provisioning reproducible.
+"~/.local/share/tmux/plugins/tmux-sessionx" = { url = "https://github.com/omerxx/tmux-sessionx.git", ref = "5e8df209e0c9ae826784555afa834db8722378a6" }
+"~/.local/share/tmux/plugins/tmux-resurrect" = { url = "https://github.com/tmux-plugins/tmux-resurrect.git", ref = "cff343cf9e81983d3da0c8562b01616f12e8d548" }
+"~/.local/share/tmux/plugins/tmux-continuum" = { url = "https://github.com/tmux-plugins/tmux-continuum.git", ref = "0698e8f4b17d6454c71bf5212895ec055c578da0" }

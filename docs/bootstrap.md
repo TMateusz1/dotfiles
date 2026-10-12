@@ -11,9 +11,9 @@ mise run bootstrap:tools      # install tools from the committed lockfiles
 mise run bootstrap:status     # what would change — read-only
 mise run bootstrap:dry-run    # preview the dotfile symlinks specifically
 mise run bootstrap:dotfiles   # apply symlinks — see "What gets symlinked" below
-mise run bootstrap:zsh-plugins  # clone/update oh-my-zsh + its 3 custom plugins
+mise run bootstrap:plugins    # provision oh-my-zsh, Zsh plugins, and tmux plugins
 mise run bootstrap:zsh-completion  # install mise's generated Zsh completion
-mise run bootstrap:all        # locked tools, then dotfiles + Zsh plugins/completion
+mise run bootstrap:all        # locked tools, then dotfiles + plugins/completion
 mise run bootstrap:all-desktop  # GUI/desktop apps — opt-in, see "Desktop apps" below
 ```
 
@@ -25,7 +25,7 @@ dotfile and repo bootstrap operations refuse to clobber a real pre-existing
 file/directory at any target without `--force`.
 
 `bootstrap:all` first completes `bootstrap:tools` (`mise install --locked`),
-then runs the dotfile and Zsh provisioning tasks. A failed tool install stops
+then runs the dotfile, plugin and Zsh completion tasks. A failed tool install stops
 provisioning. Automatic tool installation before tasks is disabled in the
 repo-local and global core settings, so status tasks can report missing tools
 and provisioning uses the explicit locked installation step.
@@ -33,7 +33,7 @@ and provisioning uses the explicit locked installation step.
 Use `mise install --locked` for a fresh checkout or a CI job as well. Missing
 lock metadata should be fixed by updating the appropriate committed lockfile,
 then retrying installation. Locked installs still download artifacts; they
-are not an offline mode. The desktop package provider and Zsh repository
+are not an offline mode. The desktop package provider and plugin repository
 checkouts use their own provisioning declarations, rather than `mise.lock`.
 
 Neovim installs its pinned editor tooling through Mason at first startup.
@@ -134,13 +134,13 @@ the generated `_mise` function to
 state rather than a tracked dotfile: mise owns its format and can refresh it
 when mise itself changes.
 
-`bootstrap:all` runs this task alongside the dotfile and Zsh plugin tasks
+`bootstrap:all` runs this task alongside the dotfile and plugin tasks
 after installing locked tools, so a fresh machine needs only
 `mise run bootstrap:all`. The matching
 `fpath` entry lives in `shell/.zshrc` before Oh My Zsh loads; Oh My Zsh already
 runs `compinit`, so bootstrap does not add a duplicate initialization.
 
-## Zsh plugins
+## Zsh and tmux plugins
 
 ```toml
 [bootstrap.repos]
@@ -148,14 +148,24 @@ runs `compinit`, so bootstrap does not add a duplicate initialization.
 "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions" = { url = "...", ref = "v0.7.1" }
 "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" = { url = "...", ref = "0.8.0" }
 "~/.oh-my-zsh/custom/plugins/you-should-use" = { url = "...", ref = "1.11.1" }
+"~/.local/share/tmux/plugins/tmux-sessionx" = { url = "...", ref = "5e8df209e0c9ae826784555afa834db8722378a6" }
+"~/.local/share/tmux/plugins/tmux-resurrect" = { url = "...", ref = "cff343cf9e81983d3da0c8562b01616f12e8d548" }
+"~/.local/share/tmux/plugins/tmux-continuum" = { url = "...", ref = "0698e8f4b17d6454c71bf5212895ec055c578da0" }
 ```
 
-`ref` pins each plugin to a real, current tag (checked directly against
-each repo) — reproducible, matching this repo's general "always lock"
+`ref` pins the Zsh plugins to real tags and the tmux plugins to exact upstream
+commits — reproducible, matching this repo's general "always lock"
 stance. oh-my-zsh itself has no tagged releases (it's designed to track
 `master` via its own self-update mechanism), so it's pinned to `master`
 rather than a specific commit — the one entry here that's a rolling
 reference rather than a fixed one.
+
+`bootstrap:plugins` applies these repositories through native mise provisioning.
+The former `bootstrap:zsh-plugins` task remains as a compatibility alias.
+Tmux loads SessionX, Resurrect and Continuum directly from their checkouts;
+no separate plugin manager is needed. Session snapshots are machine-local data
+under `~/.local/share/tmux/resurrect/`, not symlinked into this repository.
+See [tmux](./core_tools.md#tmux) for keybindings and autosave behavior.
 
 ## Desktop apps
 
