@@ -31,7 +31,7 @@ mise/                  # shared tools + macOS + opt-in desktop layers → ~/.con
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
 atuin/                 # atuin config → ~/.config/atuin/
-tmux/                  # tmux config → ~/.tmux.conf (see docs/core_tools.md#tmux)
+tmux/                  # tmux config + status metrics helper (see docs/core_tools.md#tmux)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
 eza/                   # eza theme → ~/.config/eza/
@@ -65,6 +65,8 @@ docs/                  # notes on what's configured, and why
 For everyday editor shortcuts, see the [Neovim keymap guide](./docs/nvim.md#keymap-guide)
 and [search/check results workflow](./docs/nvim.md#search-and-check-results).
 To extend language support, follow [Add a language to Neovim](./docs/nvim-add-new-lang.md).
+Rust includes Clippy diagnostics on save, macro analysis and rustfmt formatting;
+see [Rust setup](./docs/langs.md#rust).
 Neovim LSPs (including the official JetBrains Kotlin server), formatters,
 linters, and editing utilities are managed by Mason; see
 [maintenance and project version overrides](./docs/mise.md#maintaining-editor-tools).

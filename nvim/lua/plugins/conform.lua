@@ -1,4 +1,4 @@
--- Formatting. Every formatter is a binary managed by Mason; conform
+-- Formatting. Standalone formatters are managed by Mason; conform
 -- only orchestrates them. This is separate from hk.pkl, which formats *this
 -- repo's own* files at commit time — see docs/linting.md.
 return {
@@ -37,6 +37,9 @@ return {
       go = { "goimports", "gofumpt" },
       lua = { "stylua" },
       python = { "ruff_format" },
+      -- rust-analyzer invokes the active Rust toolchain's rustfmt, preserving
+      -- the crate edition and project rustfmt.toml without a second install.
+      rust = { lsp_format = "prefer" },
       yaml = { "yamlfmt" },
       toml = { "taplo" },
       json = { "jq" },

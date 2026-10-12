@@ -1309,6 +1309,18 @@ The custom set is aimed at controller work rather than at generic Go: a
 `RequeueAfter`, the controller-runtime logger, a kubebuilder RBAC marker,
 wrapped-error returns, a parallel table-driven test, and a context with timeout.
 
+### Rust
+
+rust-analyzer checks all Cargo targets with Clippy on save and supports build
+scripts and procedural macros. Cargo's default feature selection is preserved.
+The existing LSP navigation, code-action, rename and inlay-hint mappings work
+in Rust buffers. See [Rust tooling](./langs.md#rust) for toolchain components.
+
+Verified with Neovim 0.12.5 in a scratch edition-2024 Cargo project: Mason's
+rust-analyzer attached, Treesitter highlighting was active, Clippy reported
+`useless_vec`, and both `<leader>cf`'s Conform formatting path and format on
+save produced rustfmt output.
+
 ## Formatting
 
 [conform.nvim](https://github.com/stevearc/conform.nvim) sequences the
@@ -1325,6 +1337,7 @@ scoped to particular files, apply when saving from Neovim.
 | Go       | `goimports` then `gofumpt` |
 | Lua      | `stylua`                   |
 | Python   | `ruff_format`              |
+| Rust     | rust-analyzer (rustfmt)    |
 | YAML     | `yamlfmt`                  |
 | TOML     | `taplo`                    |
 | JSON     | `jq`                       |
@@ -1337,6 +1350,9 @@ YAML. For Robot Framework, conform's LSP fallback uses whichever RobotCode
 client won the local/global selection. Protocol Buffers uses the same LSP fallback
 for `buf_ls` formatting, so the Buf CLI supplies formatting and live lint
 diagnostics without a second formatter or linter.
+
+Rust explicitly prefers LSP formatting: rust-analyzer invokes the active
+toolchain's rustfmt with the crate edition and project formatting configuration.
 
 **Format on save is on by default and switchable at two levels**, because the
 common failure mode is opening someone else's repo with a different style:

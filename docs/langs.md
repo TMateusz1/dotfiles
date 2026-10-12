@@ -10,6 +10,19 @@ Mise pins Rust (`rustc` and `cargo`), used by projects, `cargo:eza`, and the
 locally compiled blink.cmp fuzzy matcher. Mason installs `rust-analyzer` and
 prepends its bin directory to Neovim's PATH, ahead of rustup's optional copy.
 
+Neovim configures [rust-analyzer](https://rust-analyzer.github.io/book/configuration.html)
+for build scripts, procedural macros and Clippy diagnostics on save across all
+targets, using the project's default Cargo features. Treesitter highlights Rust;
+Blink supplies completion and the shared LSP mappings handle navigation, rename
+and code actions. `<leader>uh` toggles rust-analyzer's inlay hints.
+
+Conform formats Rust on save and with `<leader>cf` through rust-analyzer, which
+invokes the active toolchain's rustfmt and reads the project's `rustfmt.toml`
+or `.rustfmt.toml`. Clippy and rustfmt stay with the mise-managed Rust toolchain;
+no separate Mason copies are installed. The toolchain needs the `clippy`,
+`rustfmt` and `rust-src` components; if missing, run
+`rustup component add clippy rustfmt rust-src` for the active toolchain.
+
 ## Go
 
 Mise pins Go. Neotest drives `go test` directly and needs no additional runner

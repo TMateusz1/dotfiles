@@ -241,6 +241,20 @@ return {
       end,
     })
 
+    vim.lsp.config("rust_analyzer", {
+      settings = {
+        ["rust-analyzer"] = {
+          cargo = {
+            allTargets = true,
+            buildScripts = { enable = true },
+          },
+          procMacro = { enable = true },
+          checkOnSave = true,
+          check = { command = "clippy" },
+        },
+      },
+    })
+
     vim.lsp.config("robotcode", {
       -- Prefer a conventional project-local installation without requiring
       -- shell activation, then fall back to the first `robotcode` on PATH
@@ -295,7 +309,7 @@ return {
         map("n", "<leader>cr", vim.lsp.buf.rename, "Rename symbol")
         map("n", "<leader>cR", "<cmd>LspRestart<cr>", "Restart LSP")
 
-        -- Inlay hints are configured for gopls and lua_ls above; this makes
+        -- Inlay hints are available from gopls, lua_ls and rust-analyzer; this makes
         -- them switchable rather than permanent visual noise.
         if vim.lsp.inlay_hint then
           map("n", "<leader>uh", function()

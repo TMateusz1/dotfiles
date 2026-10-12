@@ -72,6 +72,7 @@ shorthand.
 [dotfiles]
 "~/.zshrc" = "shell/.zshrc"
 "~/.tmux.conf" = "tmux/.tmux.conf"
+"~/.config/tmux/status-metrics.sh" = "tmux/status-metrics.sh"
 "~/.config/starship.toml" = "starship/starship.toml"
 "~/.config/git" = "git"
 "~/.config/atuin" = "atuin"
