@@ -143,12 +143,49 @@ fi
 if command -v tmux >/dev/null 2>&1; then
   tc() {
     local session="${1:-core}"
+    # HOME is expanded by tmux's shell when it launches the plugin.
+    # shellcheck disable=SC2016
+    local picker='exec "$HOME/.local/share/tmux/plugins/tmux-sessionx/scripts/sessionx.sh"'
+    local inside_tmux=false
 
     if [[ -n "$TMUX" ]] && tmux display-message -p '#S' >/dev/null 2>&1; then
-      tmux has-session -t "$session" 2>/dev/null || tmux new-session -d -s "$session" -c "$HOME"
-      tmux switch-client -t "$session"
+      inside_tmux=true
+    fi
+
+    # An explicit name keeps the direct create/attach shortcut.
+    if [[ $# -gt 0 ]]; then
+      if [[ "$inside_tmux" == true ]]; then
+        tmux has-session -t "=$session" 2>/dev/null || tmux new-session -d -s "$session" -c "$HOME" || return
+        tmux switch-client -t "=$session"
+      else
+        TMUX='' TMUX_PANE='' tmux new-session -A -s "$session" -c "$HOME"
+      fi
+      return
+    fi
+
+    if [[ ! -x "$HOME/.local/share/tmux/plugins/tmux-sessionx/scripts/sessionx.sh" ]]; then
+      print -u2 'SessionX is missing; run mise run bootstrap:plugins from the dotfiles repository.'
+      return 1
+    fi
+
+    # Every path uses the complete SessionX plugin and includes all sessions.
+    # Set both the public option and SessionX's cached option for live servers.
+    if [[ "$inside_tmux" == true ]]; then
+      tmux set-option -g @sessionx-filter-current false
+      tmux set-option -g @sessionx-_filter-current false
+      tmux run-shell -t "$TMUX_PANE" "$picker"
     else
-      tmux new-session -A -s "$session" -c "$HOME"
+      if ! TMUX='' TMUX_PANE='' tmux has-session 2>/dev/null; then
+        # Keep an empty server alive while its config and Continuum restore
+        # finish. With a snapshot, use restored sessions instead of adding core.
+        TMUX='' TMUX_PANE='' tmux start-server \; set-option -s exit-empty off || return
+        TMUX='' TMUX_PANE='' tmux has-session 2>/dev/null ||
+          TMUX='' TMUX_PANE='' tmux new-session -d -s core -c "$HOME" || return
+        TMUX='' TMUX_PANE='' tmux set-option -s exit-empty on
+      fi
+      TMUX='' TMUX_PANE='' tmux set-option -g @sessionx-filter-current false
+      TMUX='' TMUX_PANE='' tmux set-option -g @sessionx-_filter-current false
+      TMUX='' TMUX_PANE='' tmux attach-session \; run-shell "$picker"
     fi
   }
 fi

@@ -209,8 +209,16 @@ the native session picker with fuzzy search and a pane preview. Enter selects
 a session or creates one from a new name; within the popup, `Ctrl+r` renames,
 `Alt+Backspace` deletes, `Ctrl+w` lists windows, and Escape closes the picker.
 It uses the existing mise-managed fzf and bat, fzf's built-in tmux popup mode,
-and the shared Catppuccin colors. The shell's `tc [name]` helper still creates
-or attaches to a session from outside tmux (default: `core`).
+and the shared Catppuccin colors. The current session remains in the list.
+Plain `tc` opens the complete SessionX plugin in every context. Outside tmux,
+it attaches to an existing session and immediately opens SessionX, including
+the attached session in the list. With the server stopped, it starts tmux,
+lets Continuum restore the saved environment, then attaches and opens the
+same picker. With no saved sessions, it creates `core` in the home directory
+as the plugin's host. Escape closes the picker and leaves you attached.
+`tc name` skips the picker and creates, attaches to, or switches to that exact
+session name.
+See [shell helpers](./shell.md#tmux-session-picker) for startup use.
 
 [Resurrect](https://github.com/tmux-plugins/tmux-resurrect) and
 [Continuum](https://github.com/tmux-plugins/tmux-continuum) save the environment

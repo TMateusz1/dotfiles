@@ -89,6 +89,42 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   shell to wherever it was left — see
   [core_tools.md#yazi](./core_tools.md#yazi).
 
+## Tmux session picker
+
+Plain `tc` always opens the installed SessionX plugin, just like `prefix s`,
+with its complete hotkeys, previews and shared Catppuccin colors. Every
+session is listed, including the current one. SessionX requires an attached
+tmux client, so outside tmux the helper attaches before opening the popup.
+
+- Inside tmux: open SessionX in the current pane without nesting tmux.
+- Outside tmux: attach to an existing session, then open SessionX with all
+  sessions selectable, including the attached one.
+- With the server stopped: start tmux and let its config and Continuum restore
+  complete before attaching and opening SessionX. Restored sessions are listed
+  in the picker, and no extra `core` session is added.
+- With no snapshot or restored sessions: create `core` in `$HOME` as the host
+  required to open SessionX. Enter can create another named session.
+- Escape: close SessionX and remain attached to the current session. Use
+  `prefix d` to detach and return to the original terminal.
+- `tc name`: skip the picker and create/attach/switch to that exact name.
+
+SessionX's rename/delete/window/directory modes are available in every `tc`
+picker. The helper applies `@sessionx-filter-current false` and its cached
+SessionX counterpart so even an already running server includes the current
+session. Cold startup temporarily disables `exit-empty` while the server
+loads its config and restores sessions, then returns it to its default `on`.
+
+After updating an already running shell, use `source ~/.zshrc`. Plain `tc`
+can then be called by an interactive terminal startup script after loading
+the shell config. This repo does not call it automatically from `.zshrc`:
+shells opened inside tmux must reach their normal prompt.
+
+SessionX requires its provisioned checkout (`mise run bootstrap:plugins` from
+the dotfiles repo) and the tmux config described in [core tools](./core_tools.md#tmux).
+Session persistence remains handled by Resurrect and Continuum.
+Only sessions included in the last saved snapshot can be recovered after the
+server is killed.
+
 ## Validation
 
 `shellcheck --shell=bash` runs against this file (`zshrc-check` in
@@ -104,3 +140,12 @@ init).
 `shellcheck` is a repo-local tool (`mise.toml`, not the global config) —
 it's for linting this repo's own shell script, not something the user runs
 directly day to day.
+
+The 2026-10-13 unified SessionX flow was tested with PTY clients on an isolated
+tmux 3.7c server and a temporary home directory. After saving and killing that
+server, `tc` automatically restored three sessions and five panes with their
+directories before displaying SessionX; no `core` was added. Outside and
+inside tmux, the real SessionX popup rendered all three names and allowed
+selecting the current session. In-tmux invocation switched sessions without
+nesting clients. A fresh startup without a snapshot created `core` and opened
+SessionX. Zsh syntax, ShellCheck and Markdown checks passed.
