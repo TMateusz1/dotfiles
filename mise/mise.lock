@@ -104,29 +104,6 @@ url = "https://github.com/astral-sh/uv/releases/download/0.12.18/uv-aarch64-appl
 url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/582430554"
 provenance = "github-attestations"
 
-[[tools."aqua:atuinsh/atuin"]]
-version = "18.23.0"
-backend = "aqua:atuinsh/atuin"
-specifiers = ["18.23.0"]
-
-[tools."aqua:atuinsh/atuin"."platforms.linux-arm64"]
-checksum = "sha256:21869faff1fedb9f8fb27837136567b089bcd588d21252533d5b314605517ae2"
-url = "https://github.com/atuinsh/atuin/releases/download/v18.23.0/atuin-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/580134142"
-provenance = "github-attestations"
-
-[tools."aqua:atuinsh/atuin"."platforms.linux-x64"]
-checksum = "sha256:5cf46e926b696a9b23a3c61ef3cb00f8f7c156d1d7b7967a3b51741653b48ba3"
-url = "https://github.com/atuinsh/atuin/releases/download/v18.23.0/atuin-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/580134239"
-provenance = "github-attestations"
-
-[tools."aqua:atuinsh/atuin"."platforms.macos-arm64"]
-checksum = "sha256:c988be1cde19cd7295ce64bc8b955d42fb1855e5227cb640c87fc09c8408c3fc"
-url = "https://github.com/atuinsh/atuin/releases/download/v18.23.0/atuin-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/580134148"
-provenance = "github-attestations"
-
 [[tools."aqua:charmbracelet/glow"]]
 version = "3.0.0"
 backend = "aqua:charmbracelet/glow"

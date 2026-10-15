@@ -30,7 +30,6 @@ mise.toml, mise.lock   # repo checks, hooks, and bootstrap settings/tasks
 mise/                  # shared tools + macOS + opt-in desktop layers → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
-atuin/                 # atuin config → ~/.config/atuin/
 tmux/                  # config + metrics; SessionX and session persistence (see docs/core_tools.md#tmux)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
@@ -54,7 +53,7 @@ docs/                  # notes on what's configured, and why
 | mise                                                                                          | [docs/mise.md](./docs/mise.md)                   |
 | git (+ delta)                                                                                 | [docs/git.md](./docs/git.md)                     |
 | shell (zsh)                                                                                   | [docs/shell.md](./docs/shell.md)                 |
-| Util tools (atuin, bat, zoxide, eza, fd, fzf, gh, glab, glow, jq, yq, ripgrep, starship)      | [docs/util_tools.md](./docs/util_tools.md)       |
+| Util tools (bat, zoxide, eza, fd, fzf, gh, glab, glow, jq, yq, ripgrep, starship)             | [docs/util_tools.md](./docs/util_tools.md)       |
 | Core tools (tmux, lazygit, k9s, bottom, yazi)                                                 | [docs/core_tools.md](./docs/core_tools.md)       |
 | Desktop tools (kitty)                                                                         | [docs/desktop_tools.md](./docs/desktop_tools.md) |
 | Neovim (LSP, blink.cmp, conform, neotest, Treesitter, fzf-lua, Trouble, Neogit, Oil/Neo-tree) | [docs/nvim.md](./docs/nvim.md)                   |

@@ -1,5 +1,5 @@
 # Catppuccin Mocha, blue accent — matches this repo's accent everywhere else
-# (delta, atuin, tmux, lazygit, eza), unlike the official catppuccin/fzf
+# (delta, tmux, lazygit, eza), unlike the official catppuccin/fzf
 # theme (which uses a fixed red/mauve/rosewater mix with no blue). See
 # docs/util_tools.md#fzf.
 --color=bg:#1e1e2e,bg+:#313244,fg:#cdd6f4,fg+:#cdd6f4

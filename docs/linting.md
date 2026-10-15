@@ -111,7 +111,7 @@ publish, not a compromise, but it illustrated the actual cost of an
 npm-based tool here: you inherit its whole dependency tree's trust posture,
 not just the one package's reputation. `rumdl` is a single static Rust
 binary via aqua with no transitive dependency tree to vet, consistent with
-every other tool in this repo (mise, delta, atuin, hk, taplo) — traded off
+every other tool in this repo (mise, delta, hk, taplo) — traded off
 here against `rumdl` being newer and single-maintainer. Revisit if that
 trade stops feeling right.
 

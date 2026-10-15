@@ -75,7 +75,6 @@ shorthand.
 "~/.config/tmux/status-metrics.sh" = "tmux/status-metrics.sh"
 "~/.config/starship.toml" = "starship/starship.toml"
 "~/.config/git" = "git"
-"~/.config/atuin" = "atuin"
 "~/.config/bat" = "bat"
 "~/.config/eza" = "eza"
 "~/.config/fzf" = "fzf"
@@ -95,7 +94,7 @@ shorthand.
 "~/.config/mise/miserc.toml" = "mise/miserc.toml"
 ```
 
-Directory entries (`git`, `atuin`, `bat`, ...) symlink the *whole*
+Directory entries (`git`, `bat`, `eza`, ...) symlink the *whole*
 directory in one line — e.g. `"~/.config/git" = "git"` brings
 `git/config` and `git/delta.gitconfig` along together, since
 `git/config`'s own `[include]` already wires in delta. Nothing extra is

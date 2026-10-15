@@ -52,7 +52,7 @@ Global (`mise/config.toml`):
 
 - [`delta`](https://github.com/dandavison/delta) — git diff pager, see
   [git.md](./git.md)
-- Util tools — `atuin`, `bat`, `zoxide`, `eza`, `fd`, `fzf`, `gh`, `glab`,
+- Util tools — `bat`, `zoxide`, `eza`, `fd`, `fzf`, `gh`, `glab`,
   `glow`, `jq`, `yq`, `ripgrep`, `starship` — see
   [util_tools.md](./util_tools.md)
 - Core tools — `tmux`, `lazygit`, `k9s`, `bottom`, `yazi` — see
@@ -204,7 +204,7 @@ addition to the machine's real global config. Run `mise config ls` from the
 repo root to see the active layers.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
-having `delta`/`atuin`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
+having `delta`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
 `yq`/`ripgrep`/`starship`/`k9s`/`glow`/`bottom`/`yazi`/`gh`/`glab`/`neovim`/
 `tree-sitter`/`rust`/`go` on `PATH` while hacking on this repo isn't a
 problem — but it's

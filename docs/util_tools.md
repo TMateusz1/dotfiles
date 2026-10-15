@@ -8,27 +8,6 @@ see [mise.md](./mise.md). (git + delta, mise itself, and the repo's own
 lint tooling have their own pages: [git.md](./git.md), [mise.md](./mise.md),
 [linting.md](./linting.md).)
 
-## atuin
-
-`atuin/` maps to `~/.config/atuin/` ([atuin](https://atuin.sh) follows XDG
-directly). Contents:
-
-- `atuin/config.toml`
-  - `auto_sync = false` — no history is synced to any server by default;
-    sync requires an explicit `atuin login`/opt-in on a given machine. This
-    is a public dotfiles repo, so nothing here should assume a signed-in
-    sync account.
-  - `sync_frequency = "5m"` — takes effect only once sync is enabled.
-  - `search_mode = "fuzzy"`, `filter_mode = "global"`, `style = "compact"`,
-    `enter_accept = true` — search/UI behavior preferences.
-  - `[theme] name = "catppuccin-mocha-blue"` — Catppuccin Mocha, blue accent
-    (`#89b4fa`), matching the accent used in [git.md](./git.md)'s delta
-    theme for cross-tool consistency.
-- `atuin/themes/catppuccin-mocha-blue.toml` — vendored from
-  [catppuccin/atuin](https://github.com/catppuccin/atuin) (mocha/blue
-  variant), since atuin loads named themes from `themes/` next to
-  `config.toml` rather than shipping them built in.
-
 ## bat
 
 `bat/config` maps to `~/.config/bat/config`
@@ -41,7 +20,7 @@ file has none, unlike this repo's other `.toml`-named configs; a
 `.toml`-suffixed file would never be found once symlinked.
 
 **What's configured:** `--theme="Catppuccin Mocha"` (bundled with bat
-itself — no vendoring needed, unlike [atuin](#atuin) or
+itself — no vendoring needed, unlike
 [lazygit](./core_tools.md#lazygit)); `--style=numbers,changes,header` (line
 numbers, git-modification markers, filename header; deliberately excludes
 bat's other defaults, `grid` and `snip`, for a leaner look);
@@ -117,6 +96,12 @@ everywhere else in this repo.
 `FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/config"` (guarded — fzf
 hard-fails if this points to a missing file, unlike ripgrep below — see
 [shell.md](./shell.md)).
+
+`source <(fzf --zsh)` enables fzf's shell integration. `Ctrl-R` searches
+native Zsh history; `Ctrl-F` opens the same picker. Selecting an entry
+places it on the command line for editing; press Enter again to execute.
+History is stored in `~/.zsh_history` and shared between shells — see
+[shell.md](./shell.md#native-zsh-history).
 
 **Validation:** no linter exists for fzf's options-file format, and per
 this repo's policy no custom step fills that gap (see

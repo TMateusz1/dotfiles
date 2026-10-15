@@ -31,11 +31,10 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   [tmux.conf's own comment](./core_tools.md#tmux) about not hardcoding a
   terminal-specific `TERM`.
 - Startup follows its dependency order: base environment and `PATH`, mise
-  activation and completion path, oh-my-zsh, starship, atuin, zoxide, fzf,
+  activation and completion path, oh-my-zsh, native Zsh history, starship, zoxide, fzf,
   tool aliases/helpers, and finally `.zshrc.local` for machine-local
   overrides. Mise must precede the guarded tool checks; oh-my-zsh initializes
-  completion before zoxide and fzf; atuin follows starship so it can wrap the
-  configured prompt hooks.
+  completion before zoxide and fzf.
   `$ZSH_THEME` remains empty because starship owns the prompt. Every optional
   component is individually guarded by `command -v`/`[[ -r ... ]]`, so the
   setup degrades cleanly on a machine missing some tools.
@@ -61,13 +60,10 @@ not this file's — this doc only covers what's *in* `.zshrc`.
 - `export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"`, unguarded
   — ripgrep degrades gracefully on a missing file (a stderr warning, still
   exits `0`), so no existence check is needed.
-- `export FZF_CTRL_R_COMMAND=''` — fzf's documented mechanism for opting
-  its own `Ctrl-R` history binding out entirely. atuin binds `Ctrl-R` first
-  for its own search; fzf's init (`source <(fzf --zsh)`) runs after and
-  would otherwise also claim it. With this set, `Ctrl-R` stays on
-  `atuin-search` and the separately-bound `Ctrl-F` stays on
-  `fzf-history-widget`. Exported (not just assigned) because it's read by
-  the dynamically-sourced fzf script, not by this file directly.
+- `unset FZF_CTRL_R_COMMAND` removes the previous exported opt-out, even
+  when inherited from a parent shell. fzf's init (`source <(fzf --zsh)`)
+  binds `Ctrl-R` to `fzf-history-widget` in the emacs, vi insert and vi
+  command keymaps. `Ctrl-F` remains a shortcut to the same widget.
 - `alias glow=...` pins `--style` to this repo's vendored Catppuccin
   theme — glow's own config file has no way to reference it (no path
   expansion at all in its `style` field) — see
@@ -88,6 +84,28 @@ not this file's — this doc only covers what's *in* `.zshrc`.
 - `y()` — yazi's own documented shell wrapper, so quitting yazi `cd`s the
   shell to wherever it was left — see
   [core_tools.md#yazi](./core_tools.md#yazi).
+
+## Native Zsh history
+
+`HISTFILE="$HOME/.zsh_history"` keeps history in Zsh's standard file.
+`HISTSIZE=200000` retains up to 200,000 events in memory and
+`SAVEHIST=100000` saves up to 100,000 to disk. These settings follow
+oh-my-zsh so they take precedence over its defaults, and also work when
+oh-my-zsh is absent.
+
+`EXTENDED_HISTORY` records timestamps and durations; `SHARE_HISTORY` appends
+commands and imports history from other shells. `HIST_EXPIRE_DUPS_FIRST`
+expires duplicate events first, `HIST_IGNORE_DUPS` skips consecutive
+duplicates, `HIST_IGNORE_SPACE` excludes commands beginning with a space,
+and `HIST_VERIFY` lets you review history expansions before running them.
+
+`Ctrl-R` and `Ctrl-F` open fzf's history picker. Enter places the selected
+command on the command line for editing; a second Enter executes it. Up
+and Down retain Zsh/oh-my-zsh's normal history navigation.
+
+After switching history integrations, run `exec zsh` to start a fresh shell
+with the new hooks and bindings. Existing `~/.zsh_history` entries are read
+by Zsh normally.
 
 ## Tmux session picker
 
@@ -130,7 +148,8 @@ server is killed.
 `shellcheck --shell=bash` runs against this file (`zshrc-check` in
 `hk.pkl`) — shellcheck has no zsh dialect, but `bash` mode produces zero
 false positives against this file's zsh-specific syntax (`path+=`,
-`typeset -U`, etc.) while still catching real issues, such as a plain
+`typeset -U`, etc.) with a scoped `SC2034` suppression for `SAVEHIST`,
+which Zsh reads internally. It still catches real issues, such as a plain
 (non-exported) variable assignment that's only read by a dynamically
 sourced script. `SC1090`/`SC1091` ("can't follow this source") are excluded
 in `zshrc-check` — unavoidable noise for an rc file that legitimately
@@ -140,6 +159,14 @@ init).
 `shellcheck` is a repo-local tool (`mise.toml`, not the global config) —
 it's for linting this repo's own shell script, not something the user runs
 directly day to day.
+
+The 2026-10-15 native history setup was checked with real Zsh and fzf in a
+PTY using a temporary home and synthetic history. `Ctrl-R` resolved to
+`fzf-history-widget` in emacs, vi insert and vi command keymaps, including
+with the previous empty `FZF_CTRL_R_COMMAND` inherited. `Ctrl-F` and the
+history options were verified too. Selecting a saved command inserted it
+into the editable buffer; the following Enter executed it. Zsh syntax,
+ShellCheck, TOML, YAML, Markdown and repository hygiene checks passed.
 
 The 2026-10-13 unified SessionX flow was tested with PTY clients on an isolated
 tmux 3.7c server and a temporary home directory. After saving and killing that

@@ -63,13 +63,16 @@ fi
 # Prompt, history, navigation, and completion integrations
 # ---------------------------------------------------------------------------
 
+# Keep native Zsh history persistent and shared across interactive shells.
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=200000
+# shellcheck disable=SC2034 # Zsh reads SAVEHIST internally.
+SAVEHIST=100000
+setopt EXTENDED_HISTORY SHARE_HISTORY HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_VERIFY
+
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
-fi
-
-# Atuin follows Starship so it can wrap the configured prompt hooks.
-if command -v atuin >/dev/null 2>&1; then
-  eval "$(atuin init zsh --disable-up-arrow)"
 fi
 
 if command -v zoxide >/dev/null 2>&1; then
@@ -81,10 +84,8 @@ if command -v fzf >/dev/null 2>&1; then
   # fzf hard-fails (rather than falling back) if this points to a file that
   # doesn't exist yet — e.g. before this repo is symlinked into place.
   [[ -r "$XDG_CONFIG_HOME/fzf/config" ]] && export FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/config"
-  # Empty (not unset) tells fzf's own init script to skip binding Ctrl-R
-  # itself, leaving it to atuin above. Must be exported: read by the
-  # dynamically-sourced script below, not by this file.
-  export FZF_CTRL_R_COMMAND=''
+  # Clear the old exported opt-out, including when inherited by a new shell.
+  unset FZF_CTRL_R_COMMAND
   source <(fzf --zsh)
   bindkey '^F' fzf-history-widget
 fi

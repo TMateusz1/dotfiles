@@ -38,7 +38,6 @@ task.run_auto_install = false
 "aqua:tree-sitter/tree-sitter" = "0.27.0" # Treesitter parser compiler
 
 # Shared CLI tools (also used by editor pickers and git integrations)
-"aqua:atuinsh/atuin" = "18.23.0"                         # Shell history search
 "aqua:sharkdp/bat" = "0.26.1"                            # Syntax-highlighted cat
 "aqua:dandavison/delta" = "0.19.2"                       # Git diff pager
 "cargo:eza" = { version = "0.23.5", depends = ["rust"] } # Modern ls replacement

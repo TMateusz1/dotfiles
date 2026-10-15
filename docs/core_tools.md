@@ -107,8 +107,8 @@ unlike [tmux](#tmux) below.
 [catppuccin/lazygit](https://github.com/catppuccin/lazygit) Mocha "blue"
 variant key-for-key, including `inactiveViewSelectedLineBgColor` and
 `cherryPickedCommitBgColor` — inlined directly since lazygit's config has no
-"load an external theme file" mechanism to vendor against, unlike
-[atuin](./util_tools.md#atuin). Every color comes from that official theme
+"load an external theme file" mechanism to vendor against. Every color
+comes from that official theme
 rather than a hand-picked shade, per [AGENTS.md](../AGENTS.md)'s "prefer
 the official Catppuccin port over a hand-rolled palette" rule.
 `overlapBorderColor` isn't set here — it isn't a valid key in lazygit's own
@@ -163,7 +163,7 @@ there is no local control socket for the remote VM to access or forward. See
 [nvim.md](./nvim.md#plugins) for the Neovim-side counterpart. `prefix g` opens a [lazygit](#lazygit) popup in
 the current pane's directory. Statusline hand-rolled in Catppuccin Mocha
 (blue accent, matching [git.md](./git.md) and
-[atuin](./util_tools.md#atuin)), using tmux's own format strings.
+[fzf](./util_tools.md#fzf)), using tmux's own format strings.
 The right side also shows host CPU,
 used memory and combined disk read/write throughput in a separate Catppuccin
 green block beside the clock. The values refresh every five seconds through
