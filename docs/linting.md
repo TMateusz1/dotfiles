@@ -81,7 +81,7 @@ responsibility, and both call the same underlying binaries — `stylua`,
 Several config formats in this repo have no real third-party linter:
 tmux.conf, bat's/fzf's/ripgrep's flat args files, kitty's config, and the
 *schema* level of the YAML/TOML configs whose syntax `yamlfmt`/`taplo`
-already cover (k9s, bottom, yazi — a valid TOML file full of keys the tool
+already cover (k9s, bottom — a valid TOML file full of keys the tool
 has never heard of still passes). The rule: wire up an `hk.pkl` step only when a real,
 established tool exists for the format (like `shellcheck` above) — never
 build a bespoke one to fill the gap (e.g. loading a config on a throwaway

@@ -55,7 +55,7 @@ Global (`mise/config.toml`):
 - Util tools — `bat`, `zoxide`, `eza`, `fd`, `fzf`, `gh`, `glab`,
   `glow`, `jq`, `yq`, `ripgrep`, `starship` — see
   [util_tools.md](./util_tools.md)
-- Core tools — `tmux`, `lazygit`, `k9s`, `bottom`, `yazi` — see
+- Core tools — `tmux`, `lazygit`, `k9s`, `bottom` — see
   [core_tools.md](./core_tools.md)
 - Containers and Kubernetes — Helm, k9s and kind. Helm remains a runtime
   dependency for Mason's helm-ls chart linting.
@@ -205,7 +205,7 @@ repo root to see the active layers.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
 having `delta`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
-`yq`/`ripgrep`/`starship`/`k9s`/`glow`/`bottom`/`yazi`/`gh`/`glab`/`neovim`/
+`yq`/`ripgrep`/`starship`/`k9s`/`glow`/`bottom`/`gh`/`glab`/`neovim`/
 `tree-sitter`/`rust`/`go` on `PATH` while hacking on this repo isn't a
 problem — but it's
 worth knowing so a stray tool showing up in `mise config` output inside

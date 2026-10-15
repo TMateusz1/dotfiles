@@ -81,9 +81,6 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   glamour renders unstyled with no error when the path is bad — a broken
   reference would otherwise be invisible. glow itself ignores this
   variable entirely, hence the separate alias above.
-- `y()` — yazi's own documented shell wrapper, so quitting yazi `cd`s the
-  shell to wherever it was left — see
-  [core_tools.md#yazi](./core_tools.md#yazi).
 
 ## Native Zsh history
 

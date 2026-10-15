@@ -126,21 +126,6 @@ if [[ -r "$XDG_CONFIG_HOME/glow/glamour.json" ]]; then
   export GLAMOUR_STYLE="$XDG_CONFIG_HOME/glow/glamour.json"
 fi
 
-if command -v yazi >/dev/null 2>&1; then
-  # Standard yazi wrapper (from its own quick-start docs): `cd`s the shell to
-  # wherever yazi was left, since yazi itself is a child process and can't
-  # change its parent shell's directory.
-  y() {
-    local tmp
-    tmp="$(mktemp -t yazi-cwd.XXXXXX)"
-    yazi "$@" --cwd-file="$tmp"
-    local cwd
-    cwd="$(command cat -- "$tmp")"
-    rm -f -- "$tmp"
-    [[ -n "$cwd" && "$cwd" != "$PWD" ]] && { cd -- "$cwd" || return; }
-  }
-fi
-
 if command -v tmux >/dev/null 2>&1; then
   tc() {
     local session="${1:-core}"

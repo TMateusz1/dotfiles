@@ -83,7 +83,6 @@ shorthand.
 "~/.config/k9s" = "k9s"
 "~/.config/kitty" = "kitty"
 "~/.config/bottom" = "bottom"
-"~/.config/yazi" = "yazi"
 "~/.config/nvim" = "nvim"
 "~/.config/glow/glamour.json" = "glow/glamour.json"
 "~/.config/mise/config.toml" = "mise/config.toml"

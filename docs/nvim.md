@@ -1993,7 +1993,7 @@ was read but not rewritten.
   `dir/not/exists/file.md` selects the nearest existing ancestor instead of
   failing the reveal. The dashboard's `e` button opens the same left sidebar
   at the cwd, while a separate `nvim .` check still lands in Oil. `:Neotree`
-  and `:Oil` exist, `:Yazi` does not, and Neo-tree's effective netrw behavior
+  and `:Oil` exist, and Neo-tree's effective netrw behavior
   is `disabled`.
 - Treesitter: all 38 parsers installed and compiled for real via the
   `tree-sitter` CLI, then every target filetype opened as an actual buffer
