@@ -1,0 +1,62 @@
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      "cmd-1": "project_panel::ToggleFocus",
+      "cmd-2": "terminal_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "(Editor && vim_mode == normal && !menu) || EmptyPane",
+    "bindings": {
+      "space e": "project_panel::ToggleFocus",
+      "space f f": [
+        "action::Sequence",
+        ["file_finder::Toggle", "picker::SetPreviewRight"]
+      ],
+      "space f b": "tab_switcher::Toggle",
+      "space f g": [
+        "action::Sequence",
+        ["text_finder::Toggle", "picker::SetPreviewRight"]
+      ],
+      "space f s": "outline::Toggle",
+      "space g g": "git_panel::ToggleFocus",
+      "space g b": "git::Switch",
+      "space g d": "git::Diff",
+      "space g h": "git::FileHistory",
+      "space g s": "git::ViewStash",
+      "space g w": "git::Worktree"
+    }
+  },
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "space e": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == normal && !menu",
+    "bindings": {
+      "space c a": "editor::ToggleCodeActions",
+      "space c r": "editor::Rename",
+      "space c f": "editor::Format",
+      "space c o": "editor::OrganizeImports",
+      "space c d": "diagnostics::Deploy",
+      "space c shift-r": "editor::RestartLanguageServer"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == visual && !menu",
+    "bindings": {
+      "space c a": "editor::ToggleCodeActions",
+      "space c f": "editor::FormatSelections"
+    }
+  },
+  {
+    "context": "Picker > Editor",
+    "bindings": {
+      "ctrl-j": "menu::SelectNext",
+      "ctrl-k": "menu::SelectPrevious"
+    }
+  }
+]

@@ -82,6 +82,7 @@ shorthand.
 "~/.config/lazygit" = "lazygit"
 "~/.config/k9s" = "k9s"
 "~/.config/kitty" = "kitty"
+"~/.config/zed" = "zed"
 "~/.config/bottom" = "bottom"
 "~/.config/nvim" = "nvim"
 "~/.config/glow/glamour.json" = "glow/glamour.json"
@@ -99,7 +100,15 @@ directory in one line — e.g. `"~/.config/git" = "git"` brings
 `git/config`'s own `[include]` already wires in delta. Nothing extra is
 needed for delta specifically.
 
-Two cases deliberately use **file** entries instead:
+Zed also uses a whole-directory link so settings, keybindings and tasks share
+one config directory. It writes a prompt database there, so `.gitignore`
+allows only `settings.json`, `keymap.json` and `tasks.json`; everything else
+under `zed/` is ignored. This is a deliberate exception to the usual rule of
+using file links for tools that write into their config directory. See
+[desktop_tools.md#zed](./desktop_tools.md#zed) for migrating an existing
+directory without discarding its local data.
+
+These tools deliberately use **file** entries instead:
 
 - **glow** — glow auto-creates and rewrites its own `glow.yml` in its
   config directory (verified: it reappears after deletion on any plain

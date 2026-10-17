@@ -41,6 +41,7 @@ k9s/                   # k9s config + skin (see docs/core_tools.md#k9s)
 bottom/                # bottom (btm) system monitor → ~/.config/bottom/ (see docs/core_tools.md#bottom)
 glow/                  # glow theme → ~/.config/glow/glamour.json only (see docs/util_tools.md#glow)
 kitty/                 # kitty config + theme → ~/.config/kitty/ (see docs/desktop_tools.md)
+zed/                   # macOS Zed: Catppuccin, Vim keys, finders, code actions and Git (see docs/desktop_tools.md#zed)
 nvim/                  # neovim config → ~/.config/nvim/ (see docs/nvim.md)
 docs/                  # notes on what's configured, and why
 ```
@@ -54,7 +55,7 @@ docs/                  # notes on what's configured, and why
 | shell (zsh)                                                                                   | [docs/shell.md](./docs/shell.md)                 |
 | Util tools (bat, zoxide, eza, fd, fzf, gh, glab, glow, jq, yq, ripgrep, starship)             | [docs/util_tools.md](./docs/util_tools.md)       |
 | Core tools (tmux, lazygit, k9s, bottom)                                                       | [docs/core_tools.md](./docs/core_tools.md)       |
-| Desktop tools (kitty)                                                                         | [docs/desktop_tools.md](./docs/desktop_tools.md) |
+| Desktop tools (kitty, Zed settings)                                                           | [docs/desktop_tools.md](./docs/desktop_tools.md) |
 | Neovim (LSP, blink.cmp, conform, neotest, Treesitter, fzf-lua, Trouble, Neogit, Oil/Neo-tree) | [docs/nvim.md](./docs/nvim.md)                   |
 | languages (Rust, Go, Python, Robot Framework, Protocol Buffers, Kubernetes, Helm)             | [docs/langs.md](./docs/langs.md)                 |
 | linting / pre-commit (hk)                                                                     | [docs/linting.md](./docs/linting.md)             |
