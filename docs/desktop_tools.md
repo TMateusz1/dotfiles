@@ -273,6 +273,11 @@ split direction is right). It also works for files already open in another
 pane. For directories, the action expands/collapses the entry. The binding
 only applies while browsing, leaving filename editing unchanged.
 
+`Esc` while browsing the explorer focuses the central editor and leaves
+the explorer open. During file creation/rename, the first `Esc` retains
+native cancellation; a subsequent `Esc` returns to the editor. The mapping
+uses `workspace::FocusCenterPane` directly, bypassing panel-toggle behavior.
+
 - `Cmd-1` — open/focus the project explorer.
 - `Cmd-2` — open/focus the integrated terminal.
 - `Cmd-Shift-2` — create a new integrated terminal tab (`workspace::NewTerminal`).
