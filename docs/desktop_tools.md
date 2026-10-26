@@ -285,9 +285,15 @@ only applies while browsing, leaving filename editing unchanged.
 - `Cmd-T` — open/close the task picker to select a test or other task.
 
 The Command shortcuts apply throughout the workspace, including insert mode
-and the terminal. `Cmd-1` through `Cmd-4` use Zed's native `ToggleFocus`
+and the terminal. `Cmd-1`, `Cmd-3` and `Cmd-4` use Zed's native `ToggleFocus`
 actions with `close_panel_on_toggle = true`: open/focus the panel from
 elsewhere, then close it and return to the editor when pressed within it.
+`Cmd-2` uses `terminal_panel::Toggle`, the native terminal action used by
+the JetBrains preset for `Alt-F12`. It opens/focuses the terminal panel and
+hides it when pressed while the panel is focused, returning to the editor.
+Existing terminal sessions remain running when hidden; `Cmd-Shift-2` is
+the separate command for creating a new terminal. These panel actions and
+the JetBrains bindings were checked against the installed Zed 1.25.3 source.
 The overrides also match Pane, where JetBrains supplies its own number-key
 bindings; GitPanel, whose native `Cmd-1/2` switch Changes/History; and
 DebugPanel, whose native `Cmd-5` would otherwise close the debugger. Dock

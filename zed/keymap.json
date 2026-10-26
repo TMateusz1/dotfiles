@@ -3,11 +3,11 @@
 [
   {
     // Keep panel numbers consistent, including Git tabs and dock input fields.
-    "context": "Workspace || Pane || ProjectPanel || OutlinePanel || GitPanel || DebugPanel || (Dock > Editor) || (Dock > menu)",
+    "context": "Workspace || Pane || ProjectPanel || OutlinePanel || GitPanel || DebugPanel || Terminal || (Dock > Editor) || (Dock > menu)",
     "use_key_equivalents": true,
     "bindings": {
       "cmd-1": "project_panel::ToggleFocus",
-      "cmd-2": "terminal_panel::ToggleFocus",
+      "cmd-2": "terminal_panel::Toggle",
       "cmd-@": "workspace::NewTerminal",
       "cmd-3": "outline_panel::ToggleFocus",
       "cmd-4": "git_panel::ToggleFocus",
