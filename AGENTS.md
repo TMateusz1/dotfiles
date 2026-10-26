@@ -95,6 +95,12 @@ Prefer the official Catppuccin port/plugin for a given tool over a
 hand-rolled palette. Do not introduce a different theme "just for this one
 tool" — consistency across the whole setup is a stated goal, not a nice-to-have.
 
+**Zed keeps Catppuccin Mocha/Latte for the editor and UI.** The user chose
+Material Icon Theme for file/folder icons and the JetBrains keymap with Vim
+editing/navigation as part of the transition to Zed and IntelliJ. Do not
+replace the color theme with JetBrains Islands. See
+[docs/desktop_tools.md](./docs/desktop_tools.md#zed).
+
 ## General config philosophy
 
 - Modern, actively maintained tools/plugins over legacy ones.

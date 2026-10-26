@@ -2,6 +2,7 @@
 
 Personal dotfiles, managed with [mise](https://mise.jdx.dev) and themed
 consistently with [Catppuccin](https://catppuccin.com) (Mocha) throughout.
+Zed pairs that theme with Material icons and a JetBrains/Vim keymap.
 
 This repo is public — see [AGENTS.md](./AGENTS.md) for the hard rule on
 never committing secrets, and for the full set of conventions this repo

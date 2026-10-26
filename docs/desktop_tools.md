@@ -168,26 +168,31 @@ uses points, while Zed's uses pixels. The font is installed by the existing
 opt-in desktop bootstrap (`font-geist-mono-nerd-font`).
 
 Vim mode stays enabled, with the existing JetBrains base keymap for other
-shortcuts. The official [Catppuccin extension](https://github.com/catppuccin/zed)
-is declared in `auto_install_extensions`, so Zed installs it automatically
-at startup on each machine. Restart an already running session after adding
-the extension for the first time. The selected theme is Catppuccin Mocha in dark mode;
-Catppuccin Latte is configured for light mode.
+shortcuts. The selected theme is **Catppuccin Mocha**; Catppuccin Latte is
+configured for light mode. The official
+[Catppuccin extension](https://github.com/catppuccin/zed) and Zed Industries'
+[Material Icon Theme](https://github.com/zed-extensions/material-icon-theme)
+are declared in `auto_install_extensions` for future machines. Material icons
+are used in both light and dark modes. The file finder shows these icons
+and uses a `large` default width. Preview pickers keep Zed's larger native
+layout and locally saved dimensions.
 
-The official [Catppuccin Icons](https://github.com/catppuccin/zed-icons)
-extension is also auto-installed at startup, with matching Mocha/Latte icon
-themes. The file finder shows these icons and uses a `large` default width.
-Preview pickers keep Zed's larger native layout and locally saved dimensions.
+The IntelliJ influence is in the IDE shortcuts and file/folder icons;
+the editor and UI retain this repo's Catppuccin palette.
 
-Mocha-only theme overrides give native picker frames and preview dividers
-an opaque blue accent through `border.variant`; general `border` edges use
-Surface 2. The picker container uses Zed's `elevation_3` helper, which draws
-a one-pixel border using `border.variant`, not `border` or `border.focused`.
-The background uses darker Mantle, with a blue focus accent.
-Selected ghost rows get a translucent blue highlight. These are
-Zed's shared UI theme tokens, so other panels/popovers using the same tokens
-also receive the styling. All colors remain in the Catppuccin Mocha palette;
-no custom picker implementation or terminal-style border flags are used.
+Mocha-only overrides give picker frames and preview dividers an opaque blue
+accent (`#89b4fa`) through `border.variant`. General borders use Surface 2,
+elevated backgrounds use Mantle, and selection highlights/indent guides use
+the matching Catppuccin colors. The picker container uses a one-pixel
+`border.variant` border. These shared UI tokens also affect other panels
+and popovers that use them.
+
+On the current machine, Material Icon Theme 1.3.2 was installed from its
+publisher's source revision registered in
+`zed-industries/extensions` after the registry download endpoint returned
+HTTP 403. Only theme/icon data, manifests and licenses were installed;
+Zed's directory watcher loads them without restarting the editor. The shared
+config retains the normal registry IDs for startup installation and updates.
 
 Zed's built-in pickers provide fuzzy finding with IDE shortcuts:
 
