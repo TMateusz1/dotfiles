@@ -1,0 +1,130 @@
+// Test tasks save all edited buffers before starting, independently of autosave.
+// Native runnable tags connect the same definitions to gutter and nearest-task runs.
+[
+  {
+    "label": "Test Go: $ZED_SYMBOL ($ZED_CUSTOM_GO_PACKAGE)",
+    "command": "go",
+    "args": ["test", "-v", "-run", "\\^$ZED_SYMBOL\\$"],
+    "cwd": "$ZED_DIRNAME",
+    "tags": ["go-test", "go-example"],
+    "save": "all"
+  },
+  {
+    "label": "Test Go subtest: $ZED_SYMBOL/$ZED_CUSTOM_GO_SUBTEST_NAME ($ZED_CUSTOM_GO_PACKAGE)",
+    "command": "go",
+    "args": [
+      "test",
+      "-v",
+      "-run",
+      "\\^$ZED_SYMBOL\\$/\\^$ZED_CUSTOM_GO_SUBTEST_NAME\\$"
+    ],
+    "cwd": "$ZED_DIRNAME",
+    "tags": ["go-subtest"],
+    "save": "all"
+  },
+  {
+    "label": "Test Go case: $ZED_SYMBOL/$ZED_CUSTOM_GO_TABLE_TEST_CASE_NAME ($ZED_CUSTOM_GO_PACKAGE)",
+    "command": "go",
+    "args": [
+      "test",
+      "-v",
+      "-run",
+      "\\^$ZED_SYMBOL\\$/\\^$ZED_CUSTOM_GO_TABLE_TEST_CASE_NAME\\$"
+    ],
+    "cwd": "$ZED_DIRNAME",
+    "tags": [
+      "go-table-test-case",
+      "go-table-test-case-without-explicit-variable"
+    ],
+    "save": "all"
+  },
+  {
+    "label": "Test Go suite: $ZED_CUSTOM_GO_SUITE_NAME/$ZED_SYMBOL ($ZED_CUSTOM_GO_PACKAGE)",
+    "command": "go",
+    "args": [
+      "test",
+      "-v",
+      "-run",
+      "\\^Test$ZED_CUSTOM_GO_SUITE_NAME\\$/\\^$ZED_SYMBOL\\$"
+    ],
+    "cwd": "$ZED_DIRNAME",
+    "tags": ["go-testify-suite"],
+    "save": "all"
+  },
+  {
+    "label": "Test Go package: $ZED_CUSTOM_GO_PACKAGE",
+    "command": "go",
+    "args": ["test", "-v"],
+    "cwd": "$ZED_DIRNAME",
+    "tags": ["go-package-test"],
+    "save": "all"
+  },
+  {
+    "label": "Test Go module",
+    "command": "go",
+    "args": ["test", "./..."],
+    "cwd": "$ZED_CUSTOM_GO_MODULE_ROOT",
+    "save": "all"
+  },
+  {
+    "label": "Test Rust: $ZED_CUSTOM_RUST_TEST_NAME ($ZED_CUSTOM_RUST_PACKAGE)",
+    "command": "cargo",
+    "args": [
+      "test",
+      "-p",
+      "$ZED_CUSTOM_RUST_PACKAGE",
+      "--",
+      "--nocapture",
+      "--include-ignored",
+      "$ZED_CUSTOM_RUST_TEST_NAME"
+    ],
+    "cwd": "$ZED_CUSTOM_RUST_MANIFEST_DIRNAME",
+    "tags": ["rust-test"],
+    "save": "all"
+  },
+  {
+    "label": "Test Rust docs: $ZED_CUSTOM_RUST_DOC_TEST_NAME ($ZED_CUSTOM_RUST_PACKAGE)",
+    "command": "cargo",
+    "args": [
+      "test",
+      "--doc",
+      "-p",
+      "$ZED_CUSTOM_RUST_PACKAGE",
+      "--",
+      "--nocapture",
+      "--include-ignored",
+      "$ZED_CUSTOM_RUST_DOC_TEST_NAME"
+    ],
+    "cwd": "$ZED_CUSTOM_RUST_MANIFEST_DIRNAME",
+    "tags": ["rust-doc-test"],
+    "save": "all"
+  },
+  {
+    "label": "Test Rust module: $ZED_CUSTOM_RUST_TEST_FRAGMENT ($ZED_CUSTOM_RUST_PACKAGE)",
+    "command": "cargo",
+    "args": [
+      "test",
+      "-p",
+      "$ZED_CUSTOM_RUST_PACKAGE",
+      "--",
+      "$ZED_CUSTOM_RUST_TEST_FRAGMENT"
+    ],
+    "cwd": "$ZED_CUSTOM_RUST_MANIFEST_DIRNAME",
+    "tags": ["rust-mod-test"],
+    "save": "all"
+  },
+  {
+    "label": "Test Rust package: $ZED_CUSTOM_RUST_PACKAGE",
+    "command": "cargo",
+    "args": ["test", "-p", "$ZED_CUSTOM_RUST_PACKAGE"],
+    "cwd": "$ZED_CUSTOM_RUST_MANIFEST_DIRNAME",
+    "save": "all"
+  },
+  {
+    "label": "Test Rust workspace",
+    "command": "cargo",
+    "args": ["test", "--workspace"],
+    "cwd": "$ZED_CUSTOM_RUST_MANIFEST_DIRNAME",
+    "save": "all"
+  }
+]

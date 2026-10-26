@@ -1,62 +1,244 @@
+// JetBrains handles IDE commands; Vim handles modal editing and motions.
+// Keep only the bridges and deliberate exceptions here.
 [
   {
-    "context": "Workspace",
+    // Keep panel numbers consistent, including Git tabs and dock input fields.
+    "context": "Workspace || Pane || ProjectPanel || OutlinePanel || GitPanel || DebugPanel || (Dock > Editor) || (Dock > menu)",
+    "use_key_equivalents": true,
     "bindings": {
       "cmd-1": "project_panel::ToggleFocus",
-      "cmd-2": "terminal_panel::ToggleFocus"
+      "cmd-2": "terminal_panel::ToggleFocus",
+      "cmd-@": "workspace::NewTerminal",
+      "cmd-3": "outline_panel::ToggleFocus",
+      "cmd-4": "git_panel::ToggleFocus",
+      "cmd-5": "diagnostics::Deploy"
     }
   },
   {
-    "context": "(Editor && vim_mode == normal && !menu) || EmptyPane",
+    "context": "Diagnostics",
     "bindings": {
-      "space e": "project_panel::ToggleFocus",
-      "space f f": [
+      "cmd-5": "pane::CloseActiveItem"
+    }
+  },
+  {
+    // Cmd-T opens tasks everywhere, including terminals and the debugger.
+    "context": "Workspace || Pane || DebugPanel || Terminal || (Diagnostics > Editor)",
+    "use_key_equivalents": true,
+    "bindings": {
+      "cmd-t": ["task::Spawn", { "reveal_target": "dock" }],
+      "cmd-^": ["task::Rerun", { "reevaluate_context": false }]
+    }
+  },
+  {
+    "context": "Editor && mode == full && !menu",
+    "use_key_equivalents": true,
+    "bindings": {
+      "cmd-alt-6": "editor::SpawnNearestTask"
+    }
+  },
+  {
+    // F for files, G for grep; always request a preview on opening.
+    "context": "Workspace || Pane || ProjectPanel || ProjectSearchView || (Editor && mode == full)",
+    "use_key_equivalents": true,
+    "bindings": {
+      "cmd-shift-f": [
         "action::Sequence",
         ["file_finder::Toggle", "picker::SetPreviewRight"]
       ],
-      "space f b": "tab_switcher::Toggle",
-      "space f g": [
+      "cmd-shift-o": [
+        "action::Sequence",
+        ["file_finder::Toggle", "picker::SetPreviewRight"]
+      ],
+      "cmd-shift-n": [
+        "action::Sequence",
+        ["file_finder::Toggle", "picker::SetPreviewRight"]
+      ],
+      "cmd-e": "tab_switcher::ToggleAll",
+      "cmd-shift-g": [
         "action::Sequence",
         ["text_finder::Toggle", "picker::SetPreviewRight"]
+      ]
+    }
+  },
+  {
+    // Vim leader shortcuts for tabs, files and project text search.
+    "context": "(Editor && mode == full && vim_mode == normal && !menu) || EmptyPane",
+    "bindings": {
+      "space space": "tab_switcher::ToggleAll",
+      "space f": [
+        "action::Sequence",
+        ["file_finder::Toggle", "picker::SetPreviewRight"]
       ],
-      "space f s": "outline::Toggle",
-      "space g g": "git_panel::ToggleFocus",
-      "space g b": "git::Switch",
-      "space g d": "git::Diff",
-      "space g h": "git::FileHistory",
-      "space g s": "git::ViewStash",
-      "space g w": "git::Worktree"
+      "space g": [
+        "action::Sequence",
+        ["text_finder::Toggle", "picker::SetPreviewRight"]
+      ]
+    }
+  },
+  {
+    // Vim shortcuts for tabs and symbols.
+    "context": "Editor && mode == full && vim_mode == normal && !menu",
+    "bindings": {
+      "space q": "pane::CloseActiveItem",
+      "space tab": "pane::AlternateFile",
+      "space r n": "editor::Rename",
+      "g shift-d": "editor::GoToDefinitionSplit"
+    }
+  },
+  {
+    // Tree-sitter function motions, matching Neovim's [f / ]f habit.
+    "context": "Editor && mode == full && VimControl && !menu",
+    "bindings": {
+      "[ f": "vim::PreviousMethodStart",
+      "] f": "vim::NextMethodStart",
+      "[ shift-f": "vim::PreviousMethodEnd",
+      "] shift-f": "vim::NextMethodEnd"
+    }
+  },
+  {
+    "context": "Editor && mode == full",
+    "use_key_equivalents": true,
+    "bindings": {
+      "cmd-alt-o": "editor::OrganizeImports"
+    }
+  },
+  {
+    // Match the finder inputs, where generic Editor bindings have precedence.
+    "context": "FileFinder || (FileFinder > Picker > Editor) || (FileFinder > Picker > menu) || TextFinder || (TextFinder > Picker > Editor) || (TextFinder > Picker > menu)",
+    "use_key_equivalents": true,
+    "bindings": {
+      "cmd-enter": "pane::SplitRight"
     }
   },
   {
     "context": "ProjectPanel && not_editing",
+    "use_key_equivalents": true,
     "bindings": {
-      "space e": "project_panel::ToggleFocus"
+      "cmd-enter": "project_panel::OpenSplitVertical"
     }
   },
   {
-    "context": "Editor && vim_mode == normal && !menu",
+    // Override editing shortcuts inside dock inputs, but preserve main insert mode.
+    "context": "(Editor && mode == full && (vim_mode == normal || vim_mode == visual) && !menu) || EmptyPane || Dock || Terminal || (Dock > Editor) || (Dock > menu)",
     "bindings": {
-      "space c a": "editor::ToggleCodeActions",
-      "space c r": "editor::Rename",
-      "space c f": "editor::Format",
-      "space c o": "editor::OrganizeImports",
-      "space c d": "diagnostics::Deploy",
-      "space c shift-r": "editor::RestartLanguageServer"
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight"
     }
   },
   {
-    "context": "Editor && vim_mode == visual && !menu",
+    // Arrow equivalents also work in insert mode and dock input fields.
+    "context": "Pane || (Editor && mode == full && !menu) || EmptyPane || Dock || Terminal || (Dock > Editor) || (Dock > menu)",
     "bindings": {
-      "space c a": "editor::ToggleCodeActions",
-      "space c f": "editor::FormatSelections"
+      "ctrl-left": "workspace::ActivatePaneLeft",
+      "ctrl-down": "workspace::ActivatePaneDown",
+      "ctrl-up": "workspace::ActivatePaneUp",
+      "ctrl-right": "workspace::ActivatePaneRight"
+    }
+  },
+  {
+    // Move one central tab and follow it; dock focus must not move unrelated tabs.
+    "context": "(Pane || (Editor && mode == full) || Terminal) && !Dock && !menu",
+    "bindings": {
+      "ctrl-shift-h": [
+        "workspace::MoveItemToPaneInDirection",
+        { "direction": "left", "focus": true }
+      ],
+      "ctrl-shift-j": [
+        "workspace::MoveItemToPaneInDirection",
+        { "direction": "down", "focus": true }
+      ],
+      "ctrl-shift-k": [
+        "workspace::MoveItemToPaneInDirection",
+        { "direction": "up", "focus": true }
+      ],
+      "ctrl-shift-l": [
+        "workspace::MoveItemToPaneInDirection",
+        { "direction": "right", "focus": true }
+      ],
+      "ctrl-shift-left": [
+        "workspace::MoveItemToPaneInDirection",
+        { "direction": "left", "focus": true }
+      ],
+      "ctrl-shift-down": [
+        "workspace::MoveItemToPaneInDirection",
+        { "direction": "down", "focus": true }
+      ],
+      "ctrl-shift-up": [
+        "workspace::MoveItemToPaneInDirection",
+        { "direction": "up", "focus": true }
+      ],
+      "ctrl-shift-right": [
+        "workspace::MoveItemToPaneInDirection",
+        { "direction": "right", "focus": true }
+      ]
+    }
+  },
+  {
+    // Match all Ctrl-W direction chords in Vim and dock inputs, except terminals.
+    "context": "(Editor && mode == full && (vim_mode == normal || vim_mode == visual) && !menu) || EmptyPane || ((Dock || (Dock > Editor) || (Dock > menu)) && !Terminal)",
+    "bindings": {
+      "ctrl-w h": "workspace::ActivatePaneLeft",
+      "ctrl-w j": "workspace::ActivatePaneDown",
+      "ctrl-w k": "workspace::ActivatePaneUp",
+      "ctrl-w l": "workspace::ActivatePaneRight",
+      "ctrl-w left": "workspace::ActivatePaneLeft",
+      "ctrl-w down": "workspace::ActivatePaneDown",
+      "ctrl-w up": "workspace::ActivatePaneUp",
+      "ctrl-w right": "workspace::ActivatePaneRight",
+      "ctrl-w ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-w ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-w ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-w ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-w ctrl-left": "workspace::ActivatePaneLeft",
+      "ctrl-w ctrl-down": "workspace::ActivatePaneDown",
+      "ctrl-w ctrl-up": "workspace::ActivatePaneUp",
+      "ctrl-w ctrl-right": "workspace::ActivatePaneRight",
+      "ctrl-w shift-h": "workspace::MovePaneLeft",
+      "ctrl-w shift-j": "workspace::MovePaneDown",
+      "ctrl-w shift-k": "workspace::MovePaneUp",
+      "ctrl-w shift-l": "workspace::MovePaneRight",
+      "ctrl-w shift-left": "workspace::MovePaneLeft",
+      "ctrl-w shift-down": "workspace::MovePaneDown",
+      "ctrl-w shift-up": "workspace::MovePaneUp",
+      "ctrl-w shift-right": "workspace::MovePaneRight"
+    }
+  },
+  {
+    "context": "Editor && mode == full && vim_mode == visual && !menu",
+    "use_key_equivalents": true,
+    "bindings": {
+      "cmd-alt-l": "editor::FormatSelections"
+    }
+  },
+  {
+    // Enter accepts completions; Tab never accepts a suggestion accidentally.
+    "context": "Editor && vim_mode == insert && showing_completions",
+    "bindings": {
+      "enter": "editor::ConfirmCompletion",
+      "tab": "editor::Tab"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == insert && in_snippet && has_next_tabstop",
+    "bindings": {
+      "tab": "editor::NextSnippetTabstop"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == insert && in_snippet && has_previous_tabstop",
+    "bindings": {
+      "shift-tab": "editor::PreviousSnippetTabstop"
     }
   },
   {
     "context": "Picker > Editor",
     "bindings": {
       "ctrl-j": "menu::SelectNext",
-      "ctrl-k": "menu::SelectPrevious"
+      "ctrl-k": "menu::SelectPrevious",
+      "ctrl-down": "menu::SelectNext",
+      "ctrl-up": "menu::SelectPrevious"
     }
   }
 ]

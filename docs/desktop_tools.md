@@ -113,9 +113,45 @@ The root `.gitignore` allows only these files under `zed/`:
 - [`keymap.json`](https://zed.dev/docs/key-bindings#user-keymaps) — custom
   keybindings; the filename is singular.
 - [`tasks.json`](https://zed.dev/docs/tasks) — global tasks.
+- `snippets/go.json` — shared Go snippets; other generated/local snippet
+  files remain ignored until explicitly allowlisted.
 
-`keymap.json` contains the finder shortcuts below. No global tasks are
-configured, so no empty `tasks.json` placeholder is added.
+`keymap.json` contains a small bridge between native JetBrains IDE commands
+and native Vim editing. `tasks.json` contains Go/Rust test commands that save
+all edited buffers before running and bind to the native runnable tags.
+
+### Keyboard model and backup
+
+`base_keymap = "JetBrains"` supplies the macOS IDE shortcuts; `vim_mode = true`
+adds modal editing, text objects, operators and Vim navigation. The user keymap
+contains only deliberate overrides: our numbered panels, preview finders,
+recent/open tabs, pane/dock navigation and completion/snippet behavior.
+The current Neovim-style shortcuts are `Space Space` for the tab switcher,
+`Space f` for files and `Space g` for project text search (Vim normal mode
+and empty panes), plus `Space r n` for symbol rename, `Space q` to close
+the active tab and `Space Tab` for the alternate tab (Vim normal mode in a
+full editor). `[f`/`]f` and `[F`/`]F` move between function boundaries.
+Insert-mode spaces remain ordinary text.
+
+`vim.toggle_relative_line_numbers = true` uses relative line numbers in Vim
+normal mode and absolute numbers in insert mode. Native Which-key is enabled
+with a 450 ms delay to show matching multi-key bindings.
+
+Autosave is explicitly disabled (`autosave = "off"`). Use `Cmd-S` or `:w`
+to save deliberately; `Cmd-Alt-L` formats without saving. Native tab closing
+asks before discarding the last view of an unsaved buffer. Shared test tasks
+still use `save = "all"`, awaiting saves of edited buffers before launch.
+
+Before the rebuild, an exact copy of the previous keymap was saved under
+`zed/backups/keymap-YYYYMMDD-HHMMSS.json`. Backups are ignored by the existing
+Git allowlist and stay local. Copy the desired backup over `zed/keymap.json`
+to restore the previous bindings; Zed reloads the file automatically.
+
+The native JetBrains preset is the source of truth for commands not overridden
+here; Zed implements the available equivalents rather than every IntelliJ
+feature. Double Shift opens Zed's command palette, not IntelliJ's unified
+Search Everywhere. See [Zed keybindings](https://zed.dev/docs/key-bindings)
+and the [macOS JetBrains preset](https://github.com/zed-industries/zed/blob/v1.24.2/assets/keymaps/macos/jetbrains.json).
 
 ### AI disabled
 
@@ -123,7 +159,7 @@ configured, so no empty `tasks.json` placeholder is added.
 AI features, including the Threads Sidebar, Agent Panel, Inline Assistant
 and Edit Prediction. See [Turn AI Off](https://zed.dev/docs/ai/quick-start#turn-ai-off).
 
-### Theme and Vim-style finders
+### Theme and finders
 
 The editor uses `GeistMono Nerd Font Mono`, matching Kitty's `font_family`;
 the integrated terminal inherits that family from the editor. Zed's existing
@@ -138,22 +174,75 @@ at startup on each machine. Restart an already running session after adding
 the extension for the first time. The selected theme is Catppuccin Mocha in dark mode;
 Catppuccin Latte is configured for light mode.
 
-Zed's built-in pickers provide the fuzzy finder workflow. The Space-leader
-shortcuts match this repo's Neovim finder keys where the features overlap:
+The official [Catppuccin Icons](https://github.com/catppuccin/zed-icons)
+extension is also auto-installed at startup, with matching Mocha/Latte icon
+themes. The file finder shows these icons and uses a `large` default width.
+Preview pickers keep Zed's larger native layout and locally saved dimensions.
 
-| Shortcut            | Action                           |
-| ------------------- | -------------------------------- |
-| `Space f f`         | Find project files               |
-| `Space f b`         | Find open tabs/buffers           |
-| `Space f g`         | Search project text              |
-| `Space f s`         | Find symbols in the current file |
-| `Ctrl-j` / `Ctrl-k` | Next/previous result in a picker |
+Mocha-only theme overrides give native picker frames and preview dividers
+an opaque blue accent through `border.variant`; general `border` edges use
+Surface 2. The picker container uses Zed's `elevation_3` helper, which draws
+a one-pixel border using `border.variant`, not `border` or `border.focused`.
+The background uses darker Mantle, with a blue focus accent.
+Selected ghost rows get a translucent blue highlight. These are
+Zed's shared UI theme tokens, so other panels/popovers using the same tokens
+also receive the styling. All colors remain in the Catppuccin Mocha palette;
+no custom picker implementation or terminal-style border flags are used.
 
-Leader bindings apply in Vim normal mode and empty panes. They do not
-intercept spaces typed in insert mode. The picker navigation bindings
-apply only inside picker inputs; Enter accepts and Escape dismisses using
-Zed's existing bindings. The finders use Zed's native actions, with no
-external fzf task or extra finder extension.
+Zed's built-in pickers provide fuzzy finding with IDE shortcuts:
+
+| Shortcut                     | Action                             |
+| ---------------------------- | ---------------------------------- |
+| `Cmd-Shift-F`                | Find project files with a preview  |
+| `Space f` (normal mode)      | Find project files with a preview  |
+| `Cmd-E`                      | Find open/recent tabs              |
+| `Space Space` (normal mode)  | Find open/recent tabs              |
+| `Cmd-Shift-G`                | Search project text with a preview |
+| `Space g` (normal mode)      | Search project text with a preview |
+| `Cmd-F12`                    | Find symbols in the current file   |
+| `Cmd-O`                      | Find symbols across the project    |
+| `Cmd-Shift-A` / double Shift | Open the command palette           |
+| `Ctrl-j` / `Ctrl-k`          | Next/previous result in a picker   |
+
+The Command shortcuts also work in insert mode. `Space f` and `Space g`
+provide equivalent leader shortcuts in Vim normal mode and empty panes,
+including the same always-requested right-hand preview.
+File/project-text overrides match full editors, Pane/Workspace, the explorer
+and project-search results so native JetBrains shortcuts do not shadow the
+F-for-files/G-for-grep pair there. More specific search-field bindings retain
+their own input contexts.
+The `Cmd-E` override replaces the preset's file finder with Zed's searchable
+global tab switcher (`tab_switcher::ToggleAll`), showing tabs across all splits.
+`Space Space` opens that same switcher, providing the quick buffer-selection
+workflow used by Neovim's `BufferLinePick`. Zed shows a searchable list rather
+than assigning jump letters to the tab bar. Type part of a filename and press
+Enter, or navigate the results with `Ctrl-j`/`Ctrl-k`. Selecting a tab focuses
+its existing pane rather than duplicating the tab in the current split.
+While navigating the list, the switcher previews each selected tab in its
+editor behind the popup. Enter commits the selection; Escape restores the
+previously active tabs. This live preview is built into Zed 1.24.2 and needs
+no setting. That version's tab switcher does not support a separate preview
+pane inside the popup like the file and text finders do.
+Enter accepts and Escape dismisses pickers using native bindings.
+
+For direct tab navigation within the current pane, native `[b`/`]b` move
+to the previous/next tab, matching Neovim's bufferline mappings. `gt`/`gT`
+and the JetBrains `Cmd-Shift-[`/`Cmd-Shift-]` shortcuts are also available.
+`Space Tab` switches to the alternate file (normally the previous tab);
+repeating it toggles between the two most recently active files in that
+pane. `Space Space`/`Cmd-E` remain the searchable switcher across all panes,
+while native `Ctrl-Tab` cycles recent tabs in the current pane.
+
+`Cmd-Shift-O` and `Cmd-Shift-N` remain file-finder aliases with the same preview.
+`Cmd-P` retains JetBrains' manual signature help; automatic signature help
+remains enabled, and Vim insert mode also retains `Ctrl-S` for manual help.
+
+In both the file and text finders, `Cmd-Enter` opens the selected result in
+a vertical split to the right. Plain Enter opens it in the current pane.
+The binding matches the finder itself and its nested input/menu contexts,
+overriding generic editor handling without changing other pickers or Enter
+behavior in normal code editing. It uses the native `pane::SplitRight`
+handlers registered by the two finders.
 
 The file and project-text shortcuts run an `action::Sequence`: open the
 picker, then `picker::SetPreviewRight`. This explicitly requests a preview
@@ -166,65 +255,371 @@ These preview panes are separate from Zed's reusable preview-tab settings.
 
 ### Explorer and terminal
 
+`Cmd-W` closes tabs; `when_closing_with_no_tabs = "keep_window_open"`
+keeps the workspace window open when no tabs remain.
+`Space q` uses the same native close action in Vim normal mode. It presents
+the native save/discard/cancel prompt when closing would discard unsaved
+changes, and a Save As dialog when saving an untitled buffer. It does not
+run from terminal inputs or dock panels.
+
 The project explorer is docked on the left (`project_panel.dock = "left"`).
+Its default width is 300 pixels, with Catppuccin file/folder icons, expansion
+chevrons, bold folder labels and always-visible indent guides. A 16-pixel
+indent keeps deeper trees compact; the active guide uses the blue accent.
+
+`Cmd-Enter` on a selected explorer file opens it in a new vertical split
+to the right, using `project_panel::OpenSplitVertical` (the default vertical
+split direction is right). It also works for files already open in another
+pane. For directories, the action expands/collapses the entry. The binding
+only applies while browsing, leaving filename editing unchanged.
 
 - `Cmd-1` — open/focus the project explorer.
-- `Space e` — the same explorer action in Vim normal mode, empty panes,
-  and the project panel when not editing a filename.
 - `Cmd-2` — open/focus the integrated terminal.
+- `Cmd-Shift-2` — create a new integrated terminal tab (`workspace::NewTerminal`).
+- `Cmd-3` — open/focus the symbol outline; press it inside the outline to
+  close that panel and return to the editor.
+- `Cmd-4` — open/focus Git.
+- `Cmd-5` — open/focus project diagnostics; press it within that view to
+  close its tab and return to the previous item. Diagnostics is a central
+  workspace view, not a dock panel.
+- `Cmd-T` — open/close the task picker to select a test or other task.
 
 The Command shortcuts apply throughout the workspace, including insert mode
-and the terminal. These use Zed's native `ToggleFocus` actions, so pressing
-the same shortcut from the focused panel returns focus to the editor.
+and the terminal. `Cmd-1` through `Cmd-4` use Zed's native `ToggleFocus`
+actions with `close_panel_on_toggle = true`: open/focus the panel from
+elsewhere, then close it and return to the editor when pressed within it.
+The overrides also match Pane, where JetBrains supplies its own number-key
+bindings; GitPanel, whose native `Cmd-1/2` switch Changes/History; and
+DebugPanel, whose native `Cmd-5` would otherwise close the debugger. Dock
+input/menu contexts keep the same panel numbers while editing a filter or
+commit message. Central modal dialogs retain their own more specific shortcuts.
+The macOS keymap spells `Cmd-Shift-2` as `cmd-@` on the standard US/Polish
+programmer layout. New terminal creation is separate from `Cmd-2` focus/toggle.
 
-### Code actions and refactoring
+### Pane and dock navigation
 
-`Space c` groups code actions in Vim normal mode. Code actions, rename,
-format and language-server restart use the same suffixes as this repo's
-Neovim bindings.
+`Ctrl-h/j/k/l` focus the visible pane or dock to the left/below/above/right.
+They work in Vim normal and visual modes, empty panes, dock panels (including
+their text fields) and the integrated terminal. Hidden docks remain closed;
+use their `Cmd` shortcuts to open them. Main editor insert mode retains its
+typing shortcuts. Finder inputs use `Ctrl-j`/`Ctrl-k` and `Ctrl-Down/Up`
+for result navigation.
 
-| Shortcut    | Action                                       |
-| ----------- | -------------------------------------------- |
-| `Space c a` | Show code actions and available refactorings |
-| `Space c r` | Rename the symbol under the cursor           |
-| `Space c f` | Format the current buffer                    |
-| `Space c o` | Organize imports                             |
-| `Space c d` | Open project diagnostics                     |
-| `Space c R` | Restart the current language server          |
+`Ctrl-Left/Down/Up/Right` provide the same directional pane/dock navigation.
+They also work in editor insert mode, on the tab bar and in dock input fields.
+Central picker/search-input bindings retain their own handling.
+These shortcuts focus visible areas; use `Space Space` or `Cmd-E`
+to select a tab within or across panes.
 
-In Vim visual mode, `Space c a` requests code actions for the selected
-code and `Space c f` formats the selection. Range formatting requires a
-formatter that supports it. Insert-mode text entry is unaffected.
+In the terminal both `Ctrl-h/j/k/l` and `Ctrl-Left/Down/Up/Right` are reserved
+for Zed navigation, including when a terminal application is running; they
+are not forwarded to the shell/TUI. Enter and Backspace retain their usual
+functions. Zed's native `Cmd-K` clears the terminal, and `Cmd-Delete` sends
+the shell's `Ctrl-K`.
+
+`Ctrl-w h/j/k/l` and `Ctrl-w Left/Down/Up/Right` focus areas in Vim normal/
+visual modes and non-terminal docks, including their input fields. Holding
+Control for the second key works for both letter and arrow variants too.
+The terminal retains `Ctrl-w` for shell word deletion; use direct
+`Ctrl-h/j/k/l` or `Ctrl-Left/Down/Up/Right` to leave it.
+
+`Ctrl-Shift-h/j/k/l` and `Ctrl-Shift-Left/Down/Up/Right` move the active
+central tab to the pane in that direction and follow it. They work in
+normal/visual/insert mode and central terminals. They do not operate from
+dock panels, so editing a commit message cannot move an unrelated central
+tab. If there is no adjacent pane, Zed creates one when the source contains
+more than one tab; with one tab and no destination it does nothing. An empty
+source pane disappears after a move.
+
+`Ctrl-w Shift-H/J/K/L` and `Ctrl-w Shift-Left/Down/Up/Right` move the entire
+pane. The shifted arrow chords deliberately override native pane swapping
+to match their letter equivalents; `Ctrl-w x` retains native swapping.
+
+### Code navigation
+
+These Zed 1.24.2 Vim bindings use native actions. `g D` opens the definition
+in a split instead of going to the declaration, and the custom `[f`/`]f`
+aliases replace collaborator-following shortcuts with function motions.
+Navigation requests depend on the active language server's capabilities.
+
+| Shortcut            | Action                                   |
+| ------------------- | ---------------------------------------- |
+| `g d`               | Go to definition                         |
+| `g D`               | Open definition in the pane to the right |
+| `g y`               | Go to type definition                    |
+| `g I` / `g r i`     | Go to implementation                     |
+| `g r r`             | Find all references                      |
+| `K` / `g h`         | Show documentation/hover                 |
+| `Ctrl-o` / `Ctrl-i` | Back/forward through navigation history  |
+| `Ctrl-w g d`        | Open definition in a split               |
+| `Ctrl-w g D`        | Open type definition in a split          |
+| `[f` / `]f`         | Previous/next function or method start   |
+| `[F` / `]F`         | Previous/next function or method end     |
+
+`g i` keeps Vim's insert-at-previous-position behavior; the implementation
+shortcut uses uppercase `I` or the modern Neovim-style `g r i` sequence.
+`g D` uses `editor::GoToDefinitionSplit`: it reuses the pane to the right,
+or creates a vertical split there if needed. `g d` stays in the current pane.
+See [Zed Vim mode](https://zed.dev/docs/vim).
+
+Function motions use the same native actions as `[m`/`]m` and `[M`/`]M`.
+They work in normal, visual and operator-pending modes and use the language's
+Tree-sitter text-object queries rather than LSP. Supported languages also
+provide native `vif`/`vaf` to select a function body/whole function and `dif`
+or `cif` to delete/change its body. No Neovim plugin is installed in Zed.
+In this repo's Neovim config, the corresponding `[f`/`]f` mappings are owned
+by `nvim-treesitter-textobjects`. See [Zed text objects](https://zed.dev/docs/extensions/languages#text-objects).
+
+Panel toggling, directional navigation (including visible docks) and the
+diagnostics context were checked against the installed version's published
+workspace/diagnostics implementation. The code-navigation bindings were
+checked against its native Vim keymap. The updated settings/keymap parsed
+successfully and loaded without new keymap/context errors in Zed's log.
+Interactive panel switching and the diagnostics toggle were not exercised.
+
+### Symbol navigation
+
+`Cmd-3` opens/focuses the native Outline Panel on the right and closes it
+when pressed inside the panel, including its filter. `Cmd-F12` opens the compact
+file-symbol picker; `Cmd-O` opens the project-symbol picker.
+
+The outline panel follows the current editor and reveals the symbol near
+the cursor using Zed's defaults. It also summarizes multibuffers, including
+search results, references and diagnostics. Project symbols depend on the
+active language server's workspace-symbol support. See
+[Outline Panel](https://zed.dev/docs/outline-panel) and
+[the native action reference](https://zed.dev/docs/all-actions).
+
+The symbol actions and panel setting were checked against Zed's documented
+actions and settings; the existing file-symbol picker is unchanged.
+
+### Languages and formatting
+
+The shared settings select one language server per language and enable
+formatting on save for the languages below. `Cmd-S` saves the current file,
+including the configured formatting and import actions. `Cmd-Alt-L` formats
+the buffer, or the selection in Vim visual mode. Project settings in
+`.zed/settings.json` can override formatting choices.
+
+| Language                                    | Language server      | Formatter                     |
+| ------------------------------------------- | -------------------- | ----------------------------- |
+| Rust                                        | rust-analyzer        | rustfmt through rust-analyzer |
+| Go                                          | gopls                | gofumpt inside gopls          |
+| JavaScript (including JSX), TypeScript, TSX | vtsls                | Prettier                      |
+| JSON, JSONC                                 | json-language-server | Prettier                      |
+| YAML                                        | yaml-language-server | Prettier                      |
+| TOML                                        | Tombi                | Tombi through LSP             |
+| Markdown                                    | Marksman             | Prettier                      |
+
+Rust, Go, JavaScript/TypeScript, JSON and YAML support is built into Zed.
+The `toml` extension supplies TOML syntax support; the current version no
+longer includes an LSP. The official [Tombi extension](https://github.com/tombi-toml/tombi/tree/main/editors/zed)
+adds TOML completion, validation and formatting.
+Markdown syntax support is built in; [Marksman](https://github.com/vitallium/zed-marksman)
+adds navigation, link completion and diagnostics. These three extensions
+are declared in `auto_install_extensions` and install at app startup.
+Restart an already running Zed after adding them for the first time.
+
+Zed and its extensions download missing language servers when needed;
+existing supported installations on PATH may be used first. Zed's managed
+Prettier integration uses a project installation when available and supplies
+a fallback otherwise. There is no global npm formatter installation or
+dependency on Neovim's Mason directory. Rust, Go and Node runtimes remain
+managed by the global mise config; Rust's toolchain includes rustfmt.
+Go explicitly runs `source.organizeImports` before formatting through gopls:
+it adds missing imports, removes unused ones and sorts them. Gopls uses
+its integrated gofumpt formatter and enables Staticcheck diagnostics; separate
+`goimports`, `gofmt`, `gofumpt` or `staticcheck` processes are not required.
+This follows the same formatting style as Neovim's goimports + gofumpt setup.
+
+JavaScript, TypeScript and TSX run vtsls's `source.organizeImports` before
+Prettier, combining/sorting imports and removing unused ones. Missing imports
+remain available through completions and code actions. These actions run on
+explicit save and on `Cmd-Alt-L`.
+`Cmd-Alt-O` requests import organization separately.
+
+Rust uses the active toolchain's rustfmt through rust-analyzer, preserving
+the crate edition and project formatting rules. Stable rustfmt sorts imports
+by default. Rust-analyzer runs Clippy on save for all targets, with build-script
+and procedural-macro support. Its separate `target/rust-analyzer` build cache
+reduces contention with terminal Cargo builds at the cost of extra disk space.
+No `--all-features` override is imposed, so projects retain their selected features.
+
+Rust-analyzer does not provide a generic `source.organizeImports` action.
+Unused imports are diagnosed by Rust/Clippy and can be removed using
+`Alt-Enter` (or the remove-unused-imports assist on a selection); they are
+not removed automatically on save. `Cmd-Alt-O` therefore does not apply to Rust.
+No broad quick-fix action runs on save. JSON, YAML, TOML and Markdown retain
+their dedicated formatters; import organization is not configured for data
+or prose formats.
+
+Formatting follows project configuration such as `rustfmt.toml`,
+`.prettierrc`, `.prettierignore` and `tombi.toml`. Per-language editor choices
+can be overridden in `.zed/settings.json`. The repository's hk checks keep
+using their independently pinned tools (including Taplo, yamlfmt and rumdl),
+so editor formatting does not replace the required repository checks.
+See [Zed's language configuration](https://zed.dev/docs/configuring-languages)
+and [Prettier integration](https://zed.dev/docs/languages/typescript).
+
+The language settings were checked against Zed 1.24.2's published defaults
+and extension manifests and parsed with Zed's installed JSONC parser.
+The installed rust-analyzer accepted the configured initialization options
+and returned formatting edits on a temporary Rust crate; Clippy passed for
+all targets. Zed's gopls accepted its options, added a missing import, removed
+an unused import, returned formatted code and supplied function-call completions
+with editable argument placeholders. The resulting Go sample passed `go test`.
+First-start extension installation and formatting through the remaining
+language servers have not been exercised.
+
+### Completion and Go snippets
+
+Language servers and automatic completion menus are explicitly enabled,
+with completion documentation and automatic signature help. Snippets appear
+at the top of the completion menu. Gopls enables `usePlaceholders` and
+`completeFunctionCalls` so accepting a function call supplies editable
+arguments. AI remains disabled; these features use language servers and
+local snippets.
+
+`snippets/go.json` copies all nine project-specific entries from
+`nvim/snippets/go.json` (wrapped errors, parallel table tests and
+controller-runtime helpers). It also supplies the basic constructs that
+Neovim receives separately from friendly-snippets:
+
+| Prefix  | Expansion                                       |
+| ------- | ----------------------------------------------- |
+| `func`  | Function declaration                            |
+| `meth`  | Method with a pointer receiver                  |
+| `forr`  | Range over a slice/map with index/key and value |
+| `forc`  | Range over a channel until it closes            |
+| `fori`  | Counted loop                                    |
+| `iferr` | Return on error                                 |
+| `main`  | Main function                                   |
+| `test`  | Parallel test function                          |
+
+The copied Neovim entries are unchanged snapshots; subsequent edits in
+either editor's snippet file must be mirrored explicitly when desired.
+No dependency on an installed Neovim plugin is introduced.
+
+In Vim insert mode, type a prefix and choose its snippet in the completion
+menu. Enter accepts it; Tab/Shift-Tab move through its placeholders, including
+when another completion menu is open inside a placeholder. Tab does not
+accept a completion in that menu. `Ctrl-n`/`Ctrl-p` use Zed's existing menu
+navigation. `Ctrl-x Ctrl-o` explicitly opens completions in Vim insert mode;
+`Ctrl-Space` is also available if macOS has not reserved it for input switching.
+Structural snippets work without a running LSP; symbol suggestions,
+auto-imports and call signatures require a healthy language server.
+See [Zed snippets](https://zed.dev/docs/snippets) and
+[code completions](https://zed.dev/docs/completions).
+
+All 17 snippet bodies were expanded with their default placeholders and
+accepted by the real Go toolchain's gofmt parser. The nine copied entries
+were compared with Neovim's originals. Settings, keymap and snippet JSON
+parsed successfully, repository checks passed, and opening the files in Zed
+produced no new configuration errors. Interactive completion-menu selection
+and placeholder navigation were not exercised.
+
+### IDE code actions and refactoring
+
+These IDE shortcuts remain available alongside Vim movements:
+
+| Shortcut                             | Action                                             |
+| ------------------------------------ | -------------------------------------------------- |
+| `Alt-Enter`                          | Code actions and available refactorings            |
+| `Shift-F6`                           | Rename symbol                                      |
+| `Space r n` (normal mode)            | Rename symbol                                      |
+| `Cmd-Alt-L`                          | Format buffer; format selection in Vim visual mode |
+| `Cmd-Alt-O`                          | Organize imports                                   |
+| `Cmd-B`                              | Go to definition                                   |
+| `Cmd-Alt-B`                          | Go to implementation                               |
+| `Cmd-Shift-B`                        | Go to type definition                              |
+| `Alt-F7`                             | Find references/usages                             |
+| `Cmd-J`                              | Show documentation/hover                           |
+| `Cmd-P` / `Ctrl-S` (Vim insert mode) | Show signature help                                |
+| `Cmd-[` / `Cmd-]`                    | Navigate backward/forward                          |
+| `F2` / `Shift-F2`                    | Next/previous diagnostic                           |
+| `Cmd-F` / `Cmd-R`                    | Find/replace in the current file                   |
+| `Cmd-Shift-R`                        | Replace across the project                         |
+| `Cmd-S` / `Cmd-W`                    | Save/close the active tab                          |
+
+Vim's `gd`, `gy`, `grr`, `gri`, `K` and `Ctrl-o`/`Ctrl-i` remain native.
+Splits use native `Ctrl-w v` (side by side), `Ctrl-w s` (stacked),
+`Ctrl-w H/J/K/L` (move pane), `Ctrl-w =` (equal sizes) and
+`Ctrl-w q` (close active tab; an empty split disappears).
+Directional letter/arrow pairs are aligned as described above.
 
 Refactorings such as extracting a function or inlining are offered through
-the code-actions menu when the active language server supports them.
-Rename and import organization also depend on the language server's
-capabilities; these shortcuts do not add language support or install any
-extra extensions. See Zed's [action reference](https://zed.dev/docs/all-actions).
+`Alt-Enter` when the active language server supports them. Rename and import
+organization also depend on server capabilities. In Vim visual mode,
+`Cmd-Alt-L` requests selection formatting, which requires range support.
+Use the command palette for less frequent actions such as restarting an LSP.
+
+For Go's `Create variable err` quick fix, place the cursor inside `err` or
+select only that identifier (`viw` in Vim normal mode), then press `Alt-Enter`.
+This creates an undeclared variable; it is different from Extract variable.
+With gopls 0.24.0, a selection starting at indentation or `if` can still offer
+the quick fix but fail with `execute command: no identifier found`. This was
+reproduced against Zed's installed gopls; the cursor/word cases succeeded.
+Keep expression/block selections for Extract variable/function instead.
+
+### Running tests
+
+`Cmd-T` opens Zed's native task picker. Open a source/test file, type `test`
+to filter the available tasks, select one and press Enter. Results appear
+in the terminal dock; `Cmd-2` returns to them. Press `Cmd-T` again to dismiss
+the picker. Explicit Terminal and DebugPanel contexts override native new
+terminal/thread-picker handling, keeping the task shortcut consistent there.
+Use `Cmd-Shift-2` to create a new terminal instead.
+
+`Cmd-Shift-6` reruns the last task with its original captured context. This
+keeps a chosen test/package selected when navigating to other files. It reruns
+the most recent task of any kind, so launching a build replaces the previous
+test as the rerun target. The macOS keymap spells this shortcut `cmd-^`
+(`Shift-6` on the standard US/Polish programmer layout).
+
+`Cmd-Alt-6` invokes `editor::SpawnNearestTask` in a full editor. Inside a
+detected test it runs that test/subtest; elsewhere it can run a nearby
+runnable, such as `main`, so it is not an unconditional test-only action.
+
+Shared tasks prefixed `Test Go` and `Test Rust` in `zed/tasks.json` all use
+`save = "all"`. Zed awaits the save operation before starting the command,
+even with autosave disabled. Go tasks cover a test/example,
+subtest, table case, testify suite method, package and module. Rust tasks
+cover a test, doc test, module, package and Cargo workspace. Native runnable
+tags connect those definitions to gutter buttons and the nearest-task
+shortcut, with shared templates preceding language/LSP tasks. Project-local
+tag overrides in `.zed/tasks.json` take priority and should also set
+`save = "all"`. Other native/project tasks retain their own save policy.
+
+Go provides native tasks for the current test/subtest, package and whole
+module (`go test ./...`); availability depends on the cursor's context.
+Rust supplies Cargo/rust-analyzer tasks for tests and test modules. Gutter
+play buttons provide another way to run individual detected tests. JS/TS
+projects should define their actual test command in `.zed/tasks.json`
+(for example a project-owned npm test script); this config does not assume
+Jest, Vitest or install a test framework globally. Set `"save": "all"` on
+project-owned test tasks as well.
+
+Zed 1.24.2 provides a task picker and terminal output rather than a dedicated
+test tree with per-test pass/fail badges. See [Zed Tasks](https://zed.dev/docs/tasks)
+and [Zed's test-running workflow](https://zed.dev/docs/migrate/rustrover#running-tests).
+Bindings and task behavior were checked against the published 1.24.2 sources.
+All 11 shared test commands passed against temporary dependency-free Go/Rust
+projects, including individual-test/subtest selection and paths with spaces.
+Interactive task selection and GUI shortcut behavior were
+not exercised.
 
 ### Git actions
 
-`Space g` groups the native Git actions in Vim normal mode and empty panes.
-`Space g g` matches this repo's Neovim shortcut for opening the Git UI.
-
-| Shortcut    | Action                   |
-| ----------- | ------------------------ |
-| `Space g g` | Open/focus the Git panel |
-| `Space g b` | Find and switch branches |
-| `Space g d` | Open the project diff    |
-| `Space g h` | Show file history        |
-| `Space g s` | Browse stashes and diffs |
-| `Space g w` | Find or create worktrees |
-
-The project diff uses Zed's configured `git.diff_base`. Branches, stashes
-and worktrees use native pickers; changed files are available in the Git
-panel. These actions are also available through the command palette.
-See [Zed's Git documentation](https://zed.dev/docs/git) and
-[action reference](https://zed.dev/docs/all-actions).
+`Cmd-4` opens/focuses Git; press it within the focused panel to close it.
+The native JetBrains aliases remain available: `Cmd-0` or `Cmd-K` opens
+Git, `Cmd-~` opens the branch menu, and `Cmd-Shift-K` invokes Push.
+History, diffs, stashes and worktrees are available through the Git UI and
+command palette. No Git operation is executed when loading the keymap.
+See [Zed Git](https://zed.dev/docs/git).
 
 ### Local data and bootstrap
 
-All other files and directories are ignored, including the local `prompts/`
+Files outside the allowlist are ignored, including the local `prompts/`
 database. They will live physically under this repo once the directory is
 linked, but remain untracked and are not shared between machines. Add an
 explicit allowlist entry before tracking any additional custom config.
@@ -248,22 +643,10 @@ mise bootstrap dotfiles apply ~/.config/zed
 The local `prompts/` directory can then be copied from the backup into the
 linked directory if needed; Git will ignore it.
 
-**Validation:** the directory bootstrap was checked with `--dry-run`, and
-the Git allowlist was checked for all three config files and local state.
-The finder actions and picker context were checked against Zed 1.24.2's
-published macOS keymap and the official Vim keybinding documentation.
-Both files parsed with Zed's installed JSONC parser. Opening the settings
-in the installed app produced no settings or keymap errors in its new log
-entries. The Catppuccin extension awaits the next app startup; visual theme
-appearance and interactive shortcut behavior were not verified.
-Preview actions, layout persistence and the action-sequence syntax were
-checked against the installed version's picker implementation, macOS
-keymap overrides and official documentation. The revised keymap was
-parsed and checked for load errors in Zed's log; interactive preview
-behavior was not verified.
-Git action names were checked against the official action reference, and
-the updated keymap passed parsing and repository checks. No Git operations
-were executed while validating the bindings.
-The `Space c` actions were checked against the official action reference;
-the keymap parsed successfully and repository checks passed. Language-specific
-refactorings and interactive normal/visual-mode behavior were not exercised.
+**Validation:** bootstrap was checked with `--dry-run`; the Git allowlist
+keeps settings, keymap and the declared Go snippets shareable, while backups
+and tool-written state remain local. The rebuilt keymap was checked against
+Zed 1.24.2's published macOS JetBrains/Vim presets and key-context precedence.
+The settings and keymap parsed with Zed's installed JSONC parser. Repository
+checks and app-log loading checks are recorded when the configuration changes;
+interactive shortcut behavior has not been exercised.

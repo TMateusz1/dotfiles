@@ -35,3 +35,6 @@ glow/glow.yml
 !/zed/settings.json
 !/zed/keymap.json
 !/zed/tasks.json
+!/zed/snippets/
+/zed/snippets/*
+!/zed/snippets/go.json

@@ -7,22 +7,164 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "cli_default_open_behavior": "existing_window",
   "disable_ai": true,
   "vim_mode": true,
   "base_keymap": "JetBrains",
-  "icon_theme": "Zed (Default)",
+  "autosave": "off",
+  "vim": {
+    "toggle_relative_line_numbers": true,
+  },
+  "which_key": {
+    "enabled": true,
+    "delay_ms": 450,
+  },
+  "when_closing_with_no_tabs": "keep_window_open",
+  "close_panel_on_toggle": true,
+  "enable_language_server": true,
+  "show_completions_on_input": true,
+  "show_completion_documentation": true,
+  "snippet_sort_order": "top",
+  "auto_signature_help": true,
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Catppuccin Latte",
+    "dark": "Catppuccin Mocha",
+  },
   "ui_font_size": 16,
   "buffer_font_family": "GeistMono Nerd Font Mono",
   "buffer_font_size": 15,
   "project_panel": {
     "dock": "left",
+    "default_width": 300,
+    "file_icons": true,
+    "folder_indicator": "both",
+    "bold_folder_labels": true,
+    "indent_size": 16,
+    "indent_guides": {
+      "show": "always",
+    },
+  },
+  "outline_panel": {
+    "dock": "right",
+  },
+  "file_finder": {
+    "file_icons": true,
+    "modal_max_width": "large",
   },
   "auto_install_extensions": {
     "catppuccin": true,
+    "catppuccin-icons": true,
+    "marksman": true,
+    "toml": true,
+    "tombi": true,
+  },
+  "languages": {
+    "Rust": {
+      "language_servers": ["rust-analyzer"],
+      "formatter": "language_server",
+      "format_on_save": "on",
+    },
+    "Go": {
+      "language_servers": ["gopls"],
+      "formatter": "language_server",
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true,
+      },
+    },
+    "JavaScript": {
+      "language_servers": ["vtsls"],
+      "formatter": "prettier",
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true,
+      },
+    },
+    "TypeScript": {
+      "language_servers": ["vtsls"],
+      "formatter": "prettier",
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true,
+      },
+    },
+    "TSX": {
+      "language_servers": ["vtsls"],
+      "formatter": "prettier",
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.organizeImports": true,
+      },
+    },
+    "JSON": {
+      "language_servers": ["json-language-server"],
+      "formatter": "prettier",
+      "format_on_save": "on",
+    },
+    "JSONC": {
+      "language_servers": ["json-language-server"],
+      "formatter": "prettier",
+      "format_on_save": "on",
+    },
+    "YAML": {
+      "language_servers": ["yaml-language-server"],
+      "formatter": "prettier",
+      "format_on_save": "on",
+    },
+    "TOML": {
+      "language_servers": ["tombi"],
+      "formatter": "language_server",
+      "format_on_save": "on",
+    },
+    "Markdown": {
+      "language_servers": ["marksman"],
+      "formatter": "prettier",
+      "format_on_save": "on",
+    },
+  },
+  "lsp": {
+    "gopls": {
+      "initialization_options": {
+        "gofumpt": true,
+        "staticcheck": true,
+        "usePlaceholders": true,
+        "completeFunctionCalls": true,
+      },
+    },
+    "rust-analyzer": {
+      "initialization_options": {
+        "cargo": {
+          "allTargets": true,
+          "buildScripts": {
+            "enable": true,
+          },
+          "targetDir": true,
+        },
+        "procMacro": {
+          "enable": true,
+        },
+        "checkOnSave": true,
+        "check": {
+          "command": "clippy",
+        },
+      },
+    },
   },
   "theme": {
     "mode": "dark",
     "light": "Catppuccin Latte",
     "dark": "Catppuccin Mocha",
+  },
+  "theme_overrides": {
+    "Catppuccin Mocha": {
+      "border": "#585b70",
+      "border.variant": "#89b4fa",
+      "border.focused": "#89b4fa",
+      "elevated_surface.background": "#181825",
+      "ghost_element.selected": "#89b4fa26",
+      "panel.indent_guide": "#45475a",
+      "panel.indent_guide_active": "#89b4fa",
+    },
   },
 }
