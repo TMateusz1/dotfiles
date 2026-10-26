@@ -29,6 +29,10 @@ mise.*.local.toml
 # glow/glamour.json for that reason. See docs/util_tools.md#glow.
 glow/glow.yml
 
+# Zellij owns local backups/state; share only the theme configuration.
+/zellij/*
+!/zellij/config.kdl
+
 # Zed writes into its symlinked config directory. Track only shareable config;
 # settings.json (including SSH connections), databases and generated state stay local.
 /zed/*

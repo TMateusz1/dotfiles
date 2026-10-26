@@ -55,7 +55,7 @@ Global (`mise/config.toml`):
 - Util tools — `bat`, `zoxide`, `eza`, `fd`, `fzf`, `gh`, `glab`,
   `glow`, `jq`, `yq`, `ripgrep`, `starship` — see
   [util_tools.md](./util_tools.md)
-- Core tools — `tmux`, `lazygit`, `k9s`, `bottom` — see
+- Core tools — `zellij`, `tmux`, `lazygit`, `k9s`, `bottom` — see
   [core_tools.md](./core_tools.md)
 - Containers and Kubernetes — Helm, k9s and kind. Helm remains a runtime
   dependency for Mason's helm-ls chart linting.

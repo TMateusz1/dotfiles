@@ -129,6 +129,52 @@ in for `**/*.yml`/`**/*.yaml` generally; `.yamlfmt` at the repo root sets
 `retain_line_breaks: true` so this file's blank-line section separators
 survive formatting.
 
+## Zellij
+
+The global mise config pins `aqua:zellij-org/zellij` to `0.45.1`, with
+downloads/checksums in `mise/mise.lock`. It uses `theme "catppuccin-mocha-blue"`
+with the official theme from Zellij 0.45.1 copied into the config and small
+overrides: unselected ribbons use Catppuccin Mocha Blue (`#89b4fa`) instead
+of the pale Text background. Active ribbons retain Mocha Green (`#a6e3a1`).
+Shortcut letters on both backgrounds use Mocha Mantle (`#181825`) instead
+of red, matching the dark labels for better contrast.
+This colors the bottom mode buttons and also the unfocused tabs, which share
+the same ribbon style. The complete theme is included because omitted
+components fall back to Zellij's defaults rather than inherit Catppuccin.
+The custom name matters: Zellij 0.45.1 loads built-in themes after inline
+definitions, replacing any inline theme with the same name.
+Keybindings use Zellij's defaults with one addition: **`Ctrl+l`**
+opens [lazygit](#lazygit) in a centered floating pane, 80% wide and tall,
+using the focused pane's current directory. Exit lazygit with `q` to close
+the popup and return to the underlying pane. The shortcut works directly
+in every mode except Locked. `Ctrl+l` is reserved for lazygit while unlocked;
+press `Ctrl+g` to enter Locked mode and pass it through to applications
+for clearing/redrawing, then `Ctrl+g` again to unlock.
+Modes, layouts and other behavior otherwise use Zellij's defaults.
+
+`zellij/config.kdl` maps to **`~/.config/zellij/config.kdl`** through native
+mise `[dotfiles]` provisioning. Only the file is linked because Zellij's
+configuration UI can write settings/backups. Other files under `zellij/`
+are ignored; session data stays in Zellij's own cache/data directories.
+
+Start with `zellij`, or attach/create a named session with
+`zellij attach --create work`. On another machine:
+
+```sh
+mise install --locked aqua:zellij-org/zellij
+mise bootstrap dotfiles apply --yes '~/.config/zellij/config.kdl'
+```
+
+See [Zellij](https://zellij.dev/) and the
+[official Catppuccin port](https://github.com/catppuccin/zellij).
+
+**Validation:** Zellij 0.45.1 accepted the custom theme and lazygit keybinding
+with `setup --check`.
+Markdown lint and `git diff --check` passed. The live config path is linked
+to this repository. A disposable PTY probe produced no rendered output in
+the agent environment, so the blue/green appearance needs a visual check
+in a regular terminal.
+
 ## tmux
 
 `tmux/.tmux.conf` maps to **`~/.tmux.conf`** — not the XDG path

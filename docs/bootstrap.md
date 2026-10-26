@@ -111,6 +111,10 @@ directory without discarding its local data.
 
 These tools deliberately use **file** entries instead:
 
+- **Zellij** — only `zellij/config.kdl` maps to
+  `~/.config/zellij/config.kdl`. Its configuration UI can write settings and
+  backups, so the directory remains machine-local. See
+  [core_tools.md#zellij](./core_tools.md#zellij).
 - **glow** — glow auto-creates and rewrites its own `glow.yml` in its
   config directory (verified: it reappears after deletion on any plain
   `glow file.md` run). With a directory symlink that write lands inside

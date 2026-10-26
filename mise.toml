@@ -78,6 +78,8 @@ run = "mise -E desktop bootstrap packages apply"
 "~/.zshrc" = "shell/.zshrc"
 "~/.tmux.conf" = "tmux/.tmux.conf"
 "~/.config/tmux/status-metrics.sh" = "tmux/status-metrics.sh"
+# Keep Zellij's generated config/backups machine-local; own only this file.
+"~/.config/zellij/config.kdl" = "zellij/config.kdl"
 "~/.config/starship.toml" = "starship/starship.toml"
 "~/.config/git" = "git"
 "~/.config/bat" = "bat"

@@ -32,6 +32,7 @@ mise/                  # shared tools + macOS + opt-in desktop layers → ~/.con
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
 tmux/                  # config + metrics; SessionX and session persistence (see docs/core_tools.md#tmux)
+zellij/                # Catppuccin Mocha, blue/green ribbons, lazygit popup (see docs/core_tools.md#zellij)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
 eza/                   # eza theme → ~/.config/eza/
@@ -55,7 +56,7 @@ docs/                  # notes on what's configured, and why
 | git (+ delta)                                                                                 | [docs/git.md](./docs/git.md)                     |
 | shell (zsh)                                                                                   | [docs/shell.md](./docs/shell.md)                 |
 | Util tools (bat, zoxide, eza, fd, fzf, gh, glab, glow, jq, yq, ripgrep, starship)             | [docs/util_tools.md](./docs/util_tools.md)       |
-| Core tools (tmux, lazygit, k9s, bottom)                                                       | [docs/core_tools.md](./docs/core_tools.md)       |
+| Core tools (Zellij, tmux, lazygit, k9s, bottom)                                               | [docs/core_tools.md](./docs/core_tools.md)       |
 | Desktop tools (kitty, Zed settings)                                                           | [docs/desktop_tools.md](./docs/desktop_tools.md) |
 | Neovim (LSP, blink.cmp, conform, neotest, Treesitter, fzf-lua, Trouble, Neogit, Oil/Neo-tree) | [docs/nvim.md](./docs/nvim.md)                   |
 | languages (Rust, Go, Python, Robot Framework, Protocol Buffers, Kubernetes, Helm)             | [docs/langs.md](./docs/langs.md)                 |

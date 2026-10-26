@@ -12,6 +12,7 @@ task.run_auto_install = false
 # Terminal apps
 "aqua:neovim/neovim" = "0.12.5"         # Editor
 "aqua:tmux/tmux-builds" = "3.7c"        # Terminal multiplexer
+"aqua:zellij-org/zellij" = "0.45.1"     # Terminal workspace
 "aqua:ClementTsang/bottom" = "0.14.9"   # System monitor (btm)
 "aqua:charmbracelet/glow" = "3.0.0"     # Markdown renderer
 "aqua:jesseduffield/lazygit" = "0.65.1" # Git TUI
