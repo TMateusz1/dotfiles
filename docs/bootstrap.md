@@ -102,7 +102,8 @@ needed for delta specifically.
 
 Zed also uses a whole-directory link so settings, keybindings and tasks share
 one config directory. It writes a prompt database there, so `.gitignore`
-allows only `settings.json`, `keymap.json` and `tasks.json`; everything else
+allows only `global_settings.json`, `keymap.json`, `tasks.json` and the declared
+Go snippets. `settings.json` (including SSH connections) and everything else
 under `zed/` is ignored. This is a deliberate exception to the usual rule of
 using file links for tools that write into their config directory. See
 [desktop_tools.md#zed](./desktop_tools.md#zed) for migrating an existing

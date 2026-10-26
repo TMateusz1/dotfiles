@@ -109,7 +109,7 @@ is symlinked so settings, keybindings and tasks share one location.
 
 The root `.gitignore` allows only these files under `zed/`:
 
-- `settings.json` — Vim mode, theme and extension preferences.
+- `global_settings.json` — shared Vim mode, theme, language and extension preferences.
 - [`keymap.json`](https://zed.dev/docs/key-bindings#user-keymaps) — custom
   keybindings; the filename is singular.
 - [`tasks.json`](https://zed.dev/docs/tasks) — global tasks.
@@ -635,6 +635,28 @@ See [Zed Git](https://zed.dev/docs/git).
 
 ### Local data and bootstrap
 
+Zed natively loads `global_settings.json` as defaults, then applies the
+machine's `settings.json` on top. Shared changes belong in
+`zed/global_settings.json`; settings changed through Zed's UI are written
+to the ignored `zed/settings.json` and stay local. Local overrides take
+precedence, so remove an override to inherit the shared value again.
+Zed also writes `ssh_connections` into `settings.json`; keep that field and
+all private connection details out of `global_settings.json`. No merge
+script or additional settings loader is needed. See the
+[settings loader in Zed 1.25.3](https://github.com/zed-industries/zed/blob/v1.25.3/crates/settings/src/settings_store.rs#L1377).
+
+**Migrating another machine:** before updating this checkout, close Zed and
+back up its existing `~/.config/zed/settings.json` outside the repository.
+If local edits to that tracked file block the update, first verify the backup,
+then run `git restore -- zed/settings.json` from the checkout and update again.
+The update removes that formerly tracked file. Afterwards, restore only
+`ssh_connections` and any intentional machine-specific overrides into a
+new `~/.config/zed/settings.json`; do not restore the entire old config,
+because its duplicate values would override future shared changes.
+Verify that `git check-ignore zed/settings.json` reports the local file as
+ignored before reopening Zed. Preserve the backup until the connections
+and settings have been checked.
+
 Files outside the allowlist are ignored, including the local `prompts/`
 database. They will live physically under this repo once the directory is
 linked, but remain untracked and are not shared between machines. Add an
@@ -649,19 +671,26 @@ mise bootstrap dotfiles apply --dry-run --force ~/.config/zed
 
 Before applying, move the existing `~/.config/zed` directory to a backup
 outside this repo, keeping its prompt database and any other local data.
-Copy any desired shareable config files into `zed/`, then apply only the
-directory link with:
+Copy desired shared preferences into `zed/global_settings.json` and shared
+keymaps/tasks into their respective files, then apply only the directory
+link with:
 
 ```sh
 mise bootstrap dotfiles apply ~/.config/zed
 ```
 
-The local `prompts/` directory can then be copied from the backup into the
-linked directory if needed; Git will ignore it.
+The local `prompts/` directory and a `settings.json` containing only private
+connections and machine-specific overrides can then be copied from the
+backup into the linked directory if needed; Git will ignore them.
 
 **Validation:** bootstrap was checked with `--dry-run`; the Git allowlist
-keeps settings, keymap and the declared Go snippets shareable, while backups
-and tool-written state remain local. The rebuilt keymap was checked against
+keeps global settings, keymap, tasks and the declared Go snippets shareable,
+while local settings, backups and tool-written state remain ignored.
+For the settings split, Zed 1.25.3's native loading/merge order was reviewed;
+both JSONC files parsed, shared values matched the previous configuration,
+and opening the shared file produced no new config errors in Zed's log.
+Git confirmed that `settings.json` is ignored and absent from the index.
+The rebuilt keymap was checked against
 Zed 1.24.2's published macOS JetBrains/Vim presets and key-context precedence.
 The settings and keymap parsed with Zed's installed JSONC parser. Repository
 checks and app-log loading checks are recorded when the configuration changes;

@@ -30,9 +30,9 @@ mise.*.local.toml
 glow/glow.yml
 
 # Zed writes into its symlinked config directory. Track only shareable config;
-# prompt databases, generated state and other machine-local files stay ignored.
+# settings.json (including SSH connections), databases and generated state stay local.
 /zed/*
-!/zed/settings.json
+!/zed/global_settings.json
 !/zed/keymap.json
 !/zed/tasks.json
 !/zed/snippets/

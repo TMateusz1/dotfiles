@@ -86,6 +86,12 @@ add it to `.gitignore` as a second line of defence. Check for this when
 adding a tool: run it once and see whether anything appears or changes in
 its config directory.
 
+**Zed is an explicit user-requested exception:** keep its whole-directory
+link. Shared defaults belong in `zed/global_settings.json`. Zed writes local
+overrides and SSH connections to `zed/settings.json`, which must stay
+ignored and untracked. Never copy private connections into the shared file.
+See [docs/desktop_tools.md](./docs/desktop_tools.md#local-data-and-bootstrap).
+
 ## Visual consistency: Catppuccin everywhere
 
 Every tool that supports theming uses the **Catppuccin** theme family

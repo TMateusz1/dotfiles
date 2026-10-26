@@ -42,7 +42,7 @@ k9s/                   # k9s config + skin (see docs/core_tools.md#k9s)
 bottom/                # bottom (btm) system monitor → ~/.config/bottom/ (see docs/core_tools.md#bottom)
 glow/                  # glow theme → ~/.config/glow/glamour.json only (see docs/util_tools.md#glow)
 kitty/                 # kitty config + theme → ~/.config/kitty/ (see docs/desktop_tools.md)
-zed/                   # macOS Zed: JetBrains + Vim keys, LSPs, formatters, tests and Go snippets (see docs/desktop_tools.md#zed)
+zed/                   # macOS Zed: shared global_settings.json, local settings.json; JetBrains + Vim (see docs/desktop_tools.md#zed)
 nvim/                  # neovim config → ~/.config/nvim/ (see docs/nvim.md)
 docs/                  # notes on what's configured, and why
 ```
