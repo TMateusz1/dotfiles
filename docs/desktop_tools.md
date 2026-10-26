@@ -127,10 +127,13 @@ adds modal editing, text objects, operators and Vim navigation. The user keymap
 contains only deliberate overrides: our numbered panels, preview finders,
 recent/open tabs, pane/dock navigation and completion/snippet behavior.
 The current Neovim-style shortcuts are `Space Space` for the tab switcher,
-`Space f` for files and `Space g` for project text search (Vim normal mode
-and empty panes), plus `Space r n` for symbol rename, `Space q` to close
-the active tab and `Space Tab` for the alternate tab (Vim normal mode in a
-full editor). `[f`/`]f` and `[F`/`]F` move between function boundaries.
+`Space f` for files and `Space g` for project text search, plus `Space r n`
+for symbol rename, `Space q` to close the active tab and `Space Tab` for the
+alternate tab. All leader shortcuts require Vim normal mode in a full
+editor inside a central pane; they are inactive in docks, panel inputs,
+pickers and empty panes. Zed's inherited Vim leader bindings outside editors
+are explicitly disabled, preserving each panel's single-Space action.
+`[f`/`]f` and `[F`/`]F` move between function boundaries.
 Insert-mode spaces remain ordinary text.
 
 `vim.toggle_relative_line_numbers = true` uses relative line numbers in Vim
@@ -210,7 +213,7 @@ Zed's built-in pickers provide fuzzy finding with IDE shortcuts:
 | `Ctrl-j` / `Ctrl-k`          | Next/previous result in a picker   |
 
 The Command shortcuts also work in insert mode. `Space f` and `Space g`
-provide equivalent leader shortcuts in Vim normal mode and empty panes,
+provide equivalent leader shortcuts in Vim normal mode in central editors,
 including the same always-requested right-hand preview.
 File/project-text overrides match full editors, Pane/Workspace, the explorer
 and project-search results so native JetBrains shortcuts do not shadow the

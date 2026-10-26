@@ -61,8 +61,8 @@
     }
   },
   {
-    // Vim leader shortcuts for tabs, files and project text search.
-    "context": "(Editor && mode == full && vim_mode == normal && !menu) || EmptyPane",
+    // Leader shortcuts belong only to central editors in Vim normal mode.
+    "context": "(Pane > Editor) && mode == full && vim_mode == normal && !menu && !Dock",
     "bindings": {
       "space space": "tab_switcher::ToggleAll",
       "space f": [
@@ -72,16 +72,31 @@
       "space g": [
         "action::Sequence",
         ["text_finder::Toggle", "picker::SetPreviewRight"]
-      ]
+      ],
+      "space q": "pane::CloseActiveItem",
+      "space tab": "pane::AlternateFile",
+      "space r n": "editor::Rename"
     }
   },
   {
-    // Vim shortcuts for tabs and symbols.
+    // Vim's preset also adds leader chords outside editors; remove those.
+    // Keep the panels' native single-Space actions (open, stage, etc.).
+    "context": "!Editor && !Terminal",
+    "bindings": {
+      "space f": null,
+      "space /": null,
+      "space shift-s": null,
+      "space w h": null,
+      "space w j": null,
+      "space w k": null,
+      "space w l": null,
+      "space w q": null
+    }
+  },
+  {
+    // Open the definition in the split to the right.
     "context": "Editor && mode == full && vim_mode == normal && !menu",
     "bindings": {
-      "space q": "pane::CloseActiveItem",
-      "space tab": "pane::AlternateFile",
-      "space r n": "editor::Rename",
       "g shift-d": "editor::GoToDefinitionSplit"
     }
   },
