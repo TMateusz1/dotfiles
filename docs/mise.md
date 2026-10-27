@@ -53,20 +53,13 @@ Global (`mise/config.toml`):
 - [`delta`](https://github.com/dandavison/delta) — git diff pager, see
   [git.md](./git.md)
 - Util tools — `bat`, `zoxide`, `eza`, `fd`, `fzf`, `gh`, `glab`,
-  `glow`, `jq`, `yq`, `ripgrep`, `starship` — see
+  `jq`, `yq`, `ripgrep`, `starship` — see
   [util_tools.md](./util_tools.md)
-- Core tools — `zellij`, `tmux`, `lazygit`, `k9s`, `bottom` — see
+- Core tools — `zellij`, `lazygit`, `k9s`, `bottom` — see
   [core_tools.md](./core_tools.md)
-- Containers and Kubernetes — Helm, k9s and kind. Helm remains a runtime
-  dependency for Mason's helm-ls chart linting.
-- Languages — Rust, Go, Python and Node; uv remains for package management.
-  Neovim's language servers, formatters,
-  linters and Go editing utilities are installed by Mason instead; see
-  [langs.md](./langs.md).
-- `neovim` — editor, see [nvim.md](./nvim.md)
-- `tree-sitter` — the CLI nvim-treesitter needs to compile parsers; a hard
-  runtime dependency of the Neovim config, deliberately the aqua build
-  rather than npm — see [nvim.md](./nvim.md#the-tree-sitter-cli-is-a-hard-dependency)
+- Containers and Kubernetes — Helm, k9s and kind.
+- Languages — Rust, Go, Python and Node; uv provides Python package management.
+  Zed manages its editor tooling separately; see [langs.md](./langs.md).
 
 Desktop (`mise/config.desktop.toml`, opt-in only — see [bootstrap.md](./bootstrap.md)):
 
@@ -82,8 +75,7 @@ macOS (`mise/config.macos.toml`, loaded automatically):
 
 Repo-local (`mise.toml`):
 
-hk uses the registry-recommended `packslip:github.com/jdx/hk` backend; Neovim
-uses `aqua:neovim/neovim`. Old shorthand installations can retain a previous
+hk uses the registry-recommended `packslip:github.com/jdx/hk` backend. Old shorthand installations can retain a previous
 backend even after the tracked config changes. Inspect `mise ls` and use a
 targeted `mise uninstall <tool>@<version>` to remove obsolete installations
 after verifying the configured replacement works.
@@ -91,12 +83,10 @@ after verifying the configured replacement works.
 - [`hk`](https://hk.jdx.dev), [`taplo`](https://github.com/tamasfe/taplo),
   [`rumdl`](https://github.com/rvben/rumdl),
   [`yamlfmt`](https://github.com/google/yamlfmt),
-  [`shellcheck`](https://github.com/koalaman/shellcheck),
-  [`stylua`](https://github.com/JohnnyMorganz/StyLua) — lint/format
+  [`shellcheck`](https://github.com/koalaman/shellcheck) — lint/format
   tooling, see [linting.md](./linting.md)
 
-AI coding agents are not provisioned by either mise layer. The repo-local
-Node.js pin was removed with Codex; global Node.js remains for npm-based LSPs.
+AI coding agents are not provisioned by either mise layer. Global Node.js remains available for project tooling and language servers.
 
 The repo-root `mise.toml` also declares `[dotfiles]` and
 `[bootstrap.repos]` — not tools, but mise's own native symlinking and
@@ -104,51 +94,20 @@ git-checkout provisioning, applied explicitly (never automatically) via
 `mise bootstrap dotfiles apply`/`mise bootstrap repos apply`. See
 [bootstrap.md](./bootstrap.md).
 
-## Maintaining editor tools
+## Maintaining tools
 
-Neovim's editor tools are pinned in
-[nvim/lua/plugins/mason.lua](../nvim/lua/plugins/mason.lua), installed by
-[mason.nvim](https://github.com/mason-org/mason.nvim) and ensured by
-[mason-tool-installer.nvim](https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim).
-They live in Neovim's data directory, outside this public repository.
-
-Edit the selected package's exact version, then run `:MasonToolsInstall` to
-apply the pin. For a fresh machine or headless installation:
-
-```sh
-nvim --headless '+MasonToolsInstallSync' '+qa'
-```
-
-Automatic installation of missing or differently pinned packages runs at
-startup. Automatic version upgrades are disabled. `:Mason` shows installation
-status and `:MasonLog` shows failures. `:MasonToolsClean` removes Mason packages
-not declared in the list; use it only when those extra packages are unwanted.
-Native LSP configuration and enablement remain in `lsp.lua`; mason-lspconfig is
-not required. All configured packages use Mason's official registry.
-
-Mason prepends its bin directory to Neovim's PATH. Verify selection with
-`:lua print(vim.fn.exepath("shfmt"))`, `:ConformInfo`, and `:LspInfo`.
-A project's mise tool pin alone does not override Mason in the editor; use an
-explicit client/formatter command for that case. RobotCode and mypy already
-prefer conventional project virtualenv binaries.
-
-Mise continues to own runtimes, compilers, Neovim, terminal and shell tools,
-Helm, the Treesitter CLI, and independent repository hk checks. Keep their
-config and lockfiles together and install with `mise install --locked`.
-The global maintenance commands still inspect mise tools:
+Keep runtime/compiler pins and their lockfiles together and install with
+`mise install --locked`. Global maintenance commands inspect the active tools:
 
 ```sh
 mise run global:tools:status
 mise run global:tools:outdated
 ```
 
-After migrating tools, preview `mise prune --dry-run <tool> ...`, then use
-`mise prune <tool> ...` for only the migrated tool keys. Versions referenced
-by other tracked project configs remain installed. Repo-local StyLua, Taplo
-and yamlfmt remain required for hk; jq remains a general shell utility.
-
-For adding another language, follow
-[Add a language to Neovim](./nvim-add-new-lang.md).
+Zed and its extensions manage language servers and editor formatting tools.
+Project-specific CLI checks and dependencies belong in each project's own
+configuration. Repository checks remain independently pinned in `mise.toml`.
+See [Zed languages and formatting](./desktop_tools.md#languages-and-formatting).
 
 ## Global Docker tasks
 
@@ -204,9 +163,8 @@ addition to the machine's real global config. Run `mise config ls` from the
 repo root to see the active layers.
 
 In practice this is harmless here — both configs agree on `[settings]`, and
-having `delta`/`tmux`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
-`yq`/`ripgrep`/`starship`/`k9s`/`glow`/`bottom`/`gh`/`glab`/`neovim`/
-`tree-sitter`/`rust`/`go` on `PATH` while hacking on this repo isn't a
+having `delta`/`lazygit`/`bat`/`zoxide`/`eza`/`fd`/`fzf`/`jq`/
+`yq`/`ripgrep`/`starship`/`k9s`/`bottom`/`gh`/`glab`/`rust`/`go` on `PATH` while hacking on this repo isn't a
 problem — but it's
 worth knowing so a stray tool showing up in `mise config` output inside
 this repo doesn't come as a surprise.

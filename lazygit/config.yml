@@ -3,7 +3,7 @@
 # Theme values are the official catppuccin/lazygit Mocha "blue" variant
 # (https://github.com/catppuccin/lazygit/blob/main/themes/mocha/blue.yml),
 # matching the blue accent used everywhere else in this repo (delta,
-# tmux) — see AGENTS.md's "prefer the official Catppuccin port" rule.
+# fzf) — see AGENTS.md's "prefer the official Catppuccin port" rule.
 
 git:
   diffRenderers:

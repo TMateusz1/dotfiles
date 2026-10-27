@@ -4,8 +4,8 @@
 [interactive]
     diffFilter = delta --color-only
 
-# Every colour below is a Catppuccin Mocha value, so diffs match gitsigns in
-# Neovim and the lazygit skin instead of falling back to delta's own computed
+# Every colour below is a Catppuccin Mocha value, so diffs match the
+# lazygit skin instead of falling back to delta's own computed
 # red/green, which drifted with whichever terminal palette was loaded.
 [delta]
     navigate = true

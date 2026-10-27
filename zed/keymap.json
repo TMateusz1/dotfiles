@@ -101,7 +101,7 @@
     }
   },
   {
-    // Tree-sitter function motions, matching Neovim's [f / ]f habit.
+    // Native function motions on [f / ]f.
     "context": "Editor && mode == full && VimControl && !menu",
     "bindings": {
       "[ f": "vim::PreviousMethodStart",

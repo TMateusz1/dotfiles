@@ -5,7 +5,7 @@
 `$XDG_CONFIG_HOME/zsh/`) if `$ZDOTDIR` is set before zsh starts, normally
 from `/etc/zshenv` or `~/.zshenv` — neither exists in this repo, so the
 real, current target is `~/.zshrc`. Same shape of exception as
-[tmux](./core_tools.md#tmux)/[starship](./util_tools.md#starship).
+[starship](./util_tools.md#starship).
 
 This is the file that activates the "shell integration" pieces documented
 across [util_tools.md](./util_tools.md) and [core_tools.md](./core_tools.md)
@@ -25,11 +25,16 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   when this variable isn't set.
 - `path+=(...)` for `~/.local/bin`, `~/bin`, `~/go/bin` (only if the
   directory exists), deduped via `typeset -U path PATH`.
+- After mise activation, `EDITOR` is `zed --wait` when `zed` is on `PATH`,
+  otherwise system `vi`; `VISUAL` follows `EDITOR`. Zed's
+  [`--wait`](https://zed.dev/docs/reference/cli#-w---wait) keeps commands such
+  as Git waiting until the edited file is closed. This checks availability,
+  not whether a graphical session is usable: if a headless SSH server has
+  the full `zed` CLI installed, override both variables to `vi` in
+  `~/.zshrc.local`. Zed's headless server alone does not supply that CLI.
 - `TERM` fallback to `xterm-256color` if the current `$TERM` has no
   terminfo entry available (e.g. SSH'ing somewhere that doesn't know
-  `tmux-256color`/`xterm-ghostty`) — same class of concern as
-  [tmux.conf's own comment](./core_tools.md#tmux) about not hardcoding a
-  terminal-specific `TERM`.
+  `xterm-kitty`) instead of hardcoding a terminal-specific `TERM`.
 - Startup follows its dependency order: base environment and `PATH`, mise
   activation and completion path, oh-my-zsh, native Zsh history, starship, zoxide, fzf,
   tool aliases/helpers, and finally `.zshrc.local` for machine-local
@@ -64,15 +69,12 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   when inherited from a parent shell. fzf's init (`source <(fzf --zsh)`)
   binds `Ctrl-R` to `fzf-history-widget` in the emacs, vi insert and vi
   command keymaps. `Ctrl-F` remains a shortcut to the same widget.
-- `alias glow=...` pins `--style` to this repo's vendored Catppuccin
-  theme — glow's own config file has no way to reference it (no path
-  expansion at all in its `style` field) — see
-  [util_tools.md#glow](./util_tools.md#glow).
 - `alias za="zellij attach --create"` creates or attaches to a named Zellij
   session, e.g. `za work`, when Zellij is installed. To start with the
   session manager instead, use `zs` (`zellij -l welcome`); see
   [core tools](./core_tools.md#zellij).
-- `export GLAMOUR_STYLE=...` points the same theme at CLIs that render
+- `export GLAMOUR_STYLE="$XDG_CONFIG_HOME/glamour/glamour.json"` points the
+  [shared Catppuccin theme](./util_tools.md#glamour) at CLIs that render
   Markdown through Charm's
   [glamour](https://github.com/charmbracelet/glamour) library. `gh`
   documents it explicitly (`gh help environment`); the `glab` binary
@@ -83,8 +85,7 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   [util_tools.md#glab](./util_tools.md#glab)). Guarded on the theme file
   being readable rather than on any one tool being installed, because
   glamour renders unstyled with no error when the path is bad — a broken
-  reference would otherwise be invisible. glow itself ignores this
-  variable entirely, hence the separate alias above.
+  reference would otherwise be invisible.
 
 ## Native Zsh history
 
@@ -107,42 +108,6 @@ and Down retain Zsh/oh-my-zsh's normal history navigation.
 After switching history integrations, run `exec zsh` to start a fresh shell
 with the new hooks and bindings. Existing `~/.zsh_history` entries are read
 by Zsh normally.
-
-## Tmux session picker
-
-Plain `tc` always opens the installed SessionX plugin, just like `prefix s`,
-with its complete hotkeys, previews and shared Catppuccin colors. Every
-session is listed, including the current one. SessionX requires an attached
-tmux client, so outside tmux the helper attaches before opening the popup.
-
-- Inside tmux: open SessionX in the current pane without nesting tmux.
-- Outside tmux: attach to an existing session, then open SessionX with all
-  sessions selectable, including the attached one.
-- With the server stopped: start tmux and let its config and Continuum restore
-  complete before attaching and opening SessionX. Restored sessions are listed
-  in the picker, and no extra `core` session is added.
-- With no snapshot or restored sessions: create `core` in `$HOME` as the host
-  required to open SessionX. Enter can create another named session.
-- Escape: close SessionX and remain attached to the current session. Use
-  `prefix d` to detach and return to the original terminal.
-- `tc name`: skip the picker and create/attach/switch to that exact name.
-
-SessionX's rename/delete/window/directory modes are available in every `tc`
-picker. The helper applies `@sessionx-filter-current false` and its cached
-SessionX counterpart so even an already running server includes the current
-session. Cold startup temporarily disables `exit-empty` while the server
-loads its config and restores sessions, then returns it to its default `on`.
-
-After updating an already running shell, use `source ~/.zshrc`. Plain `tc`
-can then be called by an interactive terminal startup script after loading
-the shell config. This repo does not call it automatically from `.zshrc`:
-shells opened inside tmux must reach their normal prompt.
-
-SessionX requires its provisioned checkout (`mise run bootstrap:plugins` from
-the dotfiles repo) and the tmux config described in [core tools](./core_tools.md#tmux).
-Session persistence remains handled by Resurrect and Continuum.
-Only sessions included in the last saved snapshot can be recovered after the
-server is killed.
 
 ## Validation
 
@@ -168,12 +133,3 @@ with the previous empty `FZF_CTRL_R_COMMAND` inherited. `Ctrl-F` and the
 history options were verified too. Selecting a saved command inserted it
 into the editable buffer; the following Enter executed it. Zsh syntax,
 ShellCheck, TOML, YAML, Markdown and repository hygiene checks passed.
-
-The 2026-10-13 unified SessionX flow was tested with PTY clients on an isolated
-tmux 3.7c server and a temporary home directory. After saving and killing that
-server, `tc` automatically restored three sessions and five panes with their
-directories before displaying SessionX; no `core` was added. Outside and
-inside tmux, the real SessionX popup rendered all three names and allowed
-selecting the current session. In-tmux invocation switched sessions without
-nesting clients. A fresh startup without a snapshot created `core` and opened
-SessionX. Zsh syntax, ShellCheck and Markdown checks passed.

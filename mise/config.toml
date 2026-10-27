@@ -6,21 +6,18 @@ disable_backends = ["asdf", "vfox"]
 task.run_auto_install = false
 
 [tools]
-# Runtimes and shared shell tools. Neovim editor binaries live in Mason.
+# Runtimes and shared shell tools.
 # Projects may override pins in their own mise.toml using the same tool keys.
 
 # Terminal apps
-"aqua:neovim/neovim" = "0.12.5"         # Editor
-"aqua:tmux/tmux-builds" = "3.7c"        # Terminal multiplexer
 "aqua:zellij-org/zellij" = "0.45.1"     # Terminal workspace
 "aqua:ClementTsang/bottom" = "0.14.9"   # System monitor (btm)
-"aqua:charmbracelet/glow" = "3.0.0"     # Markdown renderer
 "aqua:jesseduffield/lazygit" = "0.65.1" # Git TUI
 "aqua:derailed/k9s" = "0.51.0"          # Kubernetes TUI
 
 # Language runtimes and toolchains
 "core:python" = "3.14.7" # Python runtime
-"core:node" = "26.10.0"  # Node.js runtime (also used by Mason servers)
+"core:node" = "26.10.0"  # Node.js runtime
 "core:go" = "1.27.1"     # Go toolchain
 "core:rust" = "1.98.1"   # Rust toolchain
 
@@ -34,10 +31,7 @@ task.run_auto_install = false
 "aqua:helm/helm" = "4.3.0"             # Kubernetes package manager
 "aqua:kubernetes-sigs/kind" = "0.33.0" # Local Kubernetes clusters
 
-# Shared editor infrastructure
-"aqua:tree-sitter/tree-sitter" = "0.27.0" # Treesitter parser compiler
-
-# Shared CLI tools (also used by editor pickers and git integrations)
+# Shared CLI tools
 "aqua:sharkdp/bat" = "0.26.1"                            # Syntax-highlighted cat
 "aqua:dandavison/delta" = "0.19.2"                       # Git diff pager
 "cargo:eza" = { version = "0.23.5", depends = ["rust"] } # Modern ls replacement

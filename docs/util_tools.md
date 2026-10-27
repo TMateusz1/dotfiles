@@ -2,7 +2,7 @@
 
 Small, general-purpose CLI utilities — things invoked briefly as part of
 normal shell use, as opposed to the standalone TUI apps in
-[core_tools.md](./core_tools.md) (tmux, lazygit, k9s). All of them are
+[core_tools.md](./core_tools.md) (Zellij, lazygit, k9s). All of them are
 installed via the **global mise config**, not by their own config files —
 see [mise.md](./mise.md). (git + delta, mise itself, and the repo's own
 lint tooling have their own pages: [git.md](./git.md), [mise.md](./mise.md),
@@ -70,7 +70,7 @@ the pinned crate version (`--locked`) and crates.io's immutability instead.
 **Validation:** no linter exists for eza's theme format beyond generic YAML
 syntax (`yamlfmt`, already applied via `hk.pkl`'s catch-all `**/*.yml`
 glob — no bespoke step needed). A load-test step (mirroring
-[bat](#bat)'s or [tmux](./core_tools.md#tmux)'s) was deliberately **not**
+[bat](#bat)'s) was deliberately **not**
 added: verified that eza silently falls back to defaults on a malformed
 `theme.yml` (exit 0, no error) rather than failing, so such a check would
 never actually catch a broken theme — it would just be for show.
@@ -118,7 +118,7 @@ symlinking just `config.yml` (not the whole directory) would be safe. It's
 skipped anyway because there's nothing worth overriding beyond theming, and
 theming doesn't need a file at all: `shell/.zshrc` exports `GLAMOUR_STYLE`
 (gh's own documented environment variable — see `gh help environment`)
-pointing at this repo's vendored [glow](#glow) theme, reusing it rather
+pointing at this repo's vendored [Glamour](#glamour) theme, reusing it rather
 than vendoring a second copy. That export is guarded on the theme file
 existing rather than on gh being installed, since the same variable serves
 every glamour-based CLI — see [shell.md](./shell.md).
@@ -152,64 +152,26 @@ repository the current directory happens to be in — discovered directly
 while testing this. Not specific to this repo; worth remembering before
 running that command inside any git repository.
 
-## glow
+## Glamour
 
-`glow/glamour.json` maps to `~/.config/glow/glamour.json`
-([glow](https://github.com/charmbracelet/glow) follows XDG directly). Its
-primary use is `glow file.md` — render once and exit, like
-[bat](#bat) — though a `--tui`/`-t` flag also opens an interactive
-file-browsing mode if wanted; grouped here rather than in
-[core_tools.md](./core_tools.md) since rendering a file is the documented,
-default use.
+`glamour/glamour.json` is the official
+[Catppuccin Glamour](https://github.com/catppuccin/glamour) Mocha Markdown
+style, preserved for `gh` and `glab`. Glamour is their rendering library,
+not an additional executable to install.
 
-**This is a single-file `[dotfiles]` entry, not a directory one** — the
-only such exception besides mise's. glow auto-creates and rewrites its own
-`glow.yml` inside its config directory (verified: delete it and it
-reappears on the very next plain `glow file.md` run). Symlinking the whole
-directory would therefore point a self-writing tool straight at this git
-repo — which is exactly how a stray, machine-generated `glow.yml` once got
-committed here. Only the theme is managed; `glow.yml` stays machine-local,
-and `.gitignore` lists it as a backstop in case the directory-level symlink
-ever comes back. See [bootstrap.md](./bootstrap.md#what-gets-symlinked).
+The file maps to `~/.config/glamour/glamour.json`; `shell/.zshrc` exports
+`GLAMOUR_STYLE` pointing to it. This is an explicit path chosen by this repo,
+not an automatically discovered Glamour config directory. Only the theme file
+is linked; no account configuration or credentials are managed here.
 
-**Theme:** `glamour.json` is the official
-[catppuccin/glamour](https://github.com/catppuccin/glamour) Mocha style
-(glow renders markdown through Charm's `glamour` library, also used by
-`gh`/`glab`/`gitea`), vendored as-is — headings use a deliberate rainbow
-scale by design (h1 red through h6 lavender), and links/images already
-land on this repo's blue accent (`#89b4fa`) in the official style, so no
-accent swap was needed here, unlike [bottom](./core_tools.md#bottom).
+The theme is vendored unchanged: heading colors follow the official rainbow
+scale and links use Mocha Blue. `gh help environment` documents
+`GLAMOUR_STYLE`; glab's precedence against its persisted `glamour_style`
+setting remains unverified, as described above.
 
-**The theme is wired through a shell alias, not through config.** glow's
-own `style` field has no path expansion at all — checked directly against
-the real binary: neither a leading `~`, nor `$HOME`, nor
-`$XDG_CONFIG_HOME` inside `glow.yml`'s `style:` value resolves. Nor does
-glow honour `GLOW_STYLE`/`GLAMOUR_STYLE` — also checked directly, both
-with and without a `glow.yml` present, so this isn't the config file
-shadowing the environment. That leaves only an absolute path, which can't
-be committed to a public repo, or the `--style` flag, which does work. So
-`shell/.zshrc` aliases glow to always pass one:
-
-```sh
-alias glow="glow --style \"\$XDG_CONFIG_HOME/glow/glamour.json\""
-```
-
-This also matters because glow fails *silently* on an unresolved style
-path — it just renders unstyled, with no error — so a broken reference
-would never announce itself.
-
-Note that other glamour-based CLIs (`gh`, `glab`) *do* read
-`GLAMOUR_STYLE`, which `shell/.zshrc` exports for exactly that reason —
-glow is the odd one out here. See [gh](#gh) and
-[shell.md](./shell.md).
-
-**Validation:** no linter exists for glamour's JSON style format beyond
-generic JSON syntax, and this repo doesn't currently lint JSON at all (this
-is its first JSON file) — not worth adding a step for one vendored file.
-Verified against the real `glow` binary directly: a deliberately broken
-JSON style produces a clear "unable to create renderer" error; the
-vendored file renders correctly (confirmed the h1 color matches the
-style's `#f38ba8`). Not checked automatically going forward.
+**Validation:** the theme is unchanged from the previously verified vendored
+file and parses as JSON. `gh help environment` confirms the `GLAMOUR_STYLE`
+setting. No custom linter is maintained for the vendored theme.
 
 ## jq
 
@@ -255,8 +217,7 @@ forward.
 file directly in `~/.config/`, *not* `~/.config/starship/starship.toml`.
 Checked directly: `starship` has no notion of a `starship/` config
 subdirectory at all; the directory here exists only to keep this repo's
-one-directory-per-tool convention, matching how [tmux](./core_tools.md#tmux)
-keeps its own directory despite also mapping outside the usual
+one-directory-per-tool convention despite mapping outside the usual
 `~/.config/<tool>/` pattern.
 
 **What's configured:** module order (`directory`, `git_branch`,

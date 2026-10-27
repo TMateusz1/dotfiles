@@ -43,9 +43,8 @@ mise/config.desktop.toml # GUI/desktop packages, loaded only via `-E desktop` (o
 hk.pkl                # lint/format steps + git hooks (see docs/linting.md)
 .rumdl.toml           # markdown lint config
 .yamlfmt              # YAML format config
-.stylua.toml          # Lua format config
 .gitignore            # includes tool-written state that must never be committed
-<tool>/               # one directory per dotfile/tool, e.g. nvim/, k9s/, mise/
+<tool>/               # one directory per dotfile/tool, e.g. zed/, k9s/, mise/
   ...                 # that tool's config, laid out as that tool expects it
 docs/                 # per-topic documentation (conventions, per-tool notes, setup)
 README.md             # repo overview, quickstart, links into docs/
@@ -62,7 +61,7 @@ two — see "mise conventions" below.
 Each top-level tool directory is named to mirror where it will eventually be
 symlinked under `$XDG_CONFIG_HOME` (`~/.config/<name>`), e.g.:
 
-- `nvim/` → `~/.config/nvim`
+- `zed/` → `~/.config/zed`
 - `k9s/` → `~/.config/k9s`
 - `mise/` → `~/.config/mise`
 
@@ -80,8 +79,8 @@ and document that exception in the tool's `docs/` entry.
 that only ever *read* their config. It is wrong for a tool that **writes
 into its own config directory** — with a directory symlink, that tool
 writes straight into this git repo. For those, symlink the specific files
-this repo owns instead (e.g. `"~/.config/glow/glamour.json" =
-"glow/glamour.json"`), leave the tool's generated file machine-local, and
+this repo owns instead (e.g. `"~/.config/zellij/config.kdl" =
+"zellij/config.kdl"`), leave the tool's generated file machine-local, and
 add it to `.gitignore` as a second line of defence. Check for this when
 adding a tool: run it once and see whether anything appears or changes in
 its config directory.
@@ -170,37 +169,16 @@ Rule specific to the **global** config:
   page), and leave it unchecked going forward rather than maintaining
   bespoke validation logic for a gap no real tool fills.
 
-## Neovim conventions (`nvim/`)
+## Zed conventions (`zed/`)
 
-- Standard modern layout: `init.lua` bootstraps
-  [lazy.nvim](https://github.com/folke/lazy.nvim) as the plugin manager,
-  with plugin specs and their config split across `lua/` (e.g.
-  `lua/plugins/*.lua`, `lua/config/*.lua`) rather than one giant `init.lua`.
-- **Mason owns Neovim's LSP, formatter, linter, and editing utility binaries.**
-  Declare exact Mason package versions in `nvim/lua/plugins/mason.lua`.
-  Mason loads at startup and prepends its bin directory to Neovim's PATH;
-  native `vim.lsp.config` / `vim.lsp.enable` still configure clients.
-  Keep project-local RobotCode and mypy virtualenv overrides.
-  Runtimes and compilers remain pinned in global mise. Treesitter parsers
-  compile locally using the mise-pinned `tree-sitter` CLI; blink.cmp's fuzzy
-  matcher builds with the mise-pinned Rust toolchain. See [docs/nvim.md](./docs/nvim.md).
-  Repository hk check tools remain independently pinned in repo-local mise.
-- Trusted, actively maintained plugins only (see "General config
-  philosophy" above) — favor small, focused, well-known plugins over
-  mega-plugins or obscure ones, and only add a plugin when a real gap
-  exists (don't reach for a plugin to replace something Neovim already does
-  natively).
-- Goal is a genuinely modern, fast, IDE-like editing experience — LSP,
-  treesitter, completion, fuzzy finding, git integration — not a
-  from-scratch "minimal vimrc" exercise.
-- Keep [which-key.nvim](https://github.com/folke/which-key.nvim) synchronized
-  with every keymap change. Each mapping must have an accurate `desc` so
-  WhichKey discovers and labels it automatically; when a leader-key namespace
-  is added, renamed, or removed, update the group declarations in
-  `nvim/lua/plugins/which-key.lua` in the same change. Do not duplicate the
-  mappings themselves in WhichKey's spec.
-- Theme: Catppuccin (see above), via the official
-  [catppuccin/nvim](https://github.com/catppuccin/nvim) plugin.
+- Shared editor defaults belong in `zed/global_settings.json`; keep local
+  overrides and SSH connections in ignored `zed/settings.json`.
+- Preserve Catppuccin Mocha/Latte, Material Icon Theme and the JetBrains
+  keymap with Vim editing/navigation. See [docs/desktop_tools.md](./docs/desktop_tools.md#zed).
+- Prefer native editor features and add extensions only for a concrete need.
+- Zed and its language extensions manage editor tooling; mise owns project
+  runtimes, compilers and independently pinned repository checks.
+- Keep keymaps, snippets, tasks and their documentation synchronized.
 
 ## Adding a new dotfile — checklist
 
@@ -209,7 +187,7 @@ Rule specific to the **global** config:
 3. Apply Catppuccin theming if the tool supports theming.
 4. If the tool needs a binary, prefer sourcing it via mise (global config)
    rather than a manual install step, unless there's a documented reason
-   not to (e.g. Neovim LSP servers — see above). Re-run `mise lock` for
+   not to (e.g. editor-managed language servers). Re-run `mise lock` for
    whichever config you touched and commit the updated lockfile.
 5. **Add a `[dotfiles]` entry in `mise.toml`** — without it the config is
    never symlinked anywhere and the tool silently keeps using its defaults.

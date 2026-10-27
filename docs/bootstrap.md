@@ -11,7 +11,7 @@ mise run bootstrap:tools      # install tools from the committed lockfiles
 mise run bootstrap:status     # what would change — read-only
 mise run bootstrap:dry-run    # preview the dotfile symlinks specifically
 mise run bootstrap:dotfiles   # apply symlinks — see "What gets symlinked" below
-mise run bootstrap:plugins    # provision oh-my-zsh, Zsh plugins, and tmux plugins
+mise run bootstrap:plugins    # provision oh-my-zsh and Zsh plugins
 mise run bootstrap:zsh-completion  # install mise's generated Zsh completion
 mise run bootstrap:all        # locked tools, then dotfiles + plugins/completion
 mise run bootstrap:all-desktop  # GUI/desktop apps — opt-in, see "Desktop apps" below
@@ -36,24 +36,13 @@ then retrying installation. Locked installs still download artifacts; they
 are not an offline mode. The desktop package provider and plugin repository
 checkouts use their own provisioning declarations, rather than `mise.lock`.
 
-Neovim installs its pinned editor tooling through Mason at first startup.
-`bootstrap:tools` supplies runtimes and compilers, not LSP/formatter/linter
-packages. To complete editor provisioning explicitly after bootstrap:
-
-```sh
-nvim --headless '+MasonToolsInstallSync' '+qa'
-```
-
-See [Neovim tool maintenance](./mise.md#maintaining-editor-tools).
-
 ## Why mise's own feature, not a script
 
 `mise bootstrap` is a whole declarative provisioning subsystem (accounts,
 packages, files, services, repos, dotfiles, ...). We only use two pieces of
 it — `[dotfiles]` and `[bootstrap.repos]` — but using them means every
 "deferred" placement decision documented across
-[util_tools.md](./util_tools.md)/[core_tools.md](./core_tools.md) (tmux's
-`~/.tmux.conf`, starship's flat `~/.config/starship.toml`, `shell/.zshrc`
+[util_tools.md](./util_tools.md)/[core_tools.md](./core_tools.md) (starship's flat `~/.config/starship.toml`, `shell/.zshrc`
 → `~/.zshrc`) is just an ordinary target/source pair — no special-casing
 logic needed, and no restructuring of this repo's existing directory names.
 
@@ -71,8 +60,6 @@ shorthand.
 ```toml
 [dotfiles]
 "~/.zshrc" = "shell/.zshrc"
-"~/.tmux.conf" = "tmux/.tmux.conf"
-"~/.config/tmux/status-metrics.sh" = "tmux/status-metrics.sh"
 "~/.config/starship.toml" = "starship/starship.toml"
 "~/.config/git" = "git"
 "~/.config/bat" = "bat"
@@ -84,8 +71,7 @@ shorthand.
 "~/.config/kitty" = "kitty"
 "~/.config/zed" = "zed"
 "~/.config/bottom" = "bottom"
-"~/.config/nvim" = "nvim"
-"~/.config/glow/glamour.json" = "glow/glamour.json"
+"~/.config/glamour/glamour.json" = "glamour/glamour.json"
 "~/.config/mise/config.toml" = "mise/config.toml"
 "~/.config/mise/mise.lock" = "mise/mise.lock"
 "~/.config/mise/config.macos.toml" = "mise/config.macos.toml"
@@ -115,13 +101,9 @@ These tools deliberately use **file** entries instead:
   `~/.config/zellij/config.kdl`. Its configuration UI can write settings and
   backups, so the directory remains machine-local. See
   [core_tools.md#zellij](./core_tools.md#zellij).
-- **glow** — glow auto-creates and rewrites its own `glow.yml` in its
-  config directory (verified: it reappears after deletion on any plain
-  `glow file.md` run). With a directory symlink that write lands inside
-  this git repo, which is exactly how a stray `glow/glow.yml` once got
-  committed here. Only the theme is symlinked; `glow.yml` stays
-  machine-local and is gitignored as a backstop. See
-  [util_tools.md#glow](./util_tools.md#glow).
+- **Glamour** — the shared Markdown theme maps to
+  `~/.config/glamour/glamour.json`, selected through `GLAMOUR_STYLE`.
+  See [util tools](./util_tools.md#glamour).
 - **mise** — the global setup is managed file-by-file: portable tools use
   `config.toml`/`mise.lock`, the automatically selected macOS Docker layer uses
   `config.macos.toml`/`mise.macos.lock`; `config.desktop.toml` contains the
@@ -138,6 +120,22 @@ credentials in the same directory (glab, in the very same file) as their
 settings, so neither is safe to symlink into a public repo — see
 [util_tools.md#gh](./util_tools.md#gh).
 
+## Applying the shared Markdown theme move
+
+The shared theme now lives under `glamour/`. On an existing machine, provision
+its new file link before restarting the shell:
+
+```sh
+mise bootstrap dotfiles apply --yes '~/.config/glamour/glamour.json'
+exec zsh
+```
+
+Reload Kitty's config (`Ctrl+Shift+F5`) and open a fresh Kitty window to
+remove the previous navigation watcher. Fresh shells also drop removed helpers.
+Removing tool declarations does not uninstall existing binaries or delete
+obsolete home-directory symlinks, plugin checkouts or saved sessions.
+Those remain machine-local; this change updates the repository configuration.
+
 ## Zsh completion
 
 `bootstrap:zsh-completion` runs `mise completion zsh --install`, which writes
@@ -152,7 +150,7 @@ after installing locked tools, so a fresh machine needs only
 `fpath` entry lives in `shell/.zshrc` before Oh My Zsh loads; Oh My Zsh already
 runs `compinit`, so bootstrap does not add a duplicate initialization.
 
-## Zsh and tmux plugins
+## Zsh plugins
 
 ```toml
 [bootstrap.repos]
@@ -160,13 +158,9 @@ runs `compinit`, so bootstrap does not add a duplicate initialization.
 "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions" = { url = "...", ref = "v0.7.1" }
 "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" = { url = "...", ref = "0.8.0" }
 "~/.oh-my-zsh/custom/plugins/you-should-use" = { url = "...", ref = "1.11.1" }
-"~/.local/share/tmux/plugins/tmux-sessionx" = { url = "...", ref = "5e8df209e0c9ae826784555afa834db8722378a6" }
-"~/.local/share/tmux/plugins/tmux-resurrect" = { url = "...", ref = "cff343cf9e81983d3da0c8562b01616f12e8d548" }
-"~/.local/share/tmux/plugins/tmux-continuum" = { url = "...", ref = "0698e8f4b17d6454c71bf5212895ec055c578da0" }
 ```
 
-`ref` pins the Zsh plugins to real tags and the tmux plugins to exact upstream
-commits — reproducible, matching this repo's general "always lock"
+`ref` pins the Zsh plugins to real tags — reproducible, matching this repo's general "always lock"
 stance. oh-my-zsh itself has no tagged releases (it's designed to track
 `master` via its own self-update mechanism), so it's pinned to `master`
 rather than a specific commit — the one entry here that's a rolling
@@ -174,10 +168,6 @@ reference rather than a fixed one.
 
 `bootstrap:plugins` applies these repositories through native mise provisioning.
 The former `bootstrap:zsh-plugins` task remains as a compatibility alias.
-Tmux loads SessionX, Resurrect and Continuum directly from their checkouts;
-no separate plugin manager is needed. Session snapshots are machine-local data
-under `~/.local/share/tmux/resurrect/`, not symlinked into this repository.
-See [tmux](./core_tools.md#tmux) for keybindings and autosave behavior.
 
 ## Desktop apps
 
@@ -238,17 +228,15 @@ Run `mise run bootstrap:status` for the authoritative view of which declared
 targets are live symlinks into this repo. Repository changes never apply or
 replace home-directory files automatically.
 
-Three targets needed `--force` on the way there, each because it was
+The lockfile target needed `--force` on the way there because it was
 *occupied* by a real file rather than absent:
 
 | Target                        | What was in the way                                                                                                      |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `~/.config/nvim`              | a symlink into an older, unrelated repo (`~/dev/dotfiles2/nvim`) — that repo still exists but nothing here references it |
 | `~/.config/mise/mise.lock`    | a lockfile mise generated itself before this repo declared the entry, since drifted (see below)                          |
-| `~/.config/glow/glamour.json` | a real file left behind by the earlier whole-directory `glow` symlink                                                    |
 
 The `mise.lock` case is the instructive one: the machine's own lockfile was
-*not* a copy of this repo's — it was missing `gh`, `neovim` and `glab` and
+*not* a copy of this repo's — it was missing `gh` and `glab` and
 still carried entries from the older repo. That drift is precisely the
 failure mode the `[dotfiles]` entry exists to prevent.
 

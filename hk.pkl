@@ -2,14 +2,13 @@ amends "package://github.com/jdx/hk/releases/download/v2.1.0/hk@2.1.0#/Config.pk
 import "package://github.com/jdx/hk/releases/download/v2.1.0/hk@2.1.0#/Builtins.pkl"
 
 // Only wire up a step here when a real, established tool exists for the
-// format (rumdl, taplo, yamlfmt, shellcheck, stylua, ...) or it's one of hk's
+// format (rumdl, taplo, yamlfmt, shellcheck, ...) or it's one of hk's
 // own built-in hygiene utilities below. Formats with no real linter —
-// tmux.conf, bat's/fzf's/ripgrep's args files, k9s's YAML *schema*, kitty's
+// bat's/fzf's/ripgrep's args files, k9s's YAML *schema*, kitty's
 // config, and glamour's JSON style — were hand-verified against the real
 // binary when each was set up (see their docs/ entries), not wired into a
-// bespoke custom step here. JSON has no step at all (glow/glamour.json and
-// nvim/lazy-lock.json are both vendored or machine-generated, never
-// hand-edited). See docs/linting.md.
+// bespoke custom step here. JSON has no step: the Glamour theme is vendored
+// and Zed uses JSON with comments. See docs/linting.md.
 local linters = new Mapping<String, Step> {
   // markdown
   ["rumdl"] = Builtins.rumdl
@@ -20,8 +19,6 @@ local linters = new Mapping<String, Step> {
   // exists yet (the Rust option, ryl, self-describes as still maturing); see
   // docs/linting.md.
   ["yamlfmt"] = Builtins.yamlfmt
-  // lua (nvim/)
-  ["stylua"] = Builtins.stylua
   // repo hygiene — enforces the "never commit secrets" rule from AGENTS.md
   // and catches common accidents, all built into hk (no extra tool installs)
   ["detect-private-key"] = Builtins.detect_private_key

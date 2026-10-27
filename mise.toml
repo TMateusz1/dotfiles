@@ -13,14 +13,12 @@ dotfiles.default_mode = "symlink"
 HK_MISE = 1
 
 [tools]
-# These pins keep repository checks self-contained, independent of the
-# Mason-managed binaries Neovim uses.
+# These pins keep repository checks self-contained, independent of editor tooling.
 "packslip:github.com/jdx/hk" = "2.1.0"
 "aqua:tamasfe/taplo" = "0.10.0"
 "aqua:rvben/rumdl" = "0.2.76"
 "aqua:google/yamlfmt" = "0.21.0"
 "aqua:koalaman/shellcheck" = "0.11.0"
-"aqua:JohnnyMorganz/StyLua" = "2.5.2"
 
 [hooks]
 # keeps the installed git hooks (hk.pkl) in sync whenever tools are (re)installed
@@ -50,7 +48,7 @@ description = "Install configured tools using the committed lockfiles"
 run = "mise install --locked"
 
 [tasks."bootstrap:plugins"]
-description = "Provision oh-my-zsh, Zsh plugins, and pinned tmux plugins"
+description = "Provision oh-my-zsh and pinned Zsh plugins"
 run = "mise bootstrap repos apply"
 
 [tasks."bootstrap:zsh-plugins"]
@@ -76,8 +74,6 @@ run = "mise -E desktop bootstrap packages apply"
 
 [dotfiles]
 "~/.zshrc" = "shell/.zshrc"
-"~/.tmux.conf" = "tmux/.tmux.conf"
-"~/.config/tmux/status-metrics.sh" = "tmux/status-metrics.sh"
 # Keep Zellij's generated config/backups machine-local; own only this file.
 "~/.config/zellij/config.kdl" = "zellij/config.kdl"
 "~/.config/starship.toml" = "starship/starship.toml"
@@ -93,12 +89,8 @@ run = "mise -E desktop bootstrap packages apply"
 # Shared defaults live in global_settings.json; settings.json stays local/ignored.
 "~/.config/zed" = "zed"
 "~/.config/bottom" = "bottom"
-"~/.config/nvim" = "nvim"
-# glow is symlinked file-by-file, not as a whole directory: glow auto-creates
-# and rewrites its own `glow.yml` in this directory, which — with a directory
-# symlink — means it writes into this git repo. Only the theme is managed
-# here; glow.yml stays machine-local. See docs/util_tools.md#glow.
-"~/.config/glow/glamour.json" = "glow/glamour.json"
+# Shared Markdown theme for gh/glab; no credentials or generated state.
+"~/.config/glamour/glamour.json" = "glamour/glamour.json"
 # Every global mise config layer and its matching lockfile must reach the
 # machine, along with the early setting that enables automatic platform layers.
 # See docs/mise.md.
@@ -116,7 +108,3 @@ run = "mise -E desktop bootstrap packages apply"
 "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions" = { url = "https://github.com/zsh-users/zsh-autosuggestions.git", ref = "v0.7.1" }
 "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" = { url = "https://github.com/zsh-users/zsh-syntax-highlighting.git", ref = "0.8.0" }
 "~/.oh-my-zsh/custom/plugins/you-should-use" = { url = "https://github.com/MichaelAquilina/zsh-you-should-use.git", ref = "1.11.1" }
-# Exact upstream revisions keep tmux plugin provisioning reproducible.
-"~/.local/share/tmux/plugins/tmux-sessionx" = { url = "https://github.com/omerxx/tmux-sessionx.git", ref = "5e8df209e0c9ae826784555afa834db8722378a6" }
-"~/.local/share/tmux/plugins/tmux-resurrect" = { url = "https://github.com/tmux-plugins/tmux-resurrect.git", ref = "cff343cf9e81983d3da0c8562b01616f12e8d548" }
-"~/.local/share/tmux/plugins/tmux-continuum" = { url = "https://github.com/tmux-plugins/tmux-continuum.git", ref = "0698e8f4b17d6454c71bf5212895ec055c578da0" }

@@ -55,7 +55,7 @@ behavior as Go's own env file (see [langs.md#go](./langs.md#go); k9s is a
 Go binary too). The repo directory is still named `k9s/`, matching the
 tool name, per this repo's usual convention — the actual OS-dependent
 target is what varies, same shape of exception as
-[starship](./util_tools.md#starship) and [tmux](#tmux). In practice this
+[starship](./util_tools.md#starship). In practice this
 doesn't come up on a machine with this repo's `shell/.zshrc` in place,
 since it exports `XDG_CONFIG_HOME` globally (see [shell.md](./shell.md)),
 landing k9s at `~/.config/k9s/` as expected — the exception only applies
@@ -97,8 +97,7 @@ gap. Not checked automatically going forward.
 `lazygit/config.yml` maps to `~/.config/lazygit/config.yml` — YAML,
 matching lazygit's config format (`.yml`, not `.toml`, despite some other
 tools in this repo using TOML). No placement exception needed here:
-[lazygit](https://github.com/jesseduffield/lazygit) follows XDG directly,
-unlike [tmux](#tmux) below.
+[lazygit](https://github.com/jesseduffield/lazygit) follows XDG directly.
 
 **What's configured:** `git.diffRenderers` renders diffs through
 [delta](https://github.com/dandavison/delta) (`delta --dark
@@ -117,13 +116,11 @@ published JSON schema
 or in the official theme. `gui.authorColors: '*': '#b4befe'` gives every
 commit author the same lavender color instead of lazygit's default
 random-per-author colors, also from the official theme.
-`gui.nerdFontsVersion: "3"` enables Nerd Font icons, consistent with the
-icon usage in [tmux](#tmux)'s statusline below.
+`gui.nerdFontsVersion: "3"` enables Nerd Font icons.
 
 **Validation:** no YAML *linter* is wired in here — the one static-binary
 Rust option (`ryl`) self-describes as still maturing, so it's skipped
-rather than added half-heartedly (same call as skipping a tmux linter
-below, and this repo's general policy — see [linting.md](./linting.md)).
+per this repo's general policy — see [linting.md](./linting.md).
 `yamlfmt` (format-only, Google-maintained, single static binary) is wired
 in for `**/*.yml`/`**/*.yaml` generally; `.yamlfmt` at the repo root sets
 `retain_line_breaks: true` so this file's blank-line section separators
@@ -190,178 +187,3 @@ Markdown lint and `git diff --check` passed. The live config path is linked
 to this repository. A disposable PTY probe produced no rendered output in
 the agent environment, so the blue/green appearance needs a visual check
 in a regular terminal.
-
-## tmux
-
-`tmux/.tmux.conf` maps to **`~/.tmux.conf`** — not the XDG path
-(`~/.config/tmux/tmux.conf`). This is a deliberate exception to the usual
-directory/symlink convention (see [AGENTS.md](../AGENTS.md)): tmux checks
-`~/.tmux.conf` *before* the XDG path, so if both exist, `~/.tmux.conf` wins
-unconditionally. Targeting the XDG path here would silently do nothing on
-any machine that still has a stray legacy `~/.tmux.conf` lying around.
-Filename keeps the leading dot for the same reason — it's not a stylistic
-choice, it's the literal filename tmux requires at that path. The status
-metrics helper is linked separately to `~/.config/tmux/status-metrics.sh`.
-
-**What's configured:** prefix is `C-b`, with `C-a` as a secondary prefix;
-`prefix r` reloads the config. `tmux-256color` terminal type with truecolor overrides,
-extended-keys passthrough (e.g. Shift-Enter), focus events (Neovim
-autoread), application-title forwarding (`set-titles` with `#T`, so Neovim's
-current buffer title reaches the Kitty tab/window), OSC52 clipboard
-passthrough for remote copy/paste. Vi-style copy mode and vi-style editing in
-tmux command prompts, mouse on, 100k-line scrollback, and `escape-time 100`, a
-temporary mitigation for tmux 3.7c misparsing split OSC 52 replies as input
-([upstream issue](https://github.com/tmux/tmux/issues/5388)), while still short
-enough not to fight Neovim's `<Esc>`. Smart pane navigation (`C-h/j/k/l`) that forwards
-to Neovim/fzf when one of those is running in the current pane, otherwise
-moves between tmux panes. The same treatment covers the arrow-key
-equivalents (`C-Left/Down/Up/Right`) and `C-\` (jump to the previously used
-pane). At an outside edge the directional keys emit a tmux passthrough sequence
-containing the narrowly scoped `tmux_kitty_navigate` Kitty user variable. The
-local watcher described in
-[desktop_tools.md](./desktop_tools.md#seamless-kitty-tmux-and-neovim-navigation)
-moves to the adjacent Kitty split, including when tmux is reached over SSH;
-there is no local control socket for the remote VM to access or forward. See
-[nvim.md](./nvim.md#plugins) for the Neovim-side counterpart. `prefix g` opens a [lazygit](#lazygit) popup in
-the current pane's directory. Statusline hand-rolled in Catppuccin Mocha
-(blue accent, matching [git.md](./git.md) and
-[fzf](./util_tools.md#fzf)), using tmux's own format strings.
-The right side also shows host CPU,
-used memory and combined disk read/write throughput in a separate Catppuccin
-green block beside the clock. The values refresh every five seconds through
-[`status-metrics.sh`](../tmux/status-metrics.sh); it uses macOS or Linux system
-tools and reflects the machine running the tmux server.
-Beside the current pane directory, the current Git branch appears with the
-same `` symbol and Catppuccin peach color as Starship. The Git query uses the
-pane directory with shell quoting, including for paths containing spaces.
-The branch label is hidden outside repositories or when HEAD is detached.
-On macOS, MEM uses `vm_stat` page counters and `sysctl hw.memsize`, excluding
-file-backed and purgeable cache while including wired memory and the physical
-compressor footprint. This follows the [Stats RAM reader](https://github.com/exelban/stats/blob/master/Modules/RAM/readers.swift)
-and avoids the near-100% readings produced by `top`'s cache-inclusive PhysMem
-summary. It measures memory usage; [memory pressure](https://support.apple.com/guide/activity-monitor/actmntr1004/mac)
-is a separate indicator of how efficiently macOS is serving memory requests.
-On Linux, CPU comes from `/proc/stat`, memory from `/proc/meminfo` and disk
-throughput from whole leaf devices in `/sys/block/*/stat`, excluding partitions,
-stacked storage layers and loop/RAM-backed devices. The CPU total excludes the
-guest counters already included in user/nice time.
-
-When adding the metrics helper to an existing installation, apply its new
-symlink before reloading tmux; `prefix r` only reloads the config and does
-not provision files:
-
-```sh
-mise bootstrap dotfiles apply --yes '~/.config/tmux/status-metrics.sh'
-```
-
-Then reload with `prefix r`. The helper prints one complete line per sample
-and uses the C locale so parsing is independent of the shell's language.
-
-Session and title shortcuts: `prefix C` prompts for a new session name and
-starts it in the current pane's directory; `prefix S` renames the session,
-`prefix W` renames the window, and `prefix T` renames the pane. These use
-uppercase letters (`Shift+C/S/W/T`), distinct from Control-letter keys.
-The built-in `prefix $` and `prefix ,` rename-session and rename-window
-bindings remain available too.
-With `status-keys vi`, these prompts use vi-style editing: `h`/`l` move the
-cursor, `b`/`w` move by word, and `0`/`$` jump to the start/end of the input.
-
-`prefix s` opens [SessionX](https://github.com/omerxx/tmux-sessionx), replacing
-the native session picker with fuzzy search and a pane preview. Enter selects
-a session or creates one from a new name; within the popup, `Ctrl+r` renames,
-`Alt+Backspace` deletes, `Ctrl+w` lists windows, and Escape closes the picker.
-It uses the existing mise-managed fzf and bat, fzf's built-in tmux popup mode,
-and the shared Catppuccin colors. The current session remains in the list.
-Plain `tc` opens the complete SessionX plugin in every context. Outside tmux,
-it attaches to an existing session and immediately opens SessionX, including
-the attached session in the list. With the server stopped, it starts tmux,
-lets Continuum restore the saved environment, then attaches and opens the
-same picker. With no saved sessions, it creates `core` in the home directory
-as the plugin's host. Escape closes the picker and leaves you attached.
-`tc name` skips the picker and creates, attaches to, or switches to that exact
-session name.
-See [shell helpers](./shell.md#tmux-session-picker) for startup use.
-
-[Resurrect](https://github.com/tmux-plugins/tmux-resurrect) and
-[Continuum](https://github.com/tmux-plugins/tmux-continuum) save the environment
-automatically every 15 minutes and restore the latest snapshot when the tmux
-server starts. Saves live in `~/.local/share/tmux/resurrect/`, outside this
-public repository. `prefix Ctrl+s` saves immediately; `prefix Ctrl+r` restores
-manually. These are Control-letter keys, distinct from `prefix S` for renaming.
-Snapshots restore sessions, windows, pane layouts and working directories;
-supported programs can be restarted, but process memory is not preserved.
-Pane-content capture remains disabled by default.
-
-All three plugin checkouts live under `~/.local/share/tmux/plugins/` and are
-pinned to exact upstream revisions in `mise.toml`'s `[bootstrap.repos]`.
-`mise run bootstrap:plugins` provisions them; no TPM is needed. Provision the
-plugins before the first config reload. Continuum loads after Resurrect and
-the statusline, so its invisible autosave job survives config reloads.
-Its upstream debug trace goes to `~/.local/share/tmux/plugins/tmux-continuum.log`
-instead of appearing in a pane when the config loads.
-Autosave needs an attached client refreshing the statusline; it does not run
-on a timer while every client is detached. Continuum also suppresses automatic
-save/restore when it detects another tmux server, to avoid mixing snapshots.
-
-`prefix [` / `prefix ]` select the previous/next window and can be repeated
-for one second after a single prefix. Ctrl-bracket variants work too; in legacy
-terminals `Ctrl+[` is Escape, so `prefix Escape` also selects the previous
-window with the same repeat timeout. These replace the stock bracket shortcuts: use
-`prefix PageUp` for scrollback and `prefix P` to paste the tmux buffer.
-
-`prefix w` captures the current session ID before filtering windows, including
-when several sessions are attached. `run-shell -C` executes a native tmux command
-and `##` delays the per-item format expansion; no shell command is needed.
-Terminal overrides and features use fixed array
-slots 10–12, preserving tmux's built-in entries and keeping repeated config
-reloads from appending duplicate capabilities. The status blocks use square
-edges and the same Mocha colors with fewer redundant style changes.
-
-**Validation:** there's no established third-party linter for `tmux.conf`
-(nothing comparable to `taplo`/`rumdl` exists for tmux config syntax), and
-per this repo's policy no custom step fills the gap — see
-[linting.md](./linting.md). Not checked automatically going forward.
-
-The 2026-09-30 review loaded the original and revised configs in separate
-temporary tmux 3.7c servers. Three reloads left every revised option and binding
-identical. Terminal capability values matched the original config; other options
-and bindings matched apart from the intended window-picker filter, shorter
-status formats and unused palette variables. With two attached test clients,
-the actual `prefix w` picker showed only its client's current session.
-The 2026-10-08 navigation change was reviewed against tmux 3.7c's
-`command-alias`, `pane_at_*` and passthrough syntax. The sandbox used for the
-change prohibited creating a tmux server socket, so config loading and the real
-desktop/SSH navigation round trip still need an attached client check.
-
-The 2026-10-11 metrics fix applied the helper's missing symlink through mise,
-ran the helper on macOS and obtained numeric CPU, RAM and disk throughput
-readings, then reloaded the live tmux server. tmux's job diagnostics confirmed
-the attached client was running the helper. The script passed ShellCheck.
-
-The bracket navigation fix was tested in a temporary tmux server with an
-attached PTY client: a single `C-a` followed by repeated `[` or `]` switched
-windows on every keypress. Repeated legacy `Ctrl+[` (Escape) also worked.
-The tested config was then reloaded in the live server. Linux metric counters
-were reviewed against the kernel documentation; Linux runtime verification
-remains outstanding because no running Linux environment was available.
-
-The 2026-10-12 macOS memory correction was checked against live `vm_stat`
-counters and the installed RAM size: the helper reported about 60% usage,
-excluding reclaimable cache, where the earlier PhysMem-based reading was
-near full. The revised script passed ShellCheck and requires no tmux reload:
-the status command reads it again on each refresh.
-
-The Git branch status command was checked in a temporary tmux server for a
-repository, its subdirectory, a non-Git directory, and a path containing spaces
-and quotes. The label matched the branch or was hidden as appropriate. The
-updated status format was applied to the live server.
-
-The 2026-10-12 session plugins were checked on an isolated tmux 3.7c server
-with an attached PTY client: both prefixes opened SessionX and selected the
-requested session. Continuum saved when its interval was due; after killing
-that test server, Resurrect recovered two sessions, three windows, four panes
-and their directories. The live server was reloaded twice, with one autosave
-status job retained, and that job created the first machine-local snapshot.
-Automatic startup restoration is enabled; the kill/restore test exercised
-Resurrect manually because Continuum suppresses automatic restoration while
-the user's separate live server exists. TOML and Markdown checks passed.

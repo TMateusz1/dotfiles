@@ -19,13 +19,13 @@ Go's own env file. No placement exception needed here.
 **What's configured:** `env read_from_shell=PATH EDITOR VISUAL` — documented
 kitty syntax: the special value `read_from_shell` tells kitty to read the
 named variables from the login shell's own startup files, each name
-treated as a glob. `editor nvim` is separate — kitty's own setting for its
-internal edit-in-kitty features, distinct from the `EDITOR` env var. Font
+treated as a glob. `editor .` follows `VISUAL`/`EDITOR` for config editing, using the
+shell's Zed-or-vi selection. See [Kitty's editor setting](https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.editor). Font
 is `GeistMono Nerd Font Mono` at 16pt with a 105% cell-height stretch.
 `background_opacity 1.0` is deliberate (commented in the file):
 translucency made real text contrast drift over composited desktop content,
-while cells with their own explicit background (Neovim, the tmux status
-bar) stayed opaque and plain shell output didn't — an inconsistent look.
+while TUI cells with explicit backgrounds stayed opaque and plain shell
+output did not.
 Also: `confirm_os_window_close 0` (no nag on close), `macos_option_as_alt
 left`, a handful of `cmd+N` tab-switching binds, `F5`/`F6` horizontal/vertical
 splits, and remapped `enter` combos (shift/alt/ctrl/ctrl+shift) sent as proper
@@ -43,37 +43,20 @@ a full Kitty restart rather than a config reload. See
 [Kitty's Option setting](https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.macos_option_as_alt).
 
 `clipboard_control` permits both writes and reads for the clipboard and primary
-selection. Writes make remote Neovim yanks reach macOS; reads make ordinary
-remote Neovim paste work through tmux without a prompt. The read half is an
+selection. Terminal applications, including those reached over SSH, can
+write and read the Mac clipboard without a prompt. The read half is an
 explicit convenience/security tradeoff: any program reached through this Kitty
 terminal, including over SSH, can read the macOS clipboard. Replace
 `read-clipboard`/`read-primary` with their `-ask` variants if per-read approval
 is preferred.
 
-### Seamless Kitty, tmux and Neovim navigation
+### Pane navigation
 
-Both `Ctrl-h/j/k/l` and `Ctrl-Left/Down/Up/Right` move in the requested
-direction across all three split layers. `pane_navigation.py` is a no-UI Kitty
-kitten and a global watcher:
-
-- At an ordinary shell prompt, the kitten moves directly to the neighboring
-  Kitty split.
-- When a full-screen application owns Kitty's alternate screen, it passes the
-  original key through. tmux therefore receives the key locally and over
-  ordinary SSH without process-name or window-title guessing.
-- At a tmux outer edge, `tmux/.tmux.conf` emits a Kitty `SetUserVar` escape
-  sequence. The watcher accepts only the `tmux_kitty_navigate` variable and
-  moves to that neighbor. This uses the terminal data path, so a tmux server on
-  another VM needs no access to a local socket.
-- At a Neovim edge, the vim-tmux-navigator configuration first tries another
-  Neovim split, then another tmux pane, and emits the same narrow request only
-  at the combined outer edge.
-
-This deliberately does not enable Kitty's general remote-control listener or
-forward a control socket to SSH hosts. A remote program can emit the named
-escape sequence and request a focus move, but it cannot use this mechanism for
-arbitrary Kitty commands. The handoff requires `allow-passthrough on` in the
-tmux config, which is already enabled for clipboard support.
+Zellij owns terminal pane navigation. `Ctrl+Arrow` reaches Zellij directly;
+`Ctrl+Shift+Left/Right` also passes through for tab switching. Kitty keeps
+its native window navigation and the configured `F5`/`F6` split shortcuts.
+No custom navigation kitten or watcher is installed.
+See [Zellij keybindings](./zellij.md).
 
 **Known issue: font registration lag.** Even with the
 `font-jetbrains-mono-nerd-font` cask installed and its `.ttf` files present
@@ -92,8 +75,7 @@ mauve/lavender/rosewater picks: `active_border_color`,
 `active_tab_background`, `url_color`. `selection_foreground`/
 `selection_background` diverge more substantially — a muted surface wash
 (`#cdd6f4` on `#585b70`) instead of the official's bright rosewater block —
-and the file's own comment explains why: matching tmux's copy-mode and
-Neovim's Visual-mode look rather than inverting to a loud highlight. Not
+for a muted selection highlight. Not
 present here (and not in conflict with anything, just omitted): the
 official theme's `scrollbar_handle_color`/`scrollbar_track_color` and
 `mark1`–`mark3` colors — minor, rarely-used features; addable later
@@ -111,9 +93,8 @@ spot-check — it's lenient on unknown keys but
 raises a real error on an invalid value for a recognized option. Not wired
 into an automated check, partly because kitty is also opt-in
 (`mise/config.desktop.toml`) and wouldn't reliably be on `PATH` during an ordinary
-`hk check --all` anyway. The navigation kitten was also imported with Kitty's
-embedded Python and its alternate-screen/pass-through, ordinary-shell/focus,
-and watcher paths were exercised with stub windows.
+`hk check --all` anyway. After removing the navigation watcher, the real
+loader confirmed `editor .`, no watchers, and no custom `Ctrl+Arrow` mappings.
 
 ## Zed
 
@@ -140,7 +121,7 @@ all edited buffers before running and bind to the native runnable tags.
 adds modal editing, text objects, operators and Vim navigation. The user keymap
 contains only deliberate overrides: our numbered panels, preview finders,
 recent/open tabs, pane/dock navigation and completion/snippet behavior.
-The current Neovim-style shortcuts are `Space Space` for the tab switcher,
+The current Vim leader shortcuts are `Space Space` for the tab switcher,
 `Space f` for files and `Space g` for project text search, plus `Space r n`
 for symbol rename, `Space q` to close the active tab and `Space Tab` for the
 alternate tab. All leader shortcuts require Vim normal mode in a full
@@ -236,8 +217,7 @@ their own input contexts.
 The `Cmd-E` override replaces the preset's file finder with Zed's searchable
 global tab switcher (`tab_switcher::ToggleAll`), showing tabs across all splits.
 `Space Space` opens that same switcher, providing the quick buffer-selection
-workflow used by Neovim's `BufferLinePick`. Zed shows a searchable list rather
-than assigning jump letters to the tab bar. Type part of a filename and press
+workflow across the workspace. Zed shows a searchable list. Type part of a filename and press
 Enter, or navigate the results with `Ctrl-j`/`Ctrl-k`. Selecting a tab focuses
 its existing pane rather than duplicating the tab in the current split.
 While navigating the list, the switcher previews each selected tab in its
@@ -248,7 +228,7 @@ pane inside the popup like the file and text finders do.
 Enter accepts and Escape dismisses pickers using native bindings.
 
 For direct tab navigation within the current pane, native `[b`/`]b` move
-to the previous/next tab, matching Neovim's bufferline mappings. `gt`/`gT`
+to the previous/next tab. `gt`/`gT`
 and the JetBrains `Cmd-Shift-[`/`Cmd-Shift-]` shortcuts are also available.
 `Space Tab` switches to the alternate file (normally the previous tab);
 repeating it toggles between the two most recently active files in that
@@ -390,7 +370,7 @@ Navigation requests depend on the active language server's capabilities.
 | `[F` / `]F`         | Previous/next function or method end     |
 
 `g i` keeps Vim's insert-at-previous-position behavior; the implementation
-shortcut uses uppercase `I` or the modern Neovim-style `g r i` sequence.
+shortcut uses uppercase `I` or the `g r i` sequence.
 `g D` uses `editor::GoToDefinitionSplit`: it reuses the pane to the right,
 or creates a vertical split there if needed. `g d` stays in the current pane.
 See [Zed Vim mode](https://zed.dev/docs/vim).
@@ -399,9 +379,8 @@ Function motions use the same native actions as `[m`/`]m` and `[M`/`]M`.
 They work in normal, visual and operator-pending modes and use the language's
 Tree-sitter text-object queries rather than LSP. Supported languages also
 provide native `vif`/`vaf` to select a function body/whole function and `dif`
-or `cif` to delete/change its body. No Neovim plugin is installed in Zed.
-In this repo's Neovim config, the corresponding `[f`/`]f` mappings are owned
-by `nvim-treesitter-textobjects`. See [Zed text objects](https://zed.dev/docs/extensions/languages#text-objects).
+or `cif` to delete/change its body. No standalone parser compiler is required.
+See [Zed text objects](https://zed.dev/docs/extensions/languages#text-objects).
 
 Panel toggling, directional navigation (including visible docks) and the
 diagnostics context were checked against the installed version's published
@@ -456,14 +435,12 @@ Restart an already running Zed after adding them for the first time.
 Zed and its extensions download missing language servers when needed;
 existing supported installations on PATH may be used first. Zed's managed
 Prettier integration uses a project installation when available and supplies
-a fallback otherwise. There is no global npm formatter installation or
-dependency on Neovim's Mason directory. Rust, Go and Node runtimes remain
+a fallback otherwise. No global npm formatter installation is required. Rust, Go and Node runtimes remain
 managed by the global mise config; Rust's toolchain includes rustfmt.
 Go explicitly runs `source.organizeImports` before formatting through gopls:
 it adds missing imports, removes unused ones and sorts them. Gopls uses
 its integrated gofumpt formatter and enables Staticcheck diagnostics; separate
 `goimports`, `gofmt`, `gofumpt` or `staticcheck` processes are not required.
-This follows the same formatting style as Neovim's goimports + gofumpt setup.
 
 JavaScript, TypeScript and TSX run vtsls's `source.organizeImports` before
 Prettier, combining/sorting imports and removing unused ones. Missing imports
@@ -548,10 +525,9 @@ at the top of the completion menu. Gopls enables `usePlaceholders` and
 arguments. AI remains disabled; these features use language servers and
 local snippets.
 
-`snippets/go.json` copies all nine project-specific entries from
-`nvim/snippets/go.json` (wrapped errors, parallel table tests and
-controller-runtime helpers). It also supplies the basic constructs that
-Neovim receives separately from friendly-snippets:
+`snippets/go.json` contains nine project-specific snippets for wrapped errors,
+parallel table tests and controller-runtime helpers, plus these eight basic
+Go constructs:
 
 | Prefix  | Expansion                                       |
 | ------- | ----------------------------------------------- |
@@ -564,9 +540,7 @@ Neovim receives separately from friendly-snippets:
 | `main`  | Main function                                   |
 | `test`  | Parallel test function                          |
 
-The copied Neovim entries are unchanged snapshots; subsequent edits in
-either editor's snippet file must be mirrored explicitly when desired.
-No dependency on an installed Neovim plugin is introduced.
+The snippets are maintained directly in `zed/snippets/go.json`.
 
 In Vim insert mode, type a prefix and choose its snippet in the completion
 menu. Enter accepts it; Tab/Shift-Tab move through its placeholders, including
@@ -580,8 +554,7 @@ See [Zed snippets](https://zed.dev/docs/snippets) and
 [code completions](https://zed.dev/docs/completions).
 
 All 17 snippet bodies were expanded with their default placeholders and
-accepted by the real Go toolchain's gofmt parser. The nine copied entries
-were compared with Neovim's originals. Settings, keymap and snippet JSON
+accepted by the real Go toolchain's gofmt parser. Settings, keymap and snippet JSON
 parsed successfully, repository checks passed, and opening the files in Zed
 produced no new configuration errors. Interactive completion-menu selection
 and placeholder navigation were not exercised.
