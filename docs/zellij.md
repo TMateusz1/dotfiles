@@ -114,6 +114,12 @@ in Locked mode. Switching modes takes effect immediately.
 | `Ctrl+g`          | Enter Locked mode; press it again to unlock      |
 | `Ctrl+l`          | Open the configured lazygit popup                |
 | `Ctrl+q`          | Quit the session and stop its programs           |
+| `Ctrl+←`          | Focus left within the current tab                |
+| `Ctrl+→`          | Focus right within the current tab               |
+| `Ctrl+↓`          | Focus downward; navigate down a stack            |
+| `Ctrl+↑`          | Focus upward; navigate up a stack                |
+| `Ctrl+Shift+←`    | Go to the previous tab                           |
+| `Ctrl+Shift+→`    | Go to the next tab                               |
 | `Alt+←` / `Alt+h` | Focus left, or switch tab at the left edge       |
 | `Alt+→` / `Alt+l` | Focus right, or switch tab at the right edge     |
 | `Alt+↓` / `Alt+j` | Focus downward                                   |
@@ -131,9 +137,16 @@ Kitty uses `macos_option_as_alt left`: on macOS, use left Option for these
 Alt shortcuts. Right Option retains native character input. After changing
 this setting, fully quit and reopen Kitty; a config reload does not apply it.
 
+Kitty's default `Ctrl+Shift+Left/Right` bindings switch Kitty tabs and
+intercept those keys before Zellij receives them. This repo's Kitty config
+unmaps both shortcuts so they pass through. Reload Kitty's config with
+`Ctrl+Shift+F5` to apply that change.
+
 ## Validation
 
 The tables were compared against every binding in the Pane, Tab, Resize,
 and Move blocks and the shared blocks in the checked-in config. Stack
 resizing and pane extraction were checked against upstream documentation;
-this documentation change does not alter any keybindings.
+Ctrl+Arrow pane navigation and Ctrl+Shift+Left/Right tab switching were
+validated by loading the checked-in config
+with `zellij --config zellij/config.kdl setup --check` on Zellij 0.45.1.

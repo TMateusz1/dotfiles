@@ -31,6 +31,12 @@ left`, a handful of `cmd+N` tab-switching binds, `F5`/`F6` horizontal/vertical
 splits, and remapped `enter` combos (shift/alt/ctrl/ctrl+shift) sent as proper
 CSI-u sequences for apps that distinguish them.
 
+`Ctrl+Shift+Left/Right` are unmapped with `no_op` so Kitty passes them to
+Zellij for previous/next tab navigation. Kitty's own tabs remain accessible
+with `Cmd+1` through `Cmd+5`. Reload Kitty's config with `Ctrl+Shift+F5`
+after changing these bindings. See
+[Kitty's shortcut unmapping](https://sw.kovidgoyal.net/kitty/mapping/#unmapping-default-shortcuts).
+
 On macOS, left Option sends Alt shortcuts to terminal applications, including
 Zellij; right Option retains native character input. This setting requires
 a full Kitty restart rather than a config reload. See
@@ -98,8 +104,10 @@ per this repo's policy no custom step fills that gap (see
 [linting.md](./linting.md)). `kitty +runpy 'from kitty.config import
 load_config; load_config(path)'` parses the config purely in-process, with
 no window/GPU/display needed (unlike actually starting kitty). Kitty 0.48.2
-accepted the left-Option setting through this loader. It is a
-handy one-liner for a manual spot-check — it's lenient on unknown keys but
+accepted the left-Option setting through this loader. The resolved keyboard
+map was also checked to confirm that `Ctrl+Shift+Left/Right` no longer
+trigger Kitty's tab actions. The loader is a handy one-liner for a manual
+spot-check — it's lenient on unknown keys but
 raises a real error on an invalid value for a recognized option. Not wired
 into an automated check, partly because kitty is also opt-in
 (`mise/config.desktop.toml`) and wouldn't reliably be on `PATH` during an ordinary

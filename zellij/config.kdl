@@ -151,6 +151,12 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
+        bind "Ctrl left" { MoveFocus "left"; }
+        bind "Ctrl down" { MoveFocus "down"; }
+        bind "Ctrl up" { MoveFocus "up"; }
+        bind "Ctrl right" { MoveFocus "right"; }
+        bind "Ctrl Shift left" { GoToPreviousTab; }
+        bind "Ctrl Shift right" { GoToNextTab; }
         bind "Alt left" { MoveFocusOrTab "left"; }
         bind "Alt down" { MoveFocus "down"; }
         bind "Alt up" { MoveFocus "up"; }

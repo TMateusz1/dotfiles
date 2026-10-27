@@ -143,7 +143,9 @@ the same ribbon style. The complete theme is included because omitted
 components fall back to Zellij's defaults rather than inherit Catppuccin.
 The custom name matters: Zellij 0.45.1 loads built-in themes after inline
 definitions, replacing any inline theme with the same name.
-Keybindings use Zellij's defaults with one addition: **`Ctrl+l`**
+**Ctrl+Arrow** focuses the pane in that direction in every mode except
+Locked, staying within the current tab. **Ctrl+Shift+Left/Right** switches
+to the previous/next tab, also in every mode except Locked. **`Ctrl+l`**
 opens [lazygit](#lazygit) in a centered floating pane, 80% wide and tall,
 using the focused pane's current directory. Exit lazygit with `q` to close
 the popup and return to the underlying pane. The shortcut works directly
