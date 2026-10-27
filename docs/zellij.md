@@ -97,6 +97,26 @@ These keys move pane positions, rather than merely moving focus.
 | `p`                  | Swap backward in layout order |
 | `Ctrl+h`, Enter, Esc | Return to Normal              |
 
+## Personal bindings: Ctrl+l
+
+Press Ctrl+l, release it, then press the action key:
+
+| Key                        | Action                                                  |
+| -------------------------- | ------------------------------------------------------- |
+| `l`                        | Send Ctrl+l to the focused application for clear/redraw |
+| `g`                        | Open lazygit in the focused pane's directory            |
+| Esc, Enter, Ctrl+c, Ctrl+l | Cancel and return to Normal                             |
+
+Both actions return to Normal. Clear/redraw uses the application's Ctrl+l
+behavior; it does not erase Zellij's scrollback. Lazygit opens in a centered
+floating pane, 80% wide and tall; `q` closes it.
+
+Zellij's [available modes](https://zellij.dev/documentation/keybindings-modes)
+are fixed, so the personal group reuses `tmux` mode and appears as TMUX
+in the status bar. The former tmux compatibility bindings are removed;
+Ctrl+b passes through to the application in Normal. Ctrl+o stays Session mode.
+Add future personal bindings to the `tmux` block in the checked-in config.
+
 ## Shared shortcuts
 
 These are also available while in Pane and Tab mode. They are disabled
@@ -110,9 +130,8 @@ in Locked mode. Switching modes takes effect immediately.
 | `Ctrl+h`          | Enter Move mode                                  |
 | `Ctrl+s`          | Enter Scroll mode                                |
 | `Ctrl+o`          | Enter Session mode                               |
-| `Ctrl+b`          | Enter tmux compatibility mode                    |
 | `Ctrl+g`          | Enter Locked mode; press it again to unlock      |
-| `Ctrl+l`          | Open the configured lazygit popup                |
+| `Ctrl+l`          | Enter the personal bindings group                |
 | `Ctrl+q`          | Quit the session and stop its programs           |
 | `Ctrl+←`          | Focus left within the current tab                |
 | `Ctrl+→`          | Focus right within the current tab               |
@@ -147,6 +166,8 @@ unmaps both shortcuts so they pass through. Reload Kitty's config with
 The tables were compared against every binding in the Pane, Tab, Resize,
 and Move blocks and the shared blocks in the checked-in config. Stack
 resizing and pane extraction were checked against upstream documentation;
-Ctrl+Arrow pane navigation and Ctrl+Shift+Left/Right tab switching were
-validated by loading the checked-in config
+Ctrl+Arrow pane navigation, Ctrl+Shift+Left/Right tab switching, and the
+personal Ctrl+l group were validated by loading the checked-in config
 with `zellij --config zellij/config.kdl setup --check` on Zellij 0.45.1.
+The personal group's interactive behavior still needs a regular-terminal
+check; the disposable PTY probe produced no rendered output here.

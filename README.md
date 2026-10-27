@@ -58,7 +58,7 @@ docs/                  # notes on what's configured, and why
 | shell (zsh)                                                                                   | [docs/shell.md](./docs/shell.md)                 |
 | Util tools (bat, zoxide, eza, fd, fzf, gh, glab, glow, jq, yq, ripgrep, starship)             | [docs/util_tools.md](./docs/util_tools.md)       |
 | Core tools (Zellij, tmux, lazygit, k9s, bottom)                                               | [docs/core_tools.md](./docs/core_tools.md)       |
-| Zellij keybindings (panes, tabs, stacks, resize, move)                                        | [docs/zellij.md](./docs/zellij.md)               |
+| Zellij keybindings (panes, tabs, stacks, resize, move, personal group)                        | [docs/zellij.md](./docs/zellij.md)               |
 | Desktop tools (kitty, Zed settings)                                                           | [docs/desktop_tools.md](./docs/desktop_tools.md) |
 | Neovim (LSP, blink.cmp, conform, neotest, Treesitter, fzf-lua, Trouble, Neogit, Oil/Neo-tree) | [docs/nvim.md](./docs/nvim.md)                   |
 | languages (Rust, Go, Python, Robot Framework, Protocol Buffers, Kubernetes, Helm)             | [docs/langs.md](./docs/langs.md)                 |

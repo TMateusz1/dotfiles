@@ -146,12 +146,14 @@ definitions, replacing any inline theme with the same name.
 **Ctrl+Arrow** focuses the pane in that direction in every mode except
 Locked, staying within the current tab. **Ctrl+Shift+Left/Right** switches
 to the previous/next tab, also in every mode except Locked. **`Ctrl+l`**
-opens [lazygit](#lazygit) in a centered floating pane, 80% wide and tall,
-using the focused pane's current directory. Exit lazygit with `q` to close
-the popup and return to the underlying pane. The shortcut works directly
-in every mode except Locked. `Ctrl+l` is reserved for lazygit while unlocked;
-press `Ctrl+g` to enter Locked mode and pass it through to applications
-for clearing/redrawing, then `Ctrl+g` again to unlock.
+enters the personal bindings group: **`l`** sends Ctrl+l to the focused
+application for clear/redraw, and **`g`** opens [lazygit](#lazygit) in a
+centered floating pane, 80% wide and tall, using the focused pane's current
+directory. Both actions return to Normal. Exit lazygit with `q` to close
+the popup. Esc, Enter, Ctrl+c, or Ctrl+l cancels the group.
+Zellij has fixed modes, so this group replaces tmux compatibility mode
+and is still labeled TMUX in the status bar. Ctrl+b passes through in Normal;
+Ctrl+o remains Session mode. In Locked mode, Ctrl+l passes through directly.
 Modes, layouts and other behavior otherwise use Zellij's defaults.
 See the [complete Pane/Tab key reference](./zellij.md), including stack
 splitting, resize/move modes, and shortcuts omitted from the bottom bar.
@@ -182,8 +184,8 @@ mise bootstrap dotfiles apply --yes '~/.config/zellij/config.kdl'
 See [Zellij](https://zellij.dev/) and the
 [official Catppuccin port](https://github.com/catppuccin/zellij).
 
-**Validation:** Zellij 0.45.1 accepted the custom theme and lazygit keybinding
-with `setup --check`.
+**Validation:** Zellij 0.45.1 accepted the custom theme and personal Ctrl+l
+group (`l` sends byte 12; `g` runs lazygit) with `setup --check`.
 Markdown lint and `git diff --check` passed. The live config path is linked
 to this repository. A disposable PTY probe produced no rendered output in
 the agent environment, so the blue/green appearance needs a visual check
