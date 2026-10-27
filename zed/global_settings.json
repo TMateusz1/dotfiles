@@ -121,6 +121,19 @@
     },
   },
   "lsp": {
+    "jdtls": {
+      "settings": {
+        "java": {
+          "sources": {
+            "organizeImports": {
+              // Keep regular and static imports explicit.
+              "starThreshold": 2147483647,
+              "staticStarThreshold": 2147483647,
+            },
+          },
+        },
+      },
+    },
     "gopls": {
       "initialization_options": {
         "gofumpt": true,

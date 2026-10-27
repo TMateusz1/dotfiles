@@ -3,6 +3,7 @@
 Personal dotfiles, managed with [mise](https://mise.jdx.dev) and themed
 consistently with [Catppuccin](https://catppuccin.com) (Mocha) throughout.
 Zed pairs that theme with Material icons and a JetBrains/Vim keymap.
+For explicit Java/Kotlin imports, see the [Zed import settings](./docs/desktop_tools.md#java-and-kotlin-imports).
 
 This repo is public — see [AGENTS.md](./AGENTS.md) for the hard rule on
 never committing secrets, and for the full set of conventions this repo
@@ -57,6 +58,7 @@ docs/                  # notes on what's configured, and why
 | shell (zsh)                                                                                   | [docs/shell.md](./docs/shell.md)                 |
 | Util tools (bat, zoxide, eza, fd, fzf, gh, glab, glow, jq, yq, ripgrep, starship)             | [docs/util_tools.md](./docs/util_tools.md)       |
 | Core tools (Zellij, tmux, lazygit, k9s, bottom)                                               | [docs/core_tools.md](./docs/core_tools.md)       |
+| Zellij keybindings (panes, tabs, stacks, resize, move)                                        | [docs/zellij.md](./docs/zellij.md)               |
 | Desktop tools (kitty, Zed settings)                                                           | [docs/desktop_tools.md](./docs/desktop_tools.md) |
 | Neovim (LSP, blink.cmp, conform, neotest, Treesitter, fzf-lua, Trouble, Neogit, Oil/Neo-tree) | [docs/nvim.md](./docs/nvim.md)                   |
 | languages (Rust, Go, Python, Robot Framework, Protocol Buffers, Kubernetes, Helm)             | [docs/langs.md](./docs/langs.md)                 |

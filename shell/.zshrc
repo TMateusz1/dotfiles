@@ -126,6 +126,11 @@ if [[ -r "$XDG_CONFIG_HOME/glow/glamour.json" ]]; then
   export GLAMOUR_STYLE="$XDG_CONFIG_HOME/glow/glamour.json"
 fi
 
+if command -v zellij >/dev/null 2>&1; then
+  alias za="zellij attach --create"
+  alias zs="zellij -l welcome"
+fi
+
 if command -v tmux >/dev/null 2>&1; then
   tc() {
     local session="${1:-core}"

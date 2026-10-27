@@ -68,6 +68,10 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   theme — glow's own config file has no way to reference it (no path
   expansion at all in its `style` field) — see
   [util_tools.md#glow](./util_tools.md#glow).
+- `alias za="zellij attach --create"` creates or attaches to a named Zellij
+  session, e.g. `za work`, when Zellij is installed. To start with the
+  session manager instead, use `zs` (`zellij -l welcome`); see
+  [core tools](./core_tools.md#zellij).
 - `export GLAMOUR_STYLE=...` points the same theme at CLIs that render
   Markdown through Charm's
   [glamour](https://github.com/charmbracelet/glamour) library. `gh`

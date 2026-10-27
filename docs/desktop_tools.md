@@ -27,9 +27,14 @@ translucency made real text contrast drift over composited desktop content,
 while cells with their own explicit background (Neovim, the tmux status
 bar) stayed opaque and plain shell output didn't — an inconsistent look.
 Also: `confirm_os_window_close 0` (no nag on close), `macos_option_as_alt
-no`, a handful of `cmd+N` tab-switching binds, `F5`/`F6` horizontal/vertical
+left`, a handful of `cmd+N` tab-switching binds, `F5`/`F6` horizontal/vertical
 splits, and remapped `enter` combos (shift/alt/ctrl/ctrl+shift) sent as proper
 CSI-u sequences for apps that distinguish them.
+
+On macOS, left Option sends Alt shortcuts to terminal applications, including
+Zellij; right Option retains native character input. This setting requires
+a full Kitty restart rather than a config reload. See
+[Kitty's Option setting](https://sw.kovidgoyal.net/kitty/conf/#opt-kitty.macos_option_as_alt).
 
 `clipboard_control` permits both writes and reads for the clipboard and primary
 selection. Writes make remote Neovim yanks reach macOS; reads make ordinary
@@ -92,7 +97,8 @@ without disturbing anything if wanted.
 per this repo's policy no custom step fills that gap (see
 [linting.md](./linting.md)). `kitty +runpy 'from kitty.config import
 load_config; load_config(path)'` parses the config purely in-process, with
-no window/GPU/display needed (unlike actually starting kitty), and is a
+no window/GPU/display needed (unlike actually starting kitty). Kitty 0.48.2
+accepted the left-Option setting through this loader. It is a
 handy one-liner for a manual spot-check — it's lenient on unknown keys but
 raises a real error on an invalid value for a recognized option. Not wired
 into an automated check, partly because kitty is also opt-in
@@ -489,6 +495,41 @@ an unused import, returned formatted code and supplied function-call completions
 with editable argument placeholders. The resulting Go sample passed `go test`.
 First-start extension installation and formatting through the remaining
 language servers have not been exercised.
+
+#### Java and Kotlin imports
+
+Java's JDTLS settings keep both regular and static imports explicit by setting
+`java.sources.organizeImports.starThreshold` and `staticStarThreshold` to
+`2147483647` (the maximum Java integer). These apply when using the
+[Java extension](https://github.com/zed-extensions/java) and its `jdtls`
+server, including import organization with `Cmd-Alt-O`. The extension is
+installed separately. See [JDTLS import preferences](https://github.com/eclipse-jdtls/eclipse.jdt.ls/blob/main/org.eclipse.jdt.ls.core/src/org/eclipse/jdt/ls/core/internal/preferences/Preferences.java).
+
+Kotlin uses the official JetBrains `kotlin-lsp` supplied by the
+[Kotlin extension](https://zed.dev/docs/languages/kotlin). Its import code
+style comes from the project's `.editorconfig`; there is no equivalent
+global Zed import setting. Add this section to each Kotlin project's
+`.editorconfig` at the project root (next to `settings.gradle.kts`,
+`build.gradle.kts` or `pom.xml`), keeping any existing sections. This follows
+[JetBrains' own import rules](https://github.com/JetBrains/intellij-community/blob/master/.editorconfig):
+
+```ini
+[{*.kt,*.kts}]
+ij_kotlin_name_count_to_use_star_import = 2147483647
+ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
+ij_kotlin_packages_to_use_import_on_demand =
+```
+
+The empty package list also disables the usual `java.util`, `kotlinx.android.synthetic`
+and `io.ktor` wildcard exceptions. Run `Cmd-Alt-O` to organize existing imports
+after the project has loaded; names must resolve for wildcard expansion to work.
+Project `.editorconfig` rules and local/project Zed overrides can take precedence
+over shared defaults.
+
+**Validation:** the updated shared settings parsed with Zed's installed
+JSONC parser and opened in Zed 1.25.3 with no new settings errors in its log.
+The Java preference keys were checked against JDTLS sources; import edits
+through JDTLS and a Kotlin project have not been exercised.
 
 ### Completion and Go snippets
 

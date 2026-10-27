@@ -151,6 +151,8 @@ in every mode except Locked. `Ctrl+l` is reserved for lazygit while unlocked;
 press `Ctrl+g` to enter Locked mode and pass it through to applications
 for clearing/redrawing, then `Ctrl+g` again to unlock.
 Modes, layouts and other behavior otherwise use Zellij's defaults.
+See the [complete Pane/Tab key reference](./zellij.md), including stack
+splitting, resize/move modes, and shortcuts omitted from the bottom bar.
 
 `zellij/config.kdl` maps to **`~/.config/zellij/config.kdl`** through native
 mise `[dotfiles]` provisioning. Only the file is linked because Zellij's
@@ -158,7 +160,17 @@ configuration UI can write settings/backups. Other files under `zellij/`
 are ignored; session data stays in Zellij's own cache/data directories.
 
 Start with `zellij`, or attach/create a named session with
-`zellij attach --create work`. On another machine:
+`zellij attach --create work` (`za work` with this repo's Zsh config).
+To start at the session manager, use `zellij -l welcome` (`zs` in Zsh): the built-in
+welcome screen lets you select a running session, resurrect an exited
+session, or create a new one. Inside a session, use `Ctrl+o`, then `w`.
+In Zellij 0.45.1, `Ctrl+r` in the manager renames the current session,
+regardless of the highlighted row. In `zs`, that is the temporary welcome
+session. To rename a project session, attach to it first, then open the
+manager with `Ctrl+o`, `w`, press `Ctrl+r`, type the name and press Enter.
+Alternatively, target a running session from another shell with
+`zellij --session old-name action rename-session new-name`.
+On another machine:
 
 ```sh
 mise install --locked aqua:zellij-org/zellij
