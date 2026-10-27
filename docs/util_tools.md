@@ -114,14 +114,10 @@ forward.
 No config file is shipped here, deliberately. [gh](https://cli.github.com/)
 (the GitHub CLI) stores its settings in `~/.config/gh/config.yml`, but its
 auth tokens live in a *separate* `hosts.yml` next to it — in principle,
-symlinking just `config.yml` (not the whole directory) would be safe. It's
-skipped anyway because there's nothing worth overriding beyond theming, and
-theming doesn't need a file at all: `shell/.zshrc` exports `GLAMOUR_STYLE`
-(gh's own documented environment variable — see `gh help environment`)
-pointing at this repo's vendored [Glamour](#glamour) theme, reusing it rather
-than vendoring a second copy. That export is guarded on the theme file
-existing rather than on gh being installed, since the same variable serves
-every glamour-based CLI — see [shell.md](./shell.md).
+symlinking just `config.yml` (not the whole directory) would be safe. The
+configuration is left machine-local because this repository has no shared
+settings to apply.
+No custom Markdown theme is configured.
 
 ## glab
 
@@ -138,40 +134,14 @@ landing inside a tracked, public file, which conflicts directly with
 [AGENTS.md](../AGENTS.md)'s "never commit secrets" rule — so this repo
 doesn't touch `~/.config/glab-cli/` at all.
 
-Theming glab is therefore left to whatever `GLAMOUR_STYLE` does on its own
-(see [shell.md](./shell.md)): `glab config`'s own help documents no
-environment override for its persisted `glamour_style` setting, but the
-glab binary does reference `GLAMOUR_STYLE`, and which of the two wins
-hasn't been verified here. Nothing in this repo depends on the answer —
-glab either picks up the shared Catppuccin style or falls back to its
-`dark` default, and both are acceptable.
+No custom Markdown theme is configured; styling follows its machine-local
+configuration and defaults.
 
 **Also worth knowing:** `glab config set` without `--global` writes a
 *second*, repo-local config to `.git/glab-cli/` inside whatever git
 repository the current directory happens to be in — discovered directly
 while testing this. Not specific to this repo; worth remembering before
 running that command inside any git repository.
-
-## Glamour
-
-`glamour/glamour.json` is the official
-[Catppuccin Glamour](https://github.com/catppuccin/glamour) Mocha Markdown
-style, preserved for `gh` and `glab`. Glamour is their rendering library,
-not an additional executable to install.
-
-The file maps to `~/.config/glamour/glamour.json`; `shell/.zshrc` exports
-`GLAMOUR_STYLE` pointing to it. This is an explicit path chosen by this repo,
-not an automatically discovered Glamour config directory. Only the theme file
-is linked; no account configuration or credentials are managed here.
-
-The theme is vendored unchanged: heading colors follow the official rainbow
-scale and links use Mocha Blue. `gh help environment` documents
-`GLAMOUR_STYLE`; glab's precedence against its persisted `glamour_style`
-setting remains unverified, as described above.
-
-**Validation:** the theme is unchanged from the previously verified vendored
-file and parses as JSON. `gh help environment` confirms the `GLAMOUR_STYLE`
-setting. No custom linter is maintained for the vendored theme.
 
 ## jq
 

@@ -89,8 +89,6 @@ run = "mise -E desktop bootstrap packages apply"
 # Shared defaults live in global_settings.json; settings.json stays local/ignored.
 "~/.config/zed" = "zed"
 "~/.config/bottom" = "bottom"
-# Shared Markdown theme for gh/glab; no credentials or generated state.
-"~/.config/glamour/glamour.json" = "glamour/glamour.json"
 # Every global mise config layer and its matching lockfile must reach the
 # machine, along with the early setting that enables automatic platform layers.
 # See docs/mise.md.

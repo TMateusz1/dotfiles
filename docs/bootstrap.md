@@ -71,7 +71,6 @@ shorthand.
 "~/.config/kitty" = "kitty"
 "~/.config/zed" = "zed"
 "~/.config/bottom" = "bottom"
-"~/.config/glamour/glamour.json" = "glamour/glamour.json"
 "~/.config/mise/config.toml" = "mise/config.toml"
 "~/.config/mise/mise.lock" = "mise/mise.lock"
 "~/.config/mise/config.macos.toml" = "mise/config.macos.toml"
@@ -101,9 +100,6 @@ These tools deliberately use **file** entries instead:
   `~/.config/zellij/config.kdl`. Its configuration UI can write settings and
   backups, so the directory remains machine-local. See
   [core_tools.md#zellij](./core_tools.md#zellij).
-- **Glamour** — the shared Markdown theme maps to
-  `~/.config/glamour/glamour.json`, selected through `GLAMOUR_STYLE`.
-  See [util tools](./util_tools.md#glamour).
 - **mise** — the global setup is managed file-by-file: portable tools use
   `config.toml`/`mise.lock`, the automatically selected macOS Docker layer uses
   `config.macos.toml`/`mise.macos.lock`; `config.desktop.toml` contains the
@@ -120,18 +116,8 @@ credentials in the same directory (glab, in the very same file) as their
 settings, so neither is safe to symlink into a public repo — see
 [util_tools.md#gh](./util_tools.md#gh).
 
-## Applying the shared Markdown theme move
+## Removing tools and integrations
 
-The shared theme now lives under `glamour/`. On an existing machine, provision
-its new file link before restarting the shell:
-
-```sh
-mise bootstrap dotfiles apply --yes '~/.config/glamour/glamour.json'
-exec zsh
-```
-
-Reload Kitty's config (`Ctrl+Shift+F5`) and open a fresh Kitty window to
-remove the previous navigation watcher. Fresh shells also drop removed helpers.
 Removing tool declarations does not uninstall existing binaries or delete
 obsolete home-directory symlinks, plugin checkouts or saved sessions.
 Those remain machine-local; this change updates the repository configuration.

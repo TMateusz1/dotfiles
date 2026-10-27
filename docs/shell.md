@@ -73,19 +73,6 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   session, e.g. `za work`, when Zellij is installed. To start with the
   session manager instead, use `zs` (`zellij -l welcome`); see
   [core tools](./core_tools.md#zellij).
-- `export GLAMOUR_STYLE="$XDG_CONFIG_HOME/glamour/glamour.json"` points the
-  [shared Catppuccin theme](./util_tools.md#glamour) at CLIs that render
-  Markdown through Charm's
-  [glamour](https://github.com/charmbracelet/glamour) library. `gh`
-  documents it explicitly (`gh help environment`); the `glab` binary
-  references the same variable too, so it is deliberately *not* scoped to
-  gh alone — though glab's precedence against its own persisted
-  `glamour_style` setting hasn't been verified here, and glab's config is
-  something this repo deliberately doesn't manage (see
-  [util_tools.md#glab](./util_tools.md#glab)). Guarded on the theme file
-  being readable rather than on any one tool being installed, because
-  glamour renders unstyled with no error when the path is bad — a broken
-  reference would otherwise be invisible.
 
 ## Native Zsh history
 

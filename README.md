@@ -31,7 +31,6 @@ The default editor is `zed --wait` when available, otherwise system `vi`.
 ```text
 mise.toml, mise.lock   # repo checks, hooks, and bootstrap settings/tasks
 mise/                  # shared tools + macOS + opt-in desktop layers → ~/.config/mise/
-glamour/               # shared Catppuccin Markdown theme for gh/glab (see docs/util_tools.md#glamour)
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
 zellij/                # Catppuccin Mocha, blue/green ribbons, lazygit popup (see docs/core_tools.md#zellij)

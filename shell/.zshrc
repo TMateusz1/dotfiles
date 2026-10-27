@@ -115,14 +115,6 @@ if command -v rg >/dev/null 2>&1; then
   export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
 fi
 
-# Markdown rendering for CLIs built on Charm's glamour library.
-# gh documents GLAMOUR_STYLE; glab reads the same variable.
-# Gated on the theme file, not on any one tool: a missing path here renders
-# unstyled with no error, which would be invisible.
-if [[ -r "$XDG_CONFIG_HOME/glamour/glamour.json" ]]; then
-  export GLAMOUR_STYLE="$XDG_CONFIG_HOME/glamour/glamour.json"
-fi
-
 if command -v zellij >/dev/null 2>&1; then
   alias za="zellij attach --create"
   alias zs="zellij -l welcome"

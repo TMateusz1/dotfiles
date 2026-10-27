@@ -5,10 +5,9 @@ import "package://github.com/jdx/hk/releases/download/v2.1.0/hk@2.1.0#/Builtins.
 // format (rumdl, taplo, yamlfmt, shellcheck, ...) or it's one of hk's
 // own built-in hygiene utilities below. Formats with no real linter —
 // bat's/fzf's/ripgrep's args files, k9s's YAML *schema*, kitty's
-// config, and glamour's JSON style — were hand-verified against the real
-// binary when each was set up (see their docs/ entries), not wired into a
-// bespoke custom step here. JSON has no step: the Glamour theme is vendored
-// and Zed uses JSON with comments. See docs/linting.md.
+// config — were hand-verified against the real binary when each was set up
+// (see their docs/ entries), not wired into a bespoke custom step here. JSON has no step: Zed uses JSON with comments.
+// See docs/linting.md.
 local linters = new Mapping<String, Step> {
   // markdown
   ["rumdl"] = Builtins.rumdl

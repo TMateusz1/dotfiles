@@ -81,10 +81,9 @@ These files are instead verified by hand against the real binary when set
 up (see their own `docs/*_tools.md` entries) and aren't checked
 automatically going forward.
 
-JSON has no step at all. The shared `glamour/glamour.json` theme is
-vendored verbatim from upstream Catppuccin. Zed uses JSON with comments. A generic
-JSON formatter would churn vendored files and would need to distinguish
-Zed's config syntax; no such step is configured.
+JSON has no step at all. Zed uses JSON with comments, so a generic JSON
+formatter would need to distinguish its configuration syntax. No such step
+is configured.
 
 ## Why rumdl, not markdownlint
 
