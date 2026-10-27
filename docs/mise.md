@@ -1,19 +1,17 @@
 # mise
 
 This repo uses [mise](https://mise.jdx.dev) as the tool manager, with separate
-repo-local, global core, macOS and desktop layers:
+repo-local tooling and two global layers: portable core and macOS.
 
-| Layer       | Path                                              | Activation and purpose                                                   |
-| ----------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
-| Repo-local  | `mise.toml` / `mise.lock`                         | Repo checks, hooks, and bootstrap tasks/settings                         |
-| Global core | `mise/config.toml` / `mise/mise.lock`             | Language runtimes, editor, terminal, and CLI tools                       |
-| macOS       | `mise/config.macos.toml` / `mise/mise.macos.lock` | Automatic on macOS; the local Docker CLI, Buildx and Colima/Lima runtime |
-| Desktop     | `mise/config.desktop.toml`                        | Opt-in via `-E desktop`; GUI packages used only by the bootstrap task    |
+| Layer       | Path                                              | Activation and purpose                                  |
+| ----------- | ------------------------------------------------- | ------------------------------------------------------- |
+| Repo-local  | `mise.toml` / `mise.lock`                         | Repo checks, hooks, and bootstrap tasks/settings        |
+| Global core | `mise/config.toml` / `mise/mise.lock`             | Language runtimes, editor, terminal, and CLI tools      |
+| macOS       | `mise/config.macos.toml` / `mise/mise.macos.lock` | Automatic on macOS; Docker/Colima tools, apps and fonts |
 
 `mise/miserc.toml` sets `auto_env = true`, so mise selects the macOS layer
-from the host platform without adding `macos` to `MISE_ENV`. The desktop
-environment remains explicit and can be combined with the automatic platform
-layer.
+from the host platform without adding `macos` to `MISE_ENV`. App installation
+runs explicitly through `global:apps:install` or the repository bootstrap.
 
 The repo-local and global core configs both set:
 
@@ -31,9 +29,9 @@ task.run_auto_install = false
   **A lockfile only counts if it actually reaches the machine.** The global
   core and macOS config files therefore each have a matching `[dotfiles]`
   entry for their lockfile. Without those entries, mise would maintain
-  machine-local locks independently of the committed pins. All six global
-  files (`config.toml`, `mise.lock`, `config.macos.toml`, `mise.macos.lock`,
-  `config.desktop.toml`, and `miserc.toml`) are declared in `mise.toml`. See
+  machine-local locks independently of the committed pins. All five global
+  files (`config.toml`, `mise.lock`, `config.macos.toml`, `mise.macos.lock`
+  and `miserc.toml`) are declared in `mise.toml`. See
   [bootstrap.md](./bootstrap.md#what-gets-symlinked).
 - `disable_backends = ["asdf", "vfox"]` — tools are resolved through mise's
   own backends (aqua, cargo, ubi, etc.) only; no asdf/vfox plugin resolution.
@@ -50,6 +48,10 @@ defined globally never shadows a same-named task in some future project's own
 
 Global (`mise/config.toml`):
 
+- [`Neovim`](https://neovim.io/) — plain terminal editor, pinned to `0.12.5`
+  through `aqua:neovim/neovim`. It uses defaults or machine-local configuration;
+  no editor config is provisioned by this repository. Run `nvim --clean` for
+  the built-in defaults.
 - [`delta`](https://github.com/dandavison/delta) — git diff pager, see
   [git.md](./git.md)
 - Util tools — `bat`, `zoxide`, `eza`, `fd`, `fzf`, `gh`, `glab`,
@@ -61,17 +63,15 @@ Global (`mise/config.toml`):
 - Languages — Rust, Go, Python and Node; uv provides Python package management.
   Zed manages its editor tooling separately; see [langs.md](./langs.md).
 
-Desktop (`mise/config.desktop.toml`, opt-in only — see [bootstrap.md](./bootstrap.md)):
-
-- `kitty`, `font-jetbrains-mono-nerd-font`, `font-geist-mono-nerd-font`
-  (via `brew-cask:`) — see
-  [desktop_tools.md](./desktop_tools.md)
-
 macOS (`mise/config.macos.toml`, loaded automatically):
 
 - Docker CLI and Docker Buildx
 - Colima and its required Lima VM manager
 - The `global:docker:*` lifecycle tasks below
+- Kitty, Zed and the JetBrains Mono/Geist Mono Nerd Fonts use mise's native
+  `brew-cask:` provisioning. `global:apps:install` applies the declarations
+  and is included in `bootstrap:all` on macOS. Homebrew is not required.
+  App and font casks use current versions, separately from mise tool lockfiles.
 
 Repo-local (`mise.toml`):
 

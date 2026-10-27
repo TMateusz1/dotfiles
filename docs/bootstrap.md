@@ -13,8 +13,7 @@ mise run bootstrap:dry-run    # preview the dotfile symlinks specifically
 mise run bootstrap:dotfiles   # apply symlinks — see "What gets symlinked" below
 mise run bootstrap:plugins    # provision oh-my-zsh and Zsh plugins
 mise run bootstrap:zsh-completion  # install mise's generated Zsh completion
-mise run bootstrap:all        # locked tools, then dotfiles + plugins/completion
-mise run bootstrap:all-desktop  # GUI/desktop apps — opt-in, see "Desktop apps" below
+mise run bootstrap:all        # complete setup, including apps and fonts on macOS
 ```
 
 The tasks are thin wrappers (`mise tasks ls` for the full list) — nothing
@@ -25,22 +24,24 @@ dotfile and repo bootstrap operations refuse to clobber a real pre-existing
 file/directory at any target without `--force`.
 
 `bootstrap:all` first completes `bootstrap:tools` (`mise install --locked`),
-then runs the dotfile, plugin and Zsh completion tasks. A failed tool install stops
-provisioning. Automatic tool installation before tasks is disabled in the
-repo-local and global core settings, so status tasks can report missing tools
+then runs the dotfile, plugin and Zsh completion tasks. On macOS it also runs
+`global:apps:install` for apps and fonts. Other platforms skip that step.
+A failed tool install stops provisioning. Automatic tool installation before
+tasks is disabled in the repo-local and global core settings, so status tasks can report missing tools
 and provisioning uses the explicit locked installation step.
 
 Use `mise install --locked` for a fresh checkout or a CI job as well. Missing
 lock metadata should be fixed by updating the appropriate committed lockfile,
 then retrying installation. Locked installs still download artifacts; they
-are not an offline mode. The desktop package provider and plugin repository
-checkouts use their own provisioning declarations, rather than `mise.lock`.
+are not an offline mode. App/font casks use their current published versions,
+while plugin repository checkouts use their declared revisions rather than
+`mise.lock`.
 
 ## Why mise's own feature, not a script
 
 `mise bootstrap` is a whole declarative provisioning subsystem (accounts,
-packages, files, services, repos, dotfiles, ...). We only use two pieces of
-it — `[dotfiles]` and `[bootstrap.repos]` — but using them means every
+packages, files, services, repos, dotfiles, ...). We use `[dotfiles]`,
+`[bootstrap.repos]` and macOS `[bootstrap.packages]`. These make every
 "deferred" placement decision documented across
 [util_tools.md](./util_tools.md)/[core_tools.md](./core_tools.md) (starship's flat `~/.config/starship.toml`, `shell/.zshrc`
 → `~/.zshrc`) is just an ordinary target/source pair — no special-casing
@@ -75,7 +76,6 @@ shorthand.
 "~/.config/mise/mise.lock" = "mise/mise.lock"
 "~/.config/mise/config.macos.toml" = "mise/config.macos.toml"
 "~/.config/mise/mise.macos.lock" = "mise/mise.macos.lock"
-"~/.config/mise/config.desktop.toml" = "mise/config.desktop.toml"
 "~/.config/mise/miserc.toml" = "mise/miserc.toml"
 ```
 
@@ -102,8 +102,8 @@ These tools deliberately use **file** entries instead:
   [core_tools.md#zellij](./core_tools.md#zellij).
 - **mise** — the global setup is managed file-by-file: portable tools use
   `config.toml`/`mise.lock`, the automatically selected macOS Docker layer uses
-  `config.macos.toml`/`mise.macos.lock`; `config.desktop.toml` contains the
-  opt-in desktop packages; and `miserc.toml` enables platform environments
+  `config.macos.toml`/`mise.macos.lock`; the macOS config also contains the
+  app-install task. `miserc.toml` enables platform environments
   early enough for discovery. Every config and lockfile this repo owns is
   symlinked because omitted locks silently become machine-local and can drift.
   `~/.config/mise/` is not symlinked wholesale because it also holds
@@ -155,58 +155,22 @@ reference rather than a fixed one.
 `bootstrap:plugins` applies these repositories through native mise provisioning.
 The former `bootstrap:zsh-plugins` task remains as a compatibility alias.
 
-## Desktop apps
+## macOS apps
 
-```toml
-# mise/config.desktop.toml
-[bootstrap.packages]
-"brew-cask:kitty" = "latest"
-"brew-cask:font-jetbrains-mono-nerd-font" = "latest"
-"brew-cask:font-geist-mono-nerd-font" = "latest"
+`mise/config.macos.toml` declares Kitty, Zed and both Nerd Fonts under
+`[bootstrap.packages]` using `brew-cask:`. Apply all four with:
+
+```sh
+mise run global:apps:install
 ```
 
-GUI apps use the same `mise bootstrap` subsystem, via its `brew-cask:`
-package manager — **no separate Homebrew installation required**. Verified
-directly: hid `brew` entirely from `PATH` and ran `mise bootstrap packages
-apply brew-cask:alacritty --dry-run` anyway — it produced a full install
-plan (cask, app bundle, binary links, shell completions) with no `brew`
-binary present at all. mise fetches cask definitions and performs the
-install itself.
-
-**Deliberately isolated from everything else.** `mise/config.desktop.toml` is
-mise's own "config environment" mechanism — a file loaded *only* when
-`-E desktop` is passed, never by plain `mise install`, `mise bootstrap`, or
-any other task here. Verified directly: `mise bootstrap packages status`
-(no `-E desktop`) reports "nothing configured in `[bootstrap.packages]`" —
-the desktop entries are structurally invisible, not just conventionally
-unused. `bootstrap:all-desktop` is the only task that reaches this file
-(`mise -E desktop bootstrap packages apply`), and it remains opt-in rather
-than a dependency of `bootstrap:all`.
-
-The normal dotfiles bootstrap symlinks this environment layer to
-`~/.config/mise/config.desktop.toml`. `bootstrap:all-desktop` depends on
-`bootstrap:all`, so it fully provisions a new desktop machine before applying
-the desktop packages.
-
-All three package names were confirmed valid by resolving them directly against
-this machine (all already installed via real Homebrew here, unrelated to
-this repo — mise refuses to touch a cask Homebrew already owns, the same
-non-clobbering stance `[dotfiles]` takes toward an occupied target).
-
-Only one file for all desktop/GUI apps for now (kitty + two fonts); split into
-more files only if this grows unwieldy. Not yet extended to Linux
-(`flatpak:`/`flatpak-user:`) or the Mac App Store (`mas:`) — same manager
-system, addable later without restructuring.
-
-**Installing the app (opt-in) and symlinking its config (not opt-in) are
-separate.** `kitty`'s `[dotfiles]` entry lives in the ordinary `mise.toml`
-`[dotfiles]` table above, applied by `bootstrap:dotfiles`/`bootstrap:all`
-same as everything else — only *installing the kitty binary itself* is
-gated behind `bootstrap:all-desktop`. Running `bootstrap:all` without ever
-running `bootstrap:all-desktop` leaves a `~/.config/kitty/` symlink in
-place for an app that isn't installed yet — harmless, just inert until
-kitty is actually installed. See [desktop_tools.md](./desktop_tools.md)
-for kitty's own config.
+`mise run bootstrap:all` includes this task on macOS. Loading the config or
+running `mise install --locked` does not install apps. Mise installs these
+casks directly; Homebrew is not required. Existing Homebrew-owned casks are
+recognized and left under Homebrew management.
+App/font versions are separate from mise's tool lockfiles.
+The Kitty and Zed configs use the ordinary `[dotfiles]` entries; see
+[desktop tools](./desktop_tools.md).
 
 ## Checking the current machine
 

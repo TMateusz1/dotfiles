@@ -3,10 +3,10 @@
 GUI applications — a different category from
 [util_tools.md](./util_tools.md) (small CLI utilities) and
 [core_tools.md](./core_tools.md) (TUI apps you run *inside* a terminal):
-these are the host application itself. Installed opt-in via
-`mise/config.desktop.toml`/`bootstrap:all-desktop`, not the always-loaded
-global mise config — see [bootstrap.md](./bootstrap.md).
-Zed's configuration is managed here; its app is installed separately.
+these are the host applications themselves. `mise/config.macos.toml`
+provisions Kitty, Zed and fonts through mise's native `brew-cask:` provider. Its
+`global:apps:install` task is included in `bootstrap:all` on macOS.
+See [bootstrap.md](./bootstrap.md#macos-apps).
 
 ## kitty
 
@@ -91,8 +91,8 @@ map was also checked to confirm that `Ctrl+Shift+Left/Right` no longer
 trigger Kitty's tab actions. The loader is a handy one-liner for a manual
 spot-check — it's lenient on unknown keys but
 raises a real error on an invalid value for a recognized option. Not wired
-into an automated check, partly because kitty is also opt-in
-(`mise/config.desktop.toml`) and wouldn't reliably be on `PATH` during an ordinary
+into an automated check, partly because kitty is a GUI application
+(installed through native mise cask provisioning) and wouldn't reliably be on `PATH` during an ordinary
 `hk check --all` anyway. After removing the navigation watcher, the real
 loader confirmed `editor .`, no watchers, and no custom `Ctrl+Arrow` mappings.
 
@@ -163,7 +163,7 @@ The editor uses `GeistMono Nerd Font Mono`, matching Kitty's `font_family`;
 the integrated terminal inherits that family from the editor. Zed's existing
 font sizes are kept; Kitty's font size
 uses points, while Zed's uses pixels. The font is installed by the existing
-opt-in desktop bootstrap (`font-geist-mono-nerd-font`).
+macOS app-install task (`font-geist-mono-nerd-font`).
 
 Vim mode stays enabled, with the existing JetBrains base keymap for other
 shortcuts. The selected theme is **Catppuccin Mocha**; Catppuccin Latte is
@@ -686,7 +686,7 @@ Files outside the allowlist are ignored, including the local `prompts/`
 database. They will live physically under this repo once the directory is
 linked, but remain untracked and are not shared between machines. Add an
 explicit allowlist entry before tracking any additional custom config.
-The Zed app is not installed by this repo's desktop bootstrap.
+The Zed app is declared as `brew-cask:zed` in the macOS config.
 
 For an existing installation, preview the directory link with:
 

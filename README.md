@@ -24,13 +24,16 @@ config directory and only individual files are symlinked (e.g.
 
 `shell/.zshrc` (→ `~/.zshrc`) activates the shell integration these tools
 need — see [docs/shell.md](./docs/shell.md).
-The default editor is `zed --wait` when available, otherwise system `vi`.
+On macOS, `mise run bootstrap:all` also installs Kitty, Zed and fonts through
+mise's native `brew-cask:` provisioning. The default editor is `zed --wait` when available,
+otherwise system `vi`.
+Neovim is also available as a plain terminal editor through [mise](./docs/mise.md#tools-currently-pinned).
 
 ## Layout
 
 ```text
 mise.toml, mise.lock   # repo checks, hooks, and bootstrap settings/tasks
-mise/                  # shared tools + macOS + opt-in desktop layers → ~/.config/mise/
+mise/                  # shared tools + macOS tools/apps → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
 zellij/                # Catppuccin Mocha, blue/green ribbons, lazygit popup (see docs/core_tools.md#zellij)

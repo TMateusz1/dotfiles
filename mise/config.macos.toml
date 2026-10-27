@@ -1,5 +1,11 @@
-# Automatically loaded on macOS via mise/miserc.toml. This layer owns the
-# local Docker runtime; environments that provide Docker use core alone.
+# Automatically loaded on macOS via mise/miserc.toml.
+# macOS tools and apps live here; portable tools stay in config.toml.
+
+[bootstrap.packages]
+"brew-cask:kitty" = "latest"
+"brew-cask:zed" = "latest"
+"brew-cask:font-jetbrains-mono-nerd-font" = "latest"
+"brew-cask:font-geist-mono-nerd-font" = "latest"
 
 [tools]
 "aqua:lima-vm/lima" = "2.2.0" # VM manager required by Colima
@@ -49,3 +55,7 @@ run = [
 [tasks."global:docker:ssh"]
 description = "Open an interactive shell in the Colima VM"
 run = "colima ssh"
+
+[tasks."global:apps:install"]
+description = "Install macOS apps and fonts through mise cask provisioning"
+run = "mise bootstrap packages apply"

@@ -10,6 +10,7 @@ task.run_auto_install = false
 # Projects may override pins in their own mise.toml using the same tool keys.
 
 # Terminal apps
+"aqua:neovim/neovim" = "0.12.5"         # Terminal editor (binary only)
 "aqua:zellij-org/zellij" = "0.45.1"     # Terminal workspace
 "aqua:ClementTsang/bottom" = "0.14.9"   # System monitor (btm)
 "aqua:jesseduffield/lazygit" = "0.65.1" # Git TUI
