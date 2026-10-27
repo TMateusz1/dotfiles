@@ -116,7 +116,18 @@ if command -v rg >/dev/null 2>&1; then
 fi
 
 if command -v zellij >/dev/null 2>&1; then
-  alias za="zellij attach --create"
+  unalias za 2>/dev/null
+  function za() {
+    if [[ -n "${ZELLIJ:-}" ]]; then
+      if [[ $# -eq 0 ]]; then
+        zellij action launch-or-focus-plugin zellij:session-manager --floating --move-to-focused-tab
+      else
+        zellij action switch-session "$@"
+      fi
+    else
+      zellij attach --create "$@"
+    fi
+  }
   alias zs="zellij -l welcome"
 fi
 

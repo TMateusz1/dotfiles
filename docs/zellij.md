@@ -1,7 +1,7 @@
 # Zellij key reference
 
 This reference follows [the checked-in config](../zellij/config.kdl) for
-Zellij 0.45.1. The bottom status bar only shows a subset of these bindings.
+Zellij 0.45.1. The built-in bottom status bar shows a subset of these bindings.
 For installation and theme notes, see [core tools](./core_tools.md#zellij).
 
 `Ctrl+p → r` means press Ctrl+p, release it, then press r. Keys in the
@@ -113,9 +113,18 @@ floating pane, 80% wide and tall; `q` closes it.
 
 Zellij's [available modes](https://zellij.dev/documentation/keybindings-modes)
 are fixed, so the personal group reuses `tmux` mode and appears as TMUX
-in the status bar. The former tmux compatibility bindings are removed;
+in the built-in status bar. Its custom `g` and `l` actions still work, but
+the built-in bar does not display descriptions for them.
+The former tmux compatibility bindings are removed;
 Ctrl+b passes through to the application in Normal. Ctrl+o stays Session mode.
 Add future personal bindings to the `tmux` block in the checked-in config.
+
+## Bottom status bar
+
+The `status-bar` alias uses the built-in `zellij:status-bar` plugin, with this
+repository's Catppuccin Mocha theme. The native mode ribbons and hints need
+no additional plugin or permissions. Plugin-alias changes take effect in a
+new session.
 
 ## Shared shortcuts
 
@@ -169,5 +178,6 @@ resizing and pane extraction were checked against upstream documentation;
 Ctrl+Arrow pane navigation, Ctrl+Shift+Left/Right tab switching, and the
 personal Ctrl+l group were validated by loading the checked-in config
 with `zellij --config zellij/config.kdl setup --check` on Zellij 0.45.1.
-The personal group's interactive behavior still needs a regular-terminal
-check; the disposable PTY probe produced no rendered output here.
+The personal group's clear/redraw and lazygit popup actions were also checked
+in an isolated PTY session. The restored built-in status-bar alias was accepted
+by `setup --check`; the keybindings are unchanged.

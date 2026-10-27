@@ -149,7 +149,8 @@ centered floating pane, 80% wide and tall, using the focused pane's current
 directory. Both actions return to Normal. Exit lazygit with `q` to close
 the popup. Esc, Enter, Ctrl+c, or Ctrl+l cancels the group.
 Zellij has fixed modes, so this group replaces tmux compatibility mode
-and is still labeled TMUX in the status bar. Ctrl+b passes through in Normal;
+and is labeled TMUX in the built-in status bar. The custom `g` and `l`
+actions work without descriptions in that bar. Ctrl+b passes through in Normal;
 Ctrl+o remains Session mode. In Locked mode, Ctrl+l passes through directly.
 Modes, layouts and other behavior otherwise use Zellij's defaults.
 See the [complete Pane/Tab key reference](./zellij.md), including stack
@@ -160,8 +161,10 @@ mise `[dotfiles]` provisioning. Only the file is linked because Zellij's
 configuration UI can write settings/backups. Other files under `zellij/`
 are ignored; session data stays in Zellij's own cache/data directories.
 
-Start with `zellij`, or attach/create a named session with
-`zellij attach --create work` (`za work` with this repo's Zsh config).
+Start with `zellij`, or use `za work` with this repo's Zsh config. Outside
+Zellij it attaches/creates with `zellij attach --create work`; inside it
+uses `zellij action switch-session work` to switch the current client.
+Bare `za` inside a session opens the floating session manager.
 To start at the session manager, use `zellij -l welcome` (`zs` in Zsh): the built-in
 welcome screen lets you select a running session, resurrect an exited
 session, or create a new one. Inside a session, use `Ctrl+o`, then `w`.
@@ -183,7 +186,6 @@ See [Zellij](https://zellij.dev/) and the
 
 **Validation:** Zellij 0.45.1 accepted the custom theme and personal Ctrl+l
 group (`l` sends byte 12; `g` runs lazygit) with `setup --check`.
-Markdown lint and `git diff --check` passed. The live config path is linked
-to this repository. A disposable PTY probe produced no rendered output in
-the agent environment, so the blue/green appearance needs a visual check
-in a regular terminal.
+The personal group's clear/redraw and lazygit popup actions were checked in
+an isolated PTY session. The built-in `zellij:status-bar` alias is restored
+and accepted by `setup --check`. See [status bar](./zellij.md#bottom-status-bar).

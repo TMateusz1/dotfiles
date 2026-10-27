@@ -69,10 +69,14 @@ not this file's — this doc only covers what's *in* `.zshrc`.
   when inherited from a parent shell. fzf's init (`source <(fzf --zsh)`)
   binds `Ctrl-R` to `fzf-history-widget` in the emacs, vi insert and vi
   command keymaps. `Ctrl-F` remains a shortcut to the same widget.
-- `alias za="zellij attach --create"` creates or attaches to a named Zellij
-  session, e.g. `za work`, when Zellij is installed. To start with the
-  session manager instead, use `zs` (`zellij -l welcome`); see
-  [core tools](./core_tools.md#zellij).
+- `za work` uses `zellij attach --create work` outside Zellij and
+  `zellij action switch-session work` inside it, switching the current client
+  without nesting another Zellij. Inside a session, bare `za` opens the
+  floating session manager; outside, it keeps native attach/create behavior.
+  Quote names containing spaces, e.g. `za "new session"`. Reloading this file
+  removes the former `za` alias before defining the function.
+  `zs` (`zellij -l welcome`) opens the welcome screen from outside Zellij;
+  see [core tools](./core_tools.md#zellij).
 
 ## Native Zsh history
 
