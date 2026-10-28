@@ -141,7 +141,11 @@ omitted components fall back to Zellij's defaults rather than inherit Catppuccin
 The custom name matters: Zellij 0.45.1 loads built-in themes after inline
 definitions, replacing any inline theme with the same name.
 **Ctrl+Arrow** focuses the pane in that direction in every mode except
-Locked, staying within the current tab. **Ctrl+Shift+Left/Right** switches
+Locked. At the left/right edge, **Ctrl+Left/Right** switches to the
+previous/next tab; **Ctrl+Up/Down** stays within the current tab.
+**Alt+Arrow** passes through to the focused application for its own text
+navigation. **Ctrl+Shift+Left/Right** or
+**`Ctrl+Shift+[` / `Ctrl+Shift+]`** switches
 to the previous/next tab, also in every mode except Locked. **`Ctrl+l`**
 enters the personal bindings group: **`l`** sends Ctrl+l to the focused
 application for clear/redraw, and **`g`** opens [lazygit](#lazygit) in a

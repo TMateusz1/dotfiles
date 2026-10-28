@@ -31,8 +31,9 @@ left`, a handful of `cmd+N` tab-switching binds, `F5`/`F6` horizontal/vertical
 splits, and remapped `enter` combos (shift/alt/ctrl/ctrl+shift) sent as proper
 CSI-u sequences for apps that distinguish them.
 
-`Ctrl+Shift+Left/Right` are unmapped with `no_op` so Kitty passes them to
-Zellij for previous/next tab navigation. Kitty's own tabs remain accessible
+`Ctrl+Shift+Left/Right` and `Ctrl+Shift+[` / `Ctrl+Shift+]` are unmapped with
+`no_op` so Kitty passes them to Zellij for previous/next tab navigation.
+Kitty's own tabs remain accessible
 with `Cmd+1` through `Cmd+5`. Reload Kitty's config with `Ctrl+Shift+F5`
 after changing these bindings. See
 [Kitty's shortcut unmapping](https://sw.kovidgoyal.net/kitty/mapping/#unmapping-default-shortcuts).
@@ -62,7 +63,9 @@ is preferred.
 ### Pane navigation
 
 Zellij owns terminal pane navigation. `Ctrl+Arrow` reaches Zellij directly;
-`Ctrl+Shift+Left/Right` also passes through for tab switching. Kitty keeps
+at the left/right edge it switches tabs. `Alt+Arrow` passes through Zellij
+to the focused application for text navigation. `Ctrl+Shift+Left/Right`
+and `Ctrl+Shift+[` / `Ctrl+Shift+]` also pass through for tab switching. Kitty keeps
 its native window navigation and the configured `F5`/`F6` split shortcuts.
 No custom navigation kitten or watcher is installed.
 See [Zellij keybindings](./zellij.md).
@@ -344,6 +347,11 @@ programmer layout. New terminal creation is separate from `Cmd-2` focus/toggle.
 
 ### Pane and dock navigation
 
+`Ctrl-Shift-[` / `Ctrl-Shift-]` activate the previous/next tab in the focused
+pane, in tab-bar order. They work in all Vim modes and integrated terminals.
+The macOS keymap spells these as `ctrl-{` / `ctrl-}` on the standard US/Polish
+programmer layout, following [Zed's shifted-punctuation syntax](https://zed.dev/docs/key-bindings#keybinding-syntax).
+
 `Ctrl-h/j/k/l` focus the visible pane or dock to the left/below/above/right.
 They work in Vim normal and visual modes, empty panes, dock panels (including
 their text fields) and the integrated terminal. Hidden docks remain closed;
@@ -356,6 +364,9 @@ They also work in editor insert mode, on the tab bar and in dock input fields.
 Central picker/search-input bindings retain their own handling.
 These shortcuts focus visible areas; use `Space Space` or `Cmd-E`
 to select a tab within or across panes.
+Unlike Zellij's `Ctrl-Left/Right`, Zed 1.25.3 does not switch tabs at the edge.
+Use `Ctrl-Shift-[` / `Ctrl-Shift-]` to switch tabs directly in either tool.
+`Option-Left/Right` retains the editor's native word/subword navigation.
 
 In the terminal both `Ctrl-h/j/k/l` and `Ctrl-Left/Down/Up/Right` are reserved
 for Zed navigation, including when a terminal application is running; they

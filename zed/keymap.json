@@ -154,6 +154,15 @@
     }
   },
   {
+    // Ctrl-Shift-[ / ] cycle tabs; shifted punctuation is written as { / }.
+    "context": "(Pane || (Editor && mode == full) || Terminal) && !menu",
+    "use_key_equivalents": true,
+    "bindings": {
+      "ctrl-{": "pane::ActivatePreviousItem",
+      "ctrl-}": "pane::ActivateNextItem"
+    }
+  },
+  {
     // Move one central tab and follow it; dock focus must not move unrelated tabs.
     "context": "(Pane || (Editor && mode == full) || Terminal) && !Dock && !menu",
     "bindings": {

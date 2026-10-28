@@ -201,16 +201,18 @@ in Locked mode. Switching modes takes effect immediately.
 | `Ctrl+g`          | Enter Locked mode; press it again to unlock      |
 | `Ctrl+l`          | Enter the personal bindings group                |
 | `Ctrl+q`          | Quit the session and stop its programs           |
-| `Ctrl+←`          | Focus left within the current tab                |
-| `Ctrl+→`          | Focus right within the current tab               |
+| `Ctrl+←`          | Focus left, or switch tab at the left edge       |
+| `Ctrl+→`          | Focus right, or switch tab at the right edge     |
 | `Ctrl+↓`          | Focus downward; navigate down a stack            |
 | `Ctrl+↑`          | Focus upward; navigate up a stack                |
 | `Ctrl+Shift+←`    | Go to the previous tab                           |
 | `Ctrl+Shift+→`    | Go to the next tab                               |
-| `Alt+←` / `Alt+h` | Focus left, or switch tab at the left edge       |
-| `Alt+→` / `Alt+l` | Focus right, or switch tab at the right edge     |
-| `Alt+↓` / `Alt+j` | Focus downward                                   |
-| `Alt+↑` / `Alt+k` | Focus upward                                     |
+| `Ctrl+Shift+[`    | Go to the previous tab                           |
+| `Ctrl+Shift+]`    | Go to the next tab                               |
+| `Alt+h`           | Focus left, or switch tab at the left edge       |
+| `Alt+l`           | Focus right, or switch tab at the right edge     |
+| `Alt+j`           | Focus downward                                   |
+| `Alt+k`           | Focus upward                                     |
 | `Alt+n`           | Open a pane with automatic placement             |
 | `Alt+f`           | Toggle the floating layer                        |
 | `Alt++` / `Alt+=` | Increase size automatically                      |
@@ -224,9 +226,15 @@ Kitty uses `macos_option_as_alt left`: on macOS, use left Option for these
 Alt shortcuts. Right Option retains native character input. After changing
 this setting, fully quit and reopen Kitty; a config reload does not apply it.
 
-Kitty's default `Ctrl+Shift+Left/Right` bindings switch Kitty tabs and
-intercept those keys before Zellij receives them. This repo's Kitty config
-unmaps both shortcuts so they pass through. Reload Kitty's config with
+`Alt+Arrow` is unbound in Zellij and passes through to the focused application,
+including shells and Codex, for its own text navigation. `Ctrl+Left/Right`
+uses native `MoveFocusOrTab`: a neighboring pane takes priority; at the edge,
+switch to the previous/next tab even when the current tab has multiple panes.
+`Ctrl+Up/Down` only moves between panes.
+
+Kitty's default `Ctrl+Shift+Left/Right` bindings switch Kitty tabs, and
+`Ctrl+Shift+[` / `Ctrl+Shift+]` switch Kitty windows. This repo's Kitty config
+unmaps these shortcuts so they pass through to Zellij. Reload Kitty's config with
 `Ctrl+Shift+F5` to apply that change.
 
 ## Validation
@@ -246,4 +254,11 @@ colors, directory and branch updates, the clock, native mode hints, new tabs,
 swap layouts, narrow windows, and the lazygit popup were checked there.
 Arrow ribbon colors, mouse tab switching, and the `+` button opening exactly
 one new tab per click were also checked in a temporary session.
+Both `Ctrl+Shift+[` / `Ctrl+Shift+]` and `Ctrl+Shift+Left/Right` switched tabs
+in an isolated PTY session; Kitty's config loader confirmed the bracket
+shortcuts were unmapped, and its encoder produced the tested CSI-u sequences.
+The `Ctrl+Left/Right` pane-first navigation and tab switching at the edges,
+vertical pane navigation without tab switching, and both bracket shortcuts
+passed in an isolated Zellij 0.45.1 PTY session. A raw input receiver in the
+focused pane received all four `Alt+Arrow` sequences with the Alt modifier.
 No custom KDL validator is maintained.
