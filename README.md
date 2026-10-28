@@ -22,8 +22,10 @@ exception (documented in that tool's entry under `docs/`, e.g.
 config directory and only individual files are symlinked (e.g.
 [Zellij](./docs/core_tools.md#zellij)).
 
-`shell/.zshrc` (→ `~/.zshrc`) activates the shell integration these tools
-need — see [docs/shell.md](./docs/shell.md).
+`shell/.zshenv` makes mise available to non-interactive SSH processes;
+`shell/.zprofile` loads mise shims for IDEs, and `shell/.zshrc` activates
+interactive shell integrations.
+See [docs/shell.md](./docs/shell.md).
 On macOS, `mise run bootstrap:all` also installs Kitty, Zed and fonts through
 mise's native `brew-cask:` provisioning. The default editor is `zed --wait` when available,
 otherwise system `vi`.
@@ -35,7 +37,7 @@ Neovim is also available as a plain terminal editor through [mise](./docs/mise.m
 mise.toml, mise.lock   # repo checks, hooks, and bootstrap settings/tasks
 mise/                  # shared tools + macOS tools/apps → ~/.config/mise/
 git/                   # git config → ~/.config/git/
-shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
+shell/                 # .zshenv + .zprofile + .zshrc → ~/ (SSH, IDEs, interactive setup; docs/shell.md)
 zellij/                # tmux-style top bar, Git branch, native bottom hints, lazygit popup (see docs/core_tools.md#zellij)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/

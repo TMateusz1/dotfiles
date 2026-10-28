@@ -34,7 +34,7 @@ local linters = new Mapping<String, Step> {
   // an rc file that legitimately sources dynamic/generated content
   // (oh-my-zsh, .zshrc.local, fzf's own init).
   ["zshrc-check"] {
-    glob = "shell/.zshrc"
+    glob = List("shell/.zshenv", "shell/.zprofile", "shell/.zshrc")
     check = "shellcheck --shell=bash --exclude=SC1090,SC1091 {{files}}"
   }
 }

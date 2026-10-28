@@ -134,6 +134,20 @@ The root `.gitignore` allows only these files under `zed/`:
 and native Vim editing. `tasks.json` contains Go/Rust test commands that save
 all edited buffers before running and bind to the native runnable tags.
 
+### Remote mise and hk environment
+
+In an SSH project, Git and its hooks run on the remote machine. A hook error
+`zsh: command not found: mise` means the remote process cannot find the mise
+executable; it has not reached project tool/environment resolution yet.
+The shared `shell/.zshenv` makes the standard `~/.local/bin` installation
+visible to non-interactive Zsh; `shell/.zprofile` loads mise's official shims
+integration for GUI editors. `.zshrc` retains full interactive activation.
+These are shared shell/tool integrations, not Zed-specific hook wrappers.
+Apply the startup files on the affected remote machine and restart/reconnect
+the remote server. See
+[deployment and PATH details](./shell.md#zed-remote-and-git-hooks).
+Local Zed settings and local mise installation do not supply remote binaries.
+
 ### Keyboard model and backup
 
 `base_keymap = "JetBrains"` supplies the macOS IDE shortcuts; `vim_mode = true`

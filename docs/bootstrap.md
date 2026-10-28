@@ -47,6 +47,14 @@ packages, files, services, repos, dotfiles, ...). We use `[dotfiles]`,
 → `~/.zshrc`) is just an ordinary target/source pair — no special-casing
 logic needed, and no restructuring of this repo's existing directory names.
 
+The shell files map individually to `~/.zshenv`, `~/.zprofile`, and `~/.zshrc`.
+They supply the minimal SSH environment, mise shims for IDEs, and interactive
+integrations respectively. Provision them on the machine running the tools
+and Git hooks. Existing `.zprofile` login setup can be preserved in
+`~/.zprofile.local`, which the shared profile sources before loading shims.
+Resolve existing-file conflicts rather than forcing replacement. See
+[Shell environment and IDEs](./shell.md).
+
 **A key fact this relies on:** relative dotfile `source` paths resolve
 against *the directory of the config file that declares the entry* — not
 against `dotfiles.root`. So `mise.toml` declaring `"~/.zshrc" =
@@ -60,6 +68,8 @@ shorthand.
 
 ```toml
 [dotfiles]
+"~/.zshenv" = "shell/.zshenv"
+"~/.zprofile" = "shell/.zprofile"
 "~/.zshrc" = "shell/.zshrc"
 "~/.config/zellij/config.kdl" = "zellij/config.kdl"
 "~/.config/starship.toml" = "starship/starship.toml"

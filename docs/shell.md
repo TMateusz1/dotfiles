@@ -1,17 +1,73 @@
-# Shell (`shell/.zshrc`)
+# Shell environment and IDEs
 
-`shell/.zshrc` maps to **`~/.zshrc`** — a flat file directly in `$HOME`,
-*not* an XDG path. zsh only looks elsewhere (e.g. under
-`$XDG_CONFIG_HOME/zsh/`) if `$ZDOTDIR` is set before zsh starts, normally
-from `/etc/zshenv` or `~/.zshenv` — neither exists in this repo, so the
-real, current target is `~/.zshrc`. Same shape of exception as
-[starship](./util_tools.md#starship).
+The three files map individually to **`~/.zshenv`**, **`~/.zprofile`**, and
+**`~/.zshrc`**, directly in `$HOME` rather than under XDG. This setup does not
+set `ZDOTDIR`; if a machine sets it elsewhere, Zsh looks for the files there.
 
-This is the file that activates the "shell integration" pieces documented
+`.zshenv` supplies the minimal environment for every Zsh invocation, including
+non-interactive SSH commands used to start Zed's remote server. It adds the
+existing `~/.local/bin` directory to `PATH`, where the standard mise installer
+puts `mise`, and deduplicates the path. Appending preserves any project tool
+directories already selected by `mise exec`. It starts no processes, prints
+nothing, and does not load prompt plugins, project tools, or interactive hooks.
+
+`.zprofile` follows mise's official IDE integration: it evaluates
+`mise activate zsh --shims` for login shells. Shims resolve a tool against the
+current project's config when the executable is invoked, so GUI editors can
+find project tools without an interactive prompt hook. This is the upstream
+approach for editors including VS Code and JetBrains IDEs; Zed also loads a
+project shell environment. Shims prepare the tool process, not the entire
+editor's environment. See [mise's IDE guide](https://mise.jdx.dev/ide-integration.html)
+and [shims setup](https://mise.jdx.dev/dev-tools/shims.html#add-shims-to-path).
+
+The profile sources `~/.zprofile.local` first for machine-local login setup.
+If an existing `.zprofile` contains package-manager initialization or other
+local settings, preserve those in `.zprofile.local` or merge deliberately
+before provisioning the shared profile. Bootstrap does not force replacement.
+
+`.zshrc` activates the interactive "shell integration" pieces documented
 across [util_tools.md](./util_tools.md) and [core_tools.md](./core_tools.md)
-for individual tools. Getting this file (and oh-my-zsh plus its custom
+for individual tools. Getting these files (and oh-my-zsh plus its custom
 plugins) actually onto a machine is [bootstrap.md](./bootstrap.md)'s job,
-not this file's — this doc only covers what's *in* `.zshrc`.
+not the startup files' job.
+
+The division is deliberate: minimal executable discovery for non-interactive
+SSH, official shims for IDEs, full activation for interactive terminals, and
+explicit `mise exec` for scripts and Git hooks. No editor-specific wrapper,
+project path, or pinned executable path is embedded in the shell startup files.
+
+## Zed Remote and Git hooks
+
+An SSH command can start non-interactive Zsh, which reads `.zshenv` but not
+`.zshrc`. Without the minimal PATH, a remote Git hook launching `mise x -- hk
+run pre-commit --from-hook` can fail with `zsh: command not found: mise` even
+when mise works in an interactive terminal. This failure happens before mise
+can load the project's tools and `[env]`; changing Zed's local terminal
+settings does not fix the remote server's environment. See
+[Zsh startup files](https://zsh.sourceforge.io/Doc/Release/Files.html) and
+[Zed Remote Development](https://zed.dev/docs/remote-development).
+
+Apply the startup files on the affected machine, from its updated dotfiles
+checkout after preserving any existing local profile settings:
+
+```sh
+"$HOME/.local/bin/mise" bootstrap dotfiles apply --yes '~/.zshenv' '~/.zprofile' '~/.zshrc'
+```
+
+Mise must already be installed on that machine. If it lives somewhere other
+than `~/.local/bin`, make that installation directory available to the remote
+shell instead. If `~/.zshenv` already exists, merge the PATH entry into it or
+resolve the provisioning conflict; do not overwrite machine-local settings.
+Restart Zed's remote server/reconnect after applying the file so Git inherits
+the corrected PATH. Each project still needs its own trusted mise config,
+installed tools, and hk hook. `mise exec` resolves that project's environment
+from the Git working directory; no interactive mise activation is needed.
+`hk install --mise` is the upstream-supported per-project hook installation;
+it makes the hook use `mise x` to load the project's tools and `[env]`. The
+installer still needs mise available on the hook's runtime PATH for this
+installation mode. See [hk's mise integration](https://hk.jdx.dev/mise_integration.html).
+
+This change has not been deployed or verified on the affected SSH host.
 
 ## What's configured
 
@@ -102,7 +158,7 @@ by Zsh normally.
 
 ## Validation
 
-`shellcheck --shell=bash` runs against this file (`zshrc-check` in
+`shellcheck --shell=bash` covers all three startup files (`zshrc-check` in
 `hk.pkl`) — shellcheck has no zsh dialect, but `bash` mode produces zero
 false positives against this file's zsh-specific syntax (`path+=`,
 `typeset -U`, etc.) with a scoped `SC2034` suppression for `SAVEHIST`,

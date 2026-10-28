@@ -3,8 +3,10 @@
 Git hooks and lint/format checks are managed by
 [hk](https://hk.jdx.dev), configured in `hk.pkl` (repo root). hk is
 mise-integrated (`HK_MISE = 1` in `mise.toml`): the installed git hook runs
-through `mise x`, so it works even for someone who hasn't activated mise in
-their shell.
+through `mise x`. Interactive activation is unnecessary, but `mise` must be
+on Git's runtime PATH. For non-interactive Zsh over SSH, the shared `.zshenv`
+exposes the standard `~/.local/bin` installation directory. See
+[Zed Remote and Git hooks](./shell.md#zed-remote-and-git-hooks).
 
 ## Setup is automatic
 
@@ -44,7 +46,8 @@ Defined once in `hk.pkl` and shared by the `pre-commit` git hook, `hk check
   [core_tools.md#lazygit](./core_tools.md#lazygit) for why. `.yamlfmt` at
   the repo root sets `retain_line_breaks: true` so intentional blank-line
   section separators (e.g. in `lazygit/config.yml`) survive formatting.
-- **`zshrc-check`** — `shellcheck --shell=bash` (shellcheck has no zsh
+- **`zshrc-check`** — checks `shell/.zshenv`, `shell/.zprofile` and `shell/.zshrc` with
+  `shellcheck --shell=bash` (shellcheck has no zsh
   dialect, but `bash` mode was verified to produce zero false positives
   against this file's zsh-specific syntax while still catching a real
   issue), excluding `SC1090`/`SC1091` (unavoidable noise for an rc file
