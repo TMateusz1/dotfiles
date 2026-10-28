@@ -36,7 +36,7 @@ mise.toml, mise.lock   # repo checks, hooks, and bootstrap settings/tasks
 mise/                  # shared tools + macOS tools/apps → ~/.config/mise/
 git/                   # git config → ~/.config/git/
 shell/                 # shell/.zshrc → ~/.zshrc (see docs/shell.md)
-zellij/                # Catppuccin Mocha, blue/green ribbons, lazygit popup (see docs/core_tools.md#zellij)
+zellij/                # tmux-style top bar, Git branch, native bottom hints, lazygit popup (see docs/core_tools.md#zellij)
 lazygit/               # lazygit config → ~/.config/lazygit/
 bat/                   # bat config → ~/.config/bat/
 eza/                   # eza theme → ~/.config/eza/
@@ -52,18 +52,18 @@ docs/                  # notes on what's configured, and why
 
 ## Tools configured so far
 
-| Topic                                                                       | Docs                                             |
-| --------------------------------------------------------------------------- | ------------------------------------------------ |
-| mise                                                                        | [docs/mise.md](./docs/mise.md)                   |
-| git (+ delta)                                                               | [docs/git.md](./docs/git.md)                     |
-| shell (zsh)                                                                 | [docs/shell.md](./docs/shell.md)                 |
-| Util tools (bat, zoxide, eza, fd, fzf, gh, glab, jq, yq, ripgrep, starship) | [docs/util_tools.md](./docs/util_tools.md)       |
-| Core tools (Zellij, lazygit, k9s, bottom)                                   | [docs/core_tools.md](./docs/core_tools.md)       |
-| Zellij keybindings (panes, tabs, stacks, resize, move, personal group)      | [docs/zellij.md](./docs/zellij.md)               |
-| Desktop tools (kitty, Zed settings)                                         | [docs/desktop_tools.md](./docs/desktop_tools.md) |
-| languages (runtimes, Zed tooling, Kubernetes and Helm)                      | [docs/langs.md](./docs/langs.md)                 |
-| linting / pre-commit (hk)                                                   | [docs/linting.md](./docs/linting.md)             |
-| bootstrap (symlinks, Zsh integration, desktop apps)                         | [docs/bootstrap.md](./docs/bootstrap.md)         |
+| Topic                                                                         | Docs                                             |
+| ----------------------------------------------------------------------------- | ------------------------------------------------ |
+| mise                                                                          | [docs/mise.md](./docs/mise.md)                   |
+| git (+ delta)                                                                 | [docs/git.md](./docs/git.md)                     |
+| shell (zsh)                                                                   | [docs/shell.md](./docs/shell.md)                 |
+| Util tools (bat, zoxide, eza, fd, fzf, gh, glab, jq, yq, ripgrep, starship)   | [docs/util_tools.md](./docs/util_tools.md)       |
+| Core tools (Zellij, lazygit, k9s, bottom)                                     | [docs/core_tools.md](./docs/core_tools.md)       |
+| Zellij bars and keybindings (Git branch, panes, tabs, stacks, personal group) | [docs/zellij.md](./docs/zellij.md)               |
+| Desktop tools (kitty, Zed settings)                                           | [docs/desktop_tools.md](./docs/desktop_tools.md) |
+| languages (runtimes, Zed tooling, Kubernetes and Helm)                        | [docs/langs.md](./docs/langs.md)                 |
+| linting / pre-commit (hk)                                                     | [docs/linting.md](./docs/linting.md)             |
+| bootstrap (symlinks, Zsh integration, desktop apps)                           | [docs/bootstrap.md](./docs/bootstrap.md)         |
 
 For editor shortcuts, language support, formatting and test tasks, see
 [Zed](./docs/desktop_tools.md#zed). Runtimes and compilers are pinned by mise;

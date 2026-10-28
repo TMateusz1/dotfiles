@@ -37,6 +37,15 @@ with `Cmd+1` through `Cmd+5`. Reload Kitty's config with `Ctrl+Shift+F5`
 after changing these bindings. See
 [Kitty's shortcut unmapping](https://sw.kovidgoyal.net/kitty/mapping/#unmapping-default-shortcuts).
 
+`Ctrl+Backspace` sends an unmodified `Delete` when the focused terminal title
+matches Zellij's `<session> | Session Manager`. This adds a Mac-friendly
+delete-session shortcut alongside the plugin's original `Delete`, including
+the welcome screen. The conditional mapping leaves `Ctrl+Backspace` unchanged
+outside that manager. Zellij 0.45.1 hardcodes the plugin's delete binding;
+it cannot be extended through its KDL keybindings. Reload Kitty with
+`Ctrl+Shift+F5` after changing the mapping. See
+[conditional mappings](https://sw.kovidgoyal.net/kitty/mapping/#conditional-mappings-depending-on-the-state-of-the-focused-window).
+
 On macOS, left Option sends Alt shortcuts to terminal applications, including
 Zellij; right Option retains native character input. This setting requires
 a full Kitty restart rather than a config reload. See
@@ -95,6 +104,16 @@ into an automated check, partly because kitty is a GUI application
 (installed through native mise cask provisioning) and wouldn't reliably be on `PATH` during an ordinary
 `hk check --all` anyway. After removing the navigation watcher, the real
 loader confirmed `editor .`, no watchers, and no custom `Ctrl+Arrow` mappings.
+The real Kitty loader resolved the conditional `Ctrl+Backspace` mapping to
+`send_key delete`. Kitty's native window-query parser was used to check the
+condition against the session-manager title captured from a temporary Zellij
+0.45.1 session and ordinary shell titles. The expression uses `\s` rather than
+literal spaces: Kitty parses spaces as separators in its match-query syntax.
+Its native key dispatcher was also checked: Ctrl+Backspace produced the plain
+Delete sequence (`ESC [ 3 ~`) for the manager title and passed through for a
+shell title. These checks exercise parsing and key emission without a GUI;
+they do not establish successful session deletion in the session-manager UI.
+No global Ctrl+Backspace remapping is configured.
 
 ## Zed
 

@@ -268,6 +268,56 @@ keybinds clear-defaults=true {
 plugins {
     about location="zellij:about"
     compact-bar location="zellij:compact-bar"
+    // tmux-style context on top; native mode/shortcut hints stay on the bottom.
+    // Zellij downloads/caches this pinned release outside the repository.
+    tab-bar location="https://github.com/dj95/zjstatus/releases/download/v0.25.0/zjstatus.wasm" {
+        format_left "#[fg=#1e1e2e,bg=#89b4fa]#[fg=#11111b,bg=#89b4fa,bold] {session} #[fg=#89b4fa,bg=#1e1e2e]#[bg=#1e1e2e] {tabs}{command_newtab}"
+        format_right "{command_directory}{command_git_branch}{datetime}"
+        format_space "#[bg=#1e1e2e]"
+        format_hide_on_overlength "true"
+        format_precedence "lrc"
+        border_enabled "false"
+        hide_frame_for_single_pane "false"
+
+        // Native-style arrow ribbons: Blue inactive tabs, Green active tab.
+        tab_normal "#[fg=#1e1e2e,bg=#89b4fa]#[fg=#181825,bg=#89b4fa] {index} {name}{sync_indicator}{fullscreen_indicator}{floating_indicator}{bell_indicator} #[fg=#89b4fa,bg=#1e1e2e]"
+        tab_active "#[fg=#1e1e2e,bg=#a6e3a1]#[fg=#181825,bg=#a6e3a1,bold] {index} {name}{sync_indicator}{fullscreen_indicator}{floating_indicator}{bell_indicator} #[fg=#a6e3a1,bg=#1e1e2e]"
+        tab_rename "#[fg=#1e1e2e,bg=#a6e3a1]#[fg=#181825,bg=#a6e3a1,bold] {index} {name} #[fg=#a6e3a1,bg=#1e1e2e]"
+        tab_separator ""
+        tab_sync_indicator " SYNC"
+        tab_fullscreen_indicator " 󰍉"
+        tab_floating_indicator " FLOAT"
+        tab_bell_indicator " !"
+        tab_display_count "5"
+        tab_truncate_start_format "#[fg=#1e1e2e,bg=#89b4fa]#[fg=#181825,bg=#89b4fa] ← +{count} #[fg=#89b4fa,bg=#1e1e2e]"
+        tab_truncate_end_format "#[fg=#1e1e2e,bg=#89b4fa]#[fg=#181825,bg=#89b4fa] +{count} → #[fg=#89b4fa,bg=#1e1e2e]"
+
+        // Render once; clicking + opens a tab in this Zellij session.
+        command_newtab_command "printf +"
+        command_newtab_format "#[fg=#1e1e2e,bg=#89b4fa]#[fg=#181825,bg=#89b4fa,bold] + #[fg=#89b4fa,bg=#1e1e2e]"
+        command_newtab_interval "0"
+        command_newtab_rendermode "static"
+        command_newtab_clickaction "zellij action new-tab"
+
+        command_directory_command "sh -c 'basename \"$PWD\"'"
+        command_directory_cwd "{focused_pane_cwd}"
+        command_directory_format "#[fg=#1e1e2e,bg=#313244]#[fg=#a6adc8,bg=#313244] 󰉋 {stdout} #[fg=#313244,bg=#1e1e2e]"
+        command_directory_interval "3"
+        command_directory_rendermode "static"
+        command_directory_hideonemptystdout "true"
+
+        // Follow the focused pane; show a short commit when HEAD is detached.
+        command_git_branch_command "sh -c 'git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null'"
+        command_git_branch_cwd "{focused_pane_cwd}"
+        command_git_branch_format "#[fg=#1e1e2e,bg=#fab387]#[fg=#181825,bg=#fab387]  {stdout} #[fg=#fab387,bg=#1e1e2e]"
+        command_git_branch_interval "3"
+        command_git_branch_rendermode "static"
+        command_git_branch_hideonemptystdout "true"
+
+        datetime "#[fg=#1e1e2e,bg=#89b4fa]#[fg=#11111b,bg=#89b4fa,bold] 󰥔 {format} #[fg=#89b4fa,bg=#1e1e2e]"
+        datetime_format "%H:%M  %d/%m/%Y"
+        datetime_timezone "Europe/Warsaw"
+    }
     configuration location="zellij:configuration"
     filepicker location="zellij:strider" {
         cwd "/"
@@ -276,7 +326,6 @@ plugins {
     session-manager location="zellij:session-manager"
     status-bar location="zellij:status-bar"
     strider location="zellij:strider"
-    tab-bar location="zellij:tab-bar"
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
     }
@@ -470,7 +519,7 @@ themes {
 // The name of the default layout to load on startup
 // Default: "default"
 //
-// default_layout "compact"
+default_layout "default"
 
 // The folder in which Zellij will look for layouts
 // (Requires restart)

@@ -1,7 +1,7 @@
 # Zellij key reference
 
 This reference follows [the checked-in config](../zellij/config.kdl) for
-Zellij 0.45.1. The built-in bottom status bar shows a subset of these bindings.
+Zellij 0.45.1. The native bottom status bar shows modes and shortcut hints.
 For installation and theme notes, see [core tools](./core_tools.md#zellij).
 
 `Ctrl+p → r` means press Ctrl+p, release it, then press r. Keys in the
@@ -113,18 +113,77 @@ floating pane, 80% wide and tall; `q` closes it.
 
 Zellij's [available modes](https://zellij.dev/documentation/keybindings-modes)
 are fixed, so the personal group reuses `tmux` mode and appears as TMUX
-in the built-in status bar. Its custom `g` and `l` actions still work, but
-the built-in bar does not display descriptions for them.
+in the native bottom status bar. Its custom `g` and `l` actions still work;
+the bar does not display descriptions for them.
 The former tmux compatibility bindings are removed;
 Ctrl+b passes through to the application in Normal. Ctrl+o stays Session mode.
 Add future personal bindings to the `tmux` block in the checked-in config.
 
+## Top bar: session, tabs, directory, branch, and clock
+
+The built-in `default` layout places the custom context bar at the top and
+Zellij's native mode/shortcut bar at the bottom. The `tab-bar` alias uses
+[zjstatus 0.25.0](https://github.com/dj95/zjstatus/releases/tag/v0.25.0), downloaded
+and cached by Zellij from the versioned URL in `zellij/config.kdl`.
+Built-in `Alt+[` / `Alt+]` swap layouts remain available.
+
+```text
+dotfiles  1 shell  2 tests  +                      󰉋 dotfiles   main  󰥔 12:34  28/10/2026
+```
+
+The session and tabs are left aligned; the directory, branch, and clock are
+right aligned. The style follows the old tmux bar on `main-2026-10-27`:
+Catppuccin Mocha Base with native-style arrow ribbons for every segment.
+The session and Warsaw clock use Blue, the directory uses Surface 0 with
+light text, and the branch uses Peach with dark text. Tabs use Green for the
+active tab and Blue for inactive tabs, with dark labels. The Blue `+` ribbon after
+the tabs opens a new tab when clicked; `Ctrl+t → n` remains the keyboard shortcut.
+The top bar contains no resource metrics or mode badges.
+
+Tabs retain synchronized-input, fullscreen, floating-pane and bell indicators.
+Up to five tabs appear around the active tab. When the sections would overlap,
+the right section hides to preserve the session and tabs. zjstatus does not
+manage pane frames. The native datetime widget uses `Europe/Warsaw` and
+`HH:MM  DD/MM/YYYY`.
+
+Directory and Git context follow the focused pane and refresh every three
+seconds. The Git segment hides outside repositories; detached HEAD shows a
+short commit. Output uses static formatting so branch names are displayed as
+text. Directory changes rely on OSC 7 reporting, already supplied by this
+setup's Oh My Zsh `precmd` hook. A plain shell without that integration can
+retain its previous directory until pane focus changes.
+
+The existing `~/.config/zellij/config.kdl` symlink provisions the entire setup;
+no extra layout file, helper script or bootstrap step is needed. Start a new
+session to load the layout and plugin configuration. On first load, if prompted,
+click the top row and press `y` to allow `ReadApplicationState` (tabs and
+focused-pane context), `ChangeApplicationState` (clickable tabs), and
+`RunCommands` (Git/directory commands and the `+` button's new-tab action).
+Zellij remembers the grant locally;
+a new plugin URL/version or cleared cache can require it again. The first
+download needs internet access. See the
+[upstream configuration guide](https://github.com/dj95/zjstatus/wiki/3-%E2%80%90-Configuration)
+for formatting and widgets.
+
 ## Bottom status bar
 
-The `status-bar` alias uses the built-in `zellij:status-bar` plugin, with this
-repository's Catppuccin Mocha theme. The native mode ribbons and hints need
-no additional plugin or permissions. Plugin-alias changes take effect in a
-new session.
+The `status-bar` alias remains the built-in `zellij:status-bar` plugin, with
+this repository's Catppuccin Mocha theme. It shows the native mode ribbons
+and contextual shortcut hints at the bottom. Keybindings are unchanged.
+
+## Session manager
+
+Open it with `Ctrl+o → w`, bare `za` inside Zellij, or `zs` outside Zellij.
+Select a session and press **Delete** or **Ctrl+Backspace** to remove it.
+For a running session this stops its processes; for an exited session it
+deletes the saved resurrection entry.
+
+The added `Ctrl+Backspace` shortcut is supplied by Kitty: when the terminal
+title is `<session> | Session Manager`, it sends the same Delete key as the
+original shortcut. It also works in the welcome screen. Outside that manager,
+Ctrl+Backspace keeps its normal behavior. Reload Kitty with `Ctrl+Shift+F5`
+to apply this mapping; Zellij does not need restarting. Renaming the manager's
+pane or overriding its terminal title can prevent the conditional match.
 
 ## Shared shortcuts
 
@@ -179,5 +238,12 @@ Ctrl+Arrow pane navigation, Ctrl+Shift+Left/Right tab switching, and the
 personal Ctrl+l group were validated by loading the checked-in config
 with `zellij --config zellij/config.kdl setup --check` on Zellij 0.45.1.
 The personal group's clear/redraw and lazygit popup actions were also checked
-in an isolated PTY session. The restored built-in status-bar alias was accepted
-by `setup --check`; the keybindings are unchanged.
+in an isolated PTY session. The zjstatus 0.25.0 release asset matched its upstream
+SHA-256 (`282ceab219e56e1908c9fac33907241fe6c3e1ef7d85faab3e5f438cef87b8fe`).
+The top-bar alias and default layout passed `setup --check` and loaded in a
+temporary Zellij 0.45.1 session. Top/bottom placement, left/right alignment,
+colors, directory and branch updates, the clock, native mode hints, new tabs,
+swap layouts, narrow windows, and the lazygit popup were checked there.
+Arrow ribbon colors, mouse tab switching, and the `+` button opening exactly
+one new tab per click were also checked in a temporary session.
+No custom KDL validator is maintained.

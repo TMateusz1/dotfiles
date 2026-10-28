@@ -135,9 +135,9 @@ overrides: unselected ribbons use Catppuccin Mocha Blue (`#89b4fa`) instead
 of the pale Text background. Active ribbons retain Mocha Green (`#a6e3a1`).
 Shortcut letters on both backgrounds use Mocha Mantle (`#181825`) instead
 of red, matching the dark labels for better contrast.
-This colors the bottom mode buttons and also the unfocused tabs, which share
-the same ribbon style. The complete theme is included because omitted
-components fall back to Zellij's defaults rather than inherit Catppuccin.
+This colors native Zellij UI components. The top bar uses the same
+Mocha palette, configured separately below. The complete theme is included because
+omitted components fall back to Zellij's defaults rather than inherit Catppuccin.
 The custom name matters: Zellij 0.45.1 loads built-in themes after inline
 definitions, replacing any inline theme with the same name.
 **Ctrl+Arrow** focuses the pane in that direction in every mode except
@@ -148,18 +148,28 @@ application for clear/redraw, and **`g`** opens [lazygit](#lazygit) in a
 centered floating pane, 80% wide and tall, using the focused pane's current
 directory. Both actions return to Normal. Exit lazygit with `q` to close
 the popup. Esc, Enter, Ctrl+c, or Ctrl+l cancels the group.
-Zellij has fixed modes, so this group replaces tmux compatibility mode
-and is labeled TMUX in the built-in status bar. The custom `g` and `l`
-actions work without descriptions in that bar. Ctrl+b passes through in Normal;
+Zellij has fixed modes, so this group replaces tmux compatibility mode and
+is labeled TMUX in the native bottom bar. Ctrl+b passes through in Normal;
 Ctrl+o remains Session mode. In Locked mode, Ctrl+l passes through directly.
-Modes, layouts and other behavior otherwise use Zellij's defaults.
-See the [complete Pane/Tab key reference](./zellij.md), including stack
-splitting, resize/move modes, and shortcuts omitted from the bottom bar.
+
+The default layout has a custom top bar using
+[zjstatus](https://github.com/dj95/zjstatus), pinned to `0.25.0`, and the native
+Zellij mode/shortcut bar at the bottom. The top follows the old tmux styling:
+a Blue session ribbon and tabs on the left; directory, Peach Git branch,
+and a Blue Warsaw clock on the right. Every segment has the same arrow
+shape, including the Surface 0 directory ribbon. The active tab uses
+Green, inactive tabs use Blue, and a clickable Blue `+` ribbon opens a new tab.
+Built-in swap layouts remain
+available. Git context follows the focused pane, refreshes every three seconds,
+and hides outside repositories. Detached HEAD shows a short commit.
+See the [bar setup and key reference](./zellij.md#top-bar-session-tabs-directory-branch-and-clock).
 
 `zellij/config.kdl` maps to **`~/.config/zellij/config.kdl`** through native
 mise `[dotfiles]` provisioning. Only the file is linked because Zellij's
 configuration UI can write settings/backups. Other files under `zellij/`
-are ignored; session data stays in Zellij's own cache/data directories.
+stay ignored; plugin caches and session state stay machine-local.
+Zellij downloads the pinned plugin URL on first use. No helper scripts,
+extra layouts or additional bootstrap entries are needed.
 
 Start with `zellij`, or use `za work` with this repo's Zsh config. Outside
 Zellij it attaches/creates with `zellij attach --create work`; inside it
@@ -186,6 +196,6 @@ See [Zellij](https://zellij.dev/) and the
 
 **Validation:** Zellij 0.45.1 accepted the custom theme and personal Ctrl+l
 group (`l` sends byte 12; `g` runs lazygit) with `setup --check`.
-The personal group's clear/redraw and lazygit popup actions were checked in
-an isolated PTY session. The built-in `zellij:status-bar` alias is restored
-and accepted by `setup --check`. See [status bar](./zellij.md#bottom-status-bar).
+The custom top bar and native bottom hints were loaded in an isolated PTY
+session, including alignment, Git context updates, the clock, new tabs, swap
+layouts, and lazygit popup. See [validation details](./zellij.md#validation).

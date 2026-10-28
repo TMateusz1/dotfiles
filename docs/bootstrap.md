@@ -61,6 +61,7 @@ shorthand.
 ```toml
 [dotfiles]
 "~/.zshrc" = "shell/.zshrc"
+"~/.config/zellij/config.kdl" = "zellij/config.kdl"
 "~/.config/starship.toml" = "starship/starship.toml"
 "~/.config/git" = "git"
 "~/.config/bat" = "bat"
