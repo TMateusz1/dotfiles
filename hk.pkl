@@ -6,8 +6,7 @@ import "package://github.com/jdx/hk/releases/download/v2.1.0/hk@2.1.0#/Builtins.
 // own built-in hygiene utilities below. Formats with no real linter —
 // bat's/fzf's/ripgrep's args files, k9s's YAML *schema*, kitty's
 // config — were hand-verified against the real binary when each was set up
-// (see their docs/ entries), not wired into a bespoke custom step here. JSON has no step: Zed uses JSON with comments.
-// See docs/linting.md.
+// rather than wired into a bespoke check. Zed uses JSON with comments.
 local linters = new Mapping<String, Step> {
   // markdown
   ["rumdl"] = Builtins.rumdl
@@ -15,8 +14,7 @@ local linters = new Mapping<String, Step> {
   ["taplo"] = Builtins.taplo
   ["taplo-format"] = Builtins.taplo_format
   // yaml — format only. No mature, established, static-binary YAML linter
-  // exists yet (the Rust option, ryl, self-describes as still maturing); see
-  // docs/linting.md.
+  // is configured here.
   ["yamlfmt"] = Builtins.yamlfmt
   // repo hygiene — enforces the "never commit secrets" rule from AGENTS.md
   // and catches common accidents, all built into hk (no extra tool installs)

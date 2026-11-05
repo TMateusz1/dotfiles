@@ -1,84 +1,26 @@
 # dotfiles
 
-Personal dotfiles, managed with [mise](https://mise.jdx.dev) and themed
-consistently with [Catppuccin](https://catppuccin.com) (Mocha) throughout.
-Zed pairs that theme with Material icons and a JetBrains/Vim keymap.
-For explicit Java/Kotlin imports, see the [Zed import settings](./docs/desktop_tools.md#java-and-kotlin-imports).
+Personal shell, editor and CLI configuration, managed with
+[mise](https://mise.jdx.dev) and themed with Catppuccin Mocha.
 
-This repo is public — see [AGENTS.md](./AGENTS.md) for the hard rule on
-never committing secrets, and for the full set of conventions this repo
-follows.
+From this repository, with mise installed:
 
-## Status
-
-Symlinking is implemented via mise's own `[dotfiles]`/`[bootstrap.repos]`;
-`mise run bootstrap:status` is the authoritative view of what is applied on
-the current machine. See [docs/bootstrap.md](./docs/bootstrap.md).
-
-Each tool directory is named so that `<tool>/` → normally
-`~/.config/<tool>/`, except where a tool's own target path forces an
-exception (documented in that tool's entry under `docs/`, e.g.
-[starship](./docs/util_tools.md#starship)), or where the tool writes into its own
-config directory and only individual files are symlinked (e.g.
-[Zellij](./docs/core_tools.md#zellij)).
-
-`shell/.zshenv` makes mise available to non-interactive SSH processes;
-`shell/.zprofile` loads mise shims for IDEs, and `shell/.zshrc` activates
-interactive shell integrations.
-See [docs/shell.md](./docs/shell.md).
-On macOS, `mise run bootstrap:all` also installs Kitty, Zed and fonts through
-mise's native `brew-cask:` provisioning. The default editor is `zed --wait` when available,
-otherwise system `vi`.
-Neovim is also available as a plain terminal editor through [mise](./docs/mise.md#tools-currently-pinned).
-
-## Layout
-
-```text
-mise.toml, mise.lock   # repo checks, hooks, and bootstrap settings/tasks
-mise/                  # shared tools + macOS tools/apps → ~/.config/mise/
-git/                   # git config → ~/.config/git/
-shell/                 # .zshenv + .zprofile + .zshrc → ~/ (SSH, IDEs, interactive setup; docs/shell.md)
-zellij/                # tmux-style top bar, Git branch, native bottom hints, lazygit popup (see docs/core_tools.md#zellij)
-lazygit/               # lazygit config → ~/.config/lazygit/
-bat/                   # bat config → ~/.config/bat/
-eza/                   # eza theme → ~/.config/eza/
-fzf/                   # fzf theme → ~/.config/fzf/ (see docs/util_tools.md#fzf)
-ripgrep/               # ripgrep config → ~/.config/ripgrep/ (see docs/util_tools.md#ripgrep)
-starship/              # starship prompt → ~/.config/starship.toml (flat, see docs/util_tools.md#starship)
-k9s/                   # k9s config + skin (see docs/core_tools.md#k9s)
-bottom/                # bottom (btm) system monitor → ~/.config/bottom/ (see docs/core_tools.md#bottom)
-kitty/                 # kitty config + theme → ~/.config/kitty/ (see docs/desktop_tools.md)
-zed/                   # macOS Zed: shared global_settings.json, local settings.json; JetBrains + Vim (see docs/desktop_tools.md#zed)
-docs/                  # notes on what's configured, and why
+```sh
+mise run bootstrap:all
+mise run global:setup
 ```
 
-## Tools configured so far
+- Root `mise.toml` provisions dotfile symlinks, Zsh plugins and mise completion.
+- `mise/config*.toml` installs global tools. On macOS, setup also installs
+  Homebrew formulae (Colima, Docker, Buildx, Compose), apps and fonts, then links
+  Docker CLI plugins. The native formula provider requires Apple Silicon.
+  Lima is installed as Colima's dependency.
+- Start the container runtime when needed: `colima start`.
 
-| Topic                                                                         | Docs                                             |
-| ----------------------------------------------------------------------------- | ------------------------------------------------ |
-| mise                                                                          | [docs/mise.md](./docs/mise.md)                   |
-| git (+ delta)                                                                 | [docs/git.md](./docs/git.md)                     |
-| shell (zsh)                                                                   | [docs/shell.md](./docs/shell.md)                 |
-| Util tools (bat, zoxide, eza, fd, fzf, gh, glab, jq, yq, ripgrep, starship)   | [docs/util_tools.md](./docs/util_tools.md)       |
-| Core tools (Zellij, lazygit, k9s, bottom)                                     | [docs/core_tools.md](./docs/core_tools.md)       |
-| Zellij bars and keybindings (Git branch, panes, tabs, stacks, personal group) | [docs/zellij.md](./docs/zellij.md)               |
-| Desktop tools (kitty, Zed settings)                                           | [docs/desktop_tools.md](./docs/desktop_tools.md) |
-| languages (runtimes, Zed tooling, Kubernetes and Helm)                        | [docs/langs.md](./docs/langs.md)                 |
-| linting / pre-commit (hk)                                                     | [docs/linting.md](./docs/linting.md)             |
-| bootstrap (symlinks, Zsh integration, desktop apps)                           | [docs/bootstrap.md](./docs/bootstrap.md)         |
+Preview symlinks with `mise run bootstrap:dry-run`; inspect provisioning with
+`mise run bootstrap:status`. Install repo checks with `mise install --locked`,
+then run `mise exec -- hk run check --all`.
 
-For editor shortcuts, language support, formatting and test tasks, see
-[Zed](./docs/desktop_tools.md#zed). Runtimes and compilers are pinned by mise;
-see [languages](./docs/langs.md).
-
-## Contributing / working on this repo
-
-`mise install --locked` pulls the repo's own tooling (including
-[hk](https://hk.jdx.dev)) and installs a pre-commit hook automatically — see
-[docs/linting.md](./docs/linting.md).
-
-## Conventions
-
-See [AGENTS.md](./AGENTS.md) — directory naming, theming, mise settings,
-and the general "keep it modern, minimal, and maintainable" philosophy this
-repo follows.
+Keep secrets and Zed SSH connections in ignored local files. Shared Zed defaults
+live in `zed/global_settings.json`; `zed/settings.json` stays machine-local.
+See [AGENTS.md](AGENTS.md) for repository conventions.

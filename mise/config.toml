@@ -2,7 +2,7 @@
 lockfile = true
 lockfile_platforms = ["macos-arm64", "linux-arm64", "linux-x64"]
 disable_backends = ["asdf", "vfox"]
-# Install explicitly with --locked; inspection tasks must not install tools.
+# Setup installs tools explicitly using the committed lockfile.
 task.run_auto_install = false
 
 [tools]
@@ -45,12 +45,7 @@ task.run_auto_install = false
 "aqua:mikefarah/yq" = "4.53.6"                           # YAML processor
 "aqua:ajeetdsouza/zoxide" = "0.10.0"                     # Directory jumper
 
-[tasks."global:tools:status"]
-description = "Show active tool versions and mise installation diagnostics"
-dir = "{{cwd}}"
-run = ["mise ls --current", "mise doctor"]
-
-[tasks."global:tools:outdated"]
-description = "Check active tools for newer releases without changing pins"
-dir = "{{cwd}}"
-run = "mise outdated --bump"
+[tasks."global:setup"]
+description = "Install global tools using the committed lockfile"
+dir = "{{xdg_config_home}}/mise"
+run = "mise install --locked"

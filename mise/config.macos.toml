@@ -1,61 +1,34 @@
-# Automatically loaded on macOS via mise/miserc.toml.
-# macOS tools and apps live here; portable tools stay in config.toml.
+# Automatically loaded on macOS via miserc.toml.
+
+[env]
+# Native brew packages have no mise shims.
+_.path = ["/opt/homebrew/bin", "/opt/homebrew/sbin"]
 
 [bootstrap.packages]
+# CLI tools are formulae; Colima pulls in Lima as a dependency.
+"brew:colima" = "latest"
+"brew:docker" = "latest"
+"brew:docker-buildx" = "latest"
+"brew:docker-compose" = "latest"
 "brew-cask:kitty" = "latest"
 "brew-cask:zed" = "latest"
 "brew-cask:font-jetbrains-mono-nerd-font" = "latest"
 "brew-cask:font-geist-mono-nerd-font" = "latest"
 
-[tools]
-"aqua:lima-vm/lima" = "2.2.0" # VM manager required by Colima
-"aqua:abiosoft/colima" = { version = "0.10.3", depends = [
-  "aqua:lima-vm/lima",
-] } # Local container runtime
-"aqua:docker/cli" = "29.8.1" # Docker command-line client
-
-[tools."github:docker/compose"]
-version = "5.5.1"
-# Docker only discovers CLI plugins from its plugin directories, not PATH.
-postinstall = '''
-mkdir -p "$HOME/.docker/cli-plugins"
-ln -sf "$MISE_TOOL_INSTALL_PATH/docker-compose" \
-  "$HOME/.docker/cli-plugins/docker-compose"
-'''
-
-[tools."aqua:docker/buildx"]
-version = "latest"
-# Docker only discovers CLI plugins from its plugin directories, not PATH.
-postinstall = '''
-mkdir -p "$HOME/.docker/cli-plugins"
-ln -sf "$MISE_TOOL_INSTALL_PATH/docker-cli-plugin-docker-buildx" \
-  "$HOME/.docker/cli-plugins/docker-buildx"
-'''
-
-[tasks."global:docker:start"]
-description = "Start Colima's Docker runtime and activate its Docker context"
-run = "colima start --runtime docker --activate"
-
-[tasks."global:docker:stop"]
-description = "Stop Colima while preserving the Docker VM state"
-run = "colima stop"
-
-[tasks."global:docker:restart"]
-description = "Restart Colima's Docker runtime"
-run = "colima restart"
-
-[tasks."global:docker:status"]
-description = "Show Colima status, the active Docker context, and Buildx version"
+[tasks."global:setup"]
+description = "Install global tools, macOS packages and Docker CLI plugin links"
+dir = "{{xdg_config_home}}/mise"
 run = [
-  "colima status --extended",
-  "docker context show",
-  "docker buildx version",
+  "mise install --locked",
+  "mise bootstrap packages apply",
+  '''
+# Stable opt paths keep the plugins linked across package upgrades.
+set -eu
+mkdir -p "$HOME/.docker/cli-plugins"
+for plugin in buildx compose; do
+  package_root="$(mise bootstrap packages where "brew:docker-$plugin")"
+  test -x "$package_root/bin/docker-$plugin"
+  ln -sfn "$package_root/bin/docker-$plugin" "$HOME/.docker/cli-plugins/docker-$plugin"
+done
+''',
 ]
-
-[tasks."global:docker:ssh"]
-description = "Open an interactive shell in the Colima VM"
-run = "colima ssh"
-
-[tasks."global:apps:install"]
-description = "Install macOS apps and fonts through mise cask provisioning"
-run = "mise bootstrap packages apply"

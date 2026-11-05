@@ -2,11 +2,9 @@
 lockfile = true
 lockfile_platforms = ["macos-arm64", "linux-arm64", "linux-x64"]
 disable_backends = ["asdf", "vfox"]
-# Bootstrap installs tools explicitly with --locked before provisioning.
+# Bootstrap provisions configuration without installing tools.
 task.run_auto_install = false
-# Relative dotfile sources below resolve against this file's own directory
-# (the repo root), not against dotfiles.root — so dotfiles.root is
-# deliberately left unset. See docs/bootstrap.md.
+# Relative dotfile sources resolve against this config directory.
 dotfiles.default_mode = "symlink"
 
 [env]
@@ -28,9 +26,7 @@ postinstall = "hk install --mise"
 description = "Run hk's pre-commit checks (mirrors the installed git hook)"
 run = "hk run pre-commit"
 
-# Bootstrap tasks — see docs/bootstrap.md. None of these run automatically
-# (not on `mise install`, not via any hook); run them explicitly, from the
-# repo root, when you're ready to apply this repo to a machine.
+# Run bootstrap explicitly from the repository root.
 [tasks."bootstrap:status"]
 description = "Show what bootstrap would change, without applying anything"
 run = ["mise bootstrap dotfiles status", "mise bootstrap repos status"]
@@ -42,10 +38,6 @@ run = "mise bootstrap dotfiles apply --dry-run"
 [tasks."bootstrap:dotfiles"]
 description = "Symlink this repo's configs into place"
 run = "mise bootstrap dotfiles apply"
-
-[tasks."bootstrap:tools"]
-description = "Install configured tools using the committed lockfiles"
-run = "mise install --locked"
 
 [tasks."bootstrap:plugins"]
 description = "Provision oh-my-zsh and pinned Zsh plugins"
@@ -60,12 +52,8 @@ description = "Install mise's generated Zsh completion"
 run = "mise completion zsh --install"
 
 [tasks."bootstrap:all"]
-description = "Install tools, dotfiles, shell integration, and macOS apps"
-depends = ["bootstrap:tools"]
-run = [
-  "mise run bootstrap:dotfiles ::: bootstrap:plugins ::: bootstrap:zsh-completion",
-  'if [ "$(uname -s)" = Darwin ]; then mise run global:apps:install; fi',
-]
+description = "Provision dotfiles, Zsh plugins and shell completion"
+run = "mise run bootstrap:dotfiles ::: bootstrap:plugins ::: bootstrap:zsh-completion"
 
 [dotfiles]
 "~/.zshenv" = "shell/.zshenv"
@@ -88,7 +76,6 @@ run = [
 "~/.config/bottom" = "bottom"
 # Every global mise config layer and its matching lockfile must reach the
 # machine, along with the early setting that enables automatic platform layers.
-# See docs/mise.md.
 "~/.config/mise/config.toml" = "mise/config.toml"
 "~/.config/mise/mise.lock" = "mise/mise.lock"
 "~/.config/mise/config.macos.toml" = "mise/config.macos.toml"
