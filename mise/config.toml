@@ -1,3 +1,5 @@
+min_version = "2026.11.1"
+
 [settings]
 lockfile = true
 lockfile_platforms = ["macos-arm64", "linux-arm64", "linux-x64"]
@@ -29,8 +31,9 @@ task.run_auto_install = false
 "aqua:jqlang/jq" = "1.8.2" # JSON processor
 
 # YAML, Helm, and Kubernetes
-"aqua:helm/helm" = "4.3.0"             # Kubernetes package manager
-"aqua:kubernetes-sigs/kind" = "0.33.0" # Local Kubernetes clusters
+"aqua:kubernetes/kubernetes/kubectl" = "1.37.2" # Kubernetes CLI
+"aqua:helm/helm" = "4.3.0"                      # Kubernetes package manager
+"aqua:kubernetes-sigs/kind" = "0.33.0"          # Local Kubernetes clusters
 
 # Shared CLI tools
 "aqua:sharkdp/bat" = "0.26.1"                            # Syntax-highlighted cat
@@ -49,3 +52,12 @@ task.run_auto_install = false
 description = "Install global tools using the committed lockfile"
 dir = "{{xdg_config_home}}/mise"
 run = "mise install --locked"
+
+[tasks."global:update"]
+description = "Upgrade global tools and refresh config pins and lockfiles"
+dir = "{{xdg_config_home}}/mise"
+run = [
+  "mise upgrade --global --bump --pin",
+  "mise lock --global",
+  "mise run global:setup",
+]

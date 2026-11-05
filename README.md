@@ -3,7 +3,7 @@
 Personal shell, editor and CLI configuration, managed with
 [mise](https://mise.jdx.dev) and themed with Catppuccin Mocha.
 
-From this repository, with mise installed:
+From this repository, with mise 2026.11.1 or newer installed:
 
 ```sh
 mise run bootstrap:all
@@ -16,6 +16,9 @@ mise run global:setup
   Docker CLI plugins. The native formula provider requires Apple Silicon.
   Lima is installed as Colima's dependency.
 - Start the container runtime when needed: `colima start`.
+
+Use `mise run global:update` to upgrade global tools and macOS packages,
+refresh Docker plugin links, and update tool pins and lockfiles for review.
 
 Preview symlinks with `mise run bootstrap:dry-run`; inspect provisioning with
 `mise run bootstrap:status`. Install repo checks with `mise install --locked`,

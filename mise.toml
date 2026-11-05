@@ -1,3 +1,5 @@
+min_version = "2026.11.1"
+
 [settings]
 lockfile = true
 lockfile_platforms = ["macos-arm64", "linux-arm64", "linux-x64"]

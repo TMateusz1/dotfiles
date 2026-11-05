@@ -1,3 +1,5 @@
+min_version = "2026.11.1"
+
 # Automatically loaded on macOS via miserc.toml.
 
 [env]
@@ -5,6 +7,7 @@
 _.path = ["/opt/homebrew/bin", "/opt/homebrew/sbin"]
 
 [bootstrap.packages]
+# Brew providers skip explicit version pins; keep current releases here.
 # CLI tools are formulae; Colima pulls in Lima as a dependency.
 "brew:colima" = "latest"
 "brew:docker" = "latest"
@@ -31,4 +34,14 @@ for plugin in buildx compose; do
   ln -sfn "$package_root/bin/docker-$plugin" "$HOME/.docker/cli-plugins/docker-$plugin"
 done
 ''',
+]
+
+[tasks."global:update"]
+description = "Upgrade global tools and macOS packages, then refresh plugin links"
+dir = "{{xdg_config_home}}/mise"
+run = [
+  "mise upgrade --global --bump --pin",
+  "mise lock --global",
+  "mise bootstrap packages upgrade",
+  "mise run global:setup",
 ]

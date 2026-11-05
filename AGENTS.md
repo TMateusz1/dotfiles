@@ -21,8 +21,9 @@ Instructions for coding agents working in this public dotfiles repository.
   shell integration. Do not build a custom installer or stow script.
 - `mise/config.toml` and `mise/config.macos.toml` are the user's global configs,
   linked under `~/.config/mise/`. They own tool and macOS package installation.
-  Expose only `global:setup`: install tools everywhere; on macOS also install
-  packages and link Docker CLI plugins. Keep this separate from repo bootstrap.
+  Expose `global:setup` for installation and `global:update` for upgrades. On
+  macOS include packages and Docker CLI plugin links. Keep both separate from
+  repo bootstrap.
 - Name top-level config directories after the tool's lowercase config-directory
   name. Add every managed config to root `[dotfiles]`, using the tool's real path.
 - Prefer whole-directory symlinks for read-only config. For tools that write into
@@ -40,6 +41,7 @@ Instructions for coding agents working in this public dotfiles repository.
   checks. Keep related keymaps, snippets and tasks consistent.
 - Prefer readable native config and maintained, trusted upstream projects. Add
   dependencies only when required by the task.
+- Require mise `2026.11.1` or newer via `min_version`.
 - Enable `lockfile = true` and `disable_backends = ["asdf", "vfox"]` in repo and
   global mise settings. Keep affected lockfiles current. Link global config and
   lockfiles together so the committed pins apply on the machine.
