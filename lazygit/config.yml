@@ -9,7 +9,9 @@ git:
   diffRenderers:
     - colorArg: always
       command: delta --dark --paging=never
-
+os:
+  # Inside nvim, open files in the running instance.
+  editPreset: nvim-remote
 gui:
   nerdFontsVersion: "3"
   theme:
@@ -38,5 +40,5 @@ gui:
       - "#f38ba8"
     defaultFgColor:
       - "#cdd6f4"
-  authorColors:
-    "*": "#b4befe"
+    authorColors:
+      "*": "#b4befe"

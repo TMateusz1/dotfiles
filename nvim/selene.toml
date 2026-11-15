@@ -1,0 +1,5 @@
+std = "vim"
+
+[lints]
+# lazy.nvim specs mix positional and named fields by design.
+mixed_table = "allow"

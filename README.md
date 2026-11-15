@@ -15,6 +15,8 @@ mise run global:setup
   Homebrew formulae (Colima, Docker, Buildx, Compose), apps and fonts, then links
   Docker CLI plugins. The native formula provider requires Apple Silicon.
   Lima is installed as Colima's dependency.
+- Neovim is part of both: bootstrap links its config and lazy.nvim, setup restores
+  plugins from `nvim/lazy-lock.json` and builds Treesitter parsers.
 - Start the container runtime when needed: `colima start`.
 
 Use `mise run global:update` to upgrade global tools and macOS packages,

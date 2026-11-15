@@ -42,16 +42,47 @@ task.run_auto_install = false
 "aqua:mikefarah/yq" = "4.54.1"                           # YAML processor
 "aqua:ajeetdsouza/zoxide" = "0.10.0"                     # Directory jumper
 
+# Neovim tooling (LSPs, formatters, linters)
+"aqua:tree-sitter/tree-sitter" = "0.27.2"         # Parser compiler for nvim-treesitter
+"go:golang.org/x/tools/gopls" = "0.24.0"          # Go LSP (no prebuilt binaries)
+"aqua:golangci/golangci-lint" = "2.15.0"          # Go linter
+"npm:@vtsls/language-server" = "0.3.0"            # TypeScript LSP
+"aqua:biomejs/biome" = "2.6.7"                    # JS/TS/JSON/CSS formatter + linter
+"npm:vscode-langservers-extracted" = "4.10.0"     # JSON + ESLint LSPs
+"npm:yaml-language-server" = "2.0.0"              # YAML LSP (also used by helm-ls)
+"aqua:mrjosh/helm-ls" = "0.5.4"                   # Helm LSP
+"aqua:LuaLS/lua-language-server" = "3.19.2"       # Lua LSP
+"aqua:JohnnyMorganz/StyLua" = "2.6.0"             # Lua formatter
+"npm:bash-language-server" = "5.8.1"              # Shell LSP (runs shellcheck itself)
+"aqua:koalaman/shellcheck" = "0.11.0"             # Shell linter (used by bashls)
+"aqua:mvdan/sh" = "3.14.1"                        # shfmt
+"github:docker/docker-language-server" = "0.20.1" # Dockerfile/Compose LSP
+"aqua:hadolint/hadolint" = "2.15.1"               # Dockerfile linter
+"aqua:astral-sh/ty" = "0.0.104"                   # Python type checker LSP
+"aqua:astral-sh/ruff" = "0.17.5"                  # Python linter + formatter (LSP)
+"aqua:tamasfe/taplo" = "0.10.0"                   # TOML LSP + formatter
+"aqua:rvben/rumdl" = "0.2.76"                     # Markdown LSP + linter
+"aqua:google/yamlfmt" = "0.21.0"                  # YAML formatter
+
 # Language runtimes and toolchains
 python = "3.15.2" # Python runtime
 node = "26.13.0"  # Node.js runtime
 go = "1.27.3"     # Go toolchain
-rust = "1.99.1"   # Rust toolchain
+
+# Rust toolchain; the components back the nvim Rust tooling.
+rust = { version = "1.99.1", components = "rust-analyzer,rustfmt,clippy" }
 
 [tasks."global:setup"]
 description = "Install global tools using the committed lockfile"
 dir = "{{xdg_config_home}}/mise"
-run = "mise install --locked"
+run = [
+  "mise install --locked",
+  '''
+# Restore plugins exactly as locked, then install the configured parsers.
+test ! -f "$HOME/.config/nvim/init.lua" || nvim --headless "+Lazy! restore" \
+  "+lua require('nvim-treesitter').install(require('config.parsers')):wait(600000)" +qa
+''',
+]
 
 [tasks."global:update"]
 description = "Upgrade global tools and refresh config pins and lockfiles"
@@ -59,5 +90,6 @@ dir = "{{xdg_config_home}}/mise"
 run = [
   "mise upgrade --global --bump --pin",
   "mise lock --global",
+  "nvim --headless '+Lazy! update' \"+lua require('nvim-treesitter').update():wait(600000)\" +qa",
   "mise run global:setup",
 ]

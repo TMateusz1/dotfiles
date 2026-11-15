@@ -19,6 +19,8 @@ HK_MISE = 1
 "aqua:rvben/rumdl" = "0.2.76"
 "aqua:google/yamlfmt" = "0.21.0"
 "aqua:koalaman/shellcheck" = "0.11.0"
+"aqua:JohnnyMorganz/StyLua" = "2.6.0"
+"aqua:Kampfkarren/selene" = "0.32.0"
 
 [hooks]
 # keeps the installed git hooks (hk.pkl) in sync whenever tools are (re)installed
@@ -76,6 +78,8 @@ run = "mise run bootstrap:dotfiles ::: bootstrap:plugins ::: bootstrap:zsh-compl
 # Shared defaults live in global_settings.json; settings.json stays local/ignored.
 "~/.config/zed" = "zed"
 "~/.config/bottom" = "bottom"
+# Neovim writes only lazy-lock.json here, and that file is tracked.
+"~/.config/nvim" = "nvim"
 # Every global mise config layer and its matching lockfile must reach the
 # machine, along with the early setting that enables automatic platform layers.
 "~/.config/mise/config.toml" = "mise/config.toml"
@@ -91,3 +95,6 @@ run = "mise run bootstrap:dotfiles ::: bootstrap:plugins ::: bootstrap:zsh-compl
 "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions" = { url = "https://github.com/zsh-users/zsh-autosuggestions.git", ref = "v0.7.1" }
 "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" = { url = "https://github.com/zsh-users/zsh-syntax-highlighting.git", ref = "0.8.0" }
 "~/.oh-my-zsh/custom/plugins/you-should-use" = { url = "https://github.com/MichaelAquilina/zsh-you-should-use.git", ref = "1.11.1" }
+# lazy.nvim itself; plugins are restored from nvim/lazy-lock.json.
+# Keep this ref equal to the lazy.nvim `tag` in nvim/lua/config/lazy.lua.
+"~/.local/share/nvim/lazy/lazy.nvim" = { url = "https://github.com/folke/lazy.nvim.git", ref = "v11.17.5" }

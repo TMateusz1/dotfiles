@@ -34,6 +34,11 @@ for plugin in buildx compose; do
   ln -sfn "$package_root/bin/docker-$plugin" "$HOME/.docker/cli-plugins/docker-$plugin"
 done
 ''',
+  '''
+# Restore plugins exactly as locked, then install the configured parsers.
+test ! -f "$HOME/.config/nvim/init.lua" || nvim --headless "+Lazy! restore" \
+  "+lua require('nvim-treesitter').install(require('config.parsers')):wait(600000)" +qa
+''',
 ]
 
 [tasks."global:update"]
@@ -43,5 +48,6 @@ run = [
   "mise upgrade --global --bump --pin",
   "mise lock --global",
   "mise bootstrap packages upgrade",
+  "nvim --headless '+Lazy! update' \"+lua require('nvim-treesitter').update():wait(600000)\" +qa",
   "mise run global:setup",
 ]

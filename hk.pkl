@@ -16,6 +16,9 @@ local linters = new Mapping<String, Step> {
   // yaml — format only. No mature, established, static-binary YAML linter
   // is configured here.
   ["yamlfmt"] = Builtins.yamlfmt
+  // lua (nvim config); selene runs from nvim/ to pick up its selene.toml
+  ["stylua"] = (Builtins.stylua) { glob = List("nvim/**/*.lua") }
+  ["selene"] = (Builtins.selene) { dir = "nvim"; glob = List("**/*.lua") }
   // repo hygiene — enforces the "never commit secrets" rule from AGENTS.md
   // and catches common accidents, all built into hk (no extra tool installs)
   ["detect-private-key"] = Builtins.detect_private_key

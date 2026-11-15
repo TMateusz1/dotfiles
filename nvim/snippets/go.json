@@ -1,0 +1,41 @@
+{
+  "if err": {
+    "prefix": "iferr",
+    "body": ["if err != nil {", "\treturn ${1:err}", "}"],
+    "description": "Return on error"
+  },
+  "func": {
+    "prefix": "fn",
+    "body": ["func ${1:name}(${2}) ${3}{", "\t$0", "}"],
+    "description": "Function"
+  },
+  "method": {
+    "prefix": "meth",
+    "body": ["func (${1:r} ${2:Type}) ${3:name}(${4}) ${5}{", "\t$0", "}"],
+    "description": "Method"
+  },
+  "test": {
+    "prefix": "test",
+    "body": ["func Test${1:Name}(t *testing.T) {", "\t$0", "}"],
+    "description": "Test function"
+  },
+  "table test": {
+    "prefix": "tt",
+    "body": [
+      "func Test${1:Name}(t *testing.T) {",
+      "\ttests := []struct {",
+      "\t\tname string",
+      "\t\t${2:want string}",
+      "\t}{",
+      "\t\t{name: \"${3:case}\"},",
+      "\t}",
+      "\tfor _, tt := range tests {",
+      "\t\tt.Run(tt.name, func(t *testing.T) {",
+      "\t\t\t$0",
+      "\t\t})",
+      "\t}",
+      "}"
+    ],
+    "description": "Table-driven test"
+  }
+}
