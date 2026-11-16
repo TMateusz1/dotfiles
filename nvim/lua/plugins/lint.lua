@@ -11,21 +11,22 @@ return {
         lua = { "selene" },
       }
 
+      -- Run from the project root, not nvim's cwd: golangci-lint needs its go.mod (else every
+      -- import fails to resolve) and selene reads selene.toml and its std from the cwd.
+      local roots = { golangcilint = { "go.work", "go.mod" }, selene = { "selene.toml" } }
+
       local function try_lint()
-        local names = vim.tbl_filter(function(name)
+        for _, name in ipairs(lint._resolve_linter_by_ft(vim.bo.filetype)) do
           local linter = lint.linters[name]
           local cmd = type(linter) == "table" and linter.cmd or name
           if type(cmd) == "function" then
             cmd = cmd()
           end
-          if vim.fn.executable(cmd) == 0 then
-            return false
-          end
+          local root = roots[name] and vim.fs.root(0, roots[name])
           -- selene only where a selene.toml configures it (e.g. this repo).
-          return name ~= "selene" or vim.fs.root(0, "selene.toml") ~= nil
-        end, lint._resolve_linter_by_ft(vim.bo.filetype))
-        if #names > 0 then
-          lint.try_lint(names)
+          if vim.fn.executable(cmd) == 1 and (name ~= "selene" or root) then
+            lint.try_lint(name, { cwd = root or nil })
+          end
         end
       end
 

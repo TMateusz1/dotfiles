@@ -43,26 +43,28 @@ task.run_auto_install = false
 "aqua:ajeetdsouza/zoxide" = "0.10.0"                     # Directory jumper
 
 # Neovim tooling (LSPs, formatters, linters)
-"aqua:tree-sitter/tree-sitter" = "0.27.2"         # Parser compiler for nvim-treesitter
-"go:golang.org/x/tools/gopls" = "0.24.0"          # Go LSP (no prebuilt binaries)
-"aqua:golangci/golangci-lint" = "2.15.0"          # Go linter
-"npm:@vtsls/language-server" = "0.3.0"            # TypeScript LSP
-"aqua:biomejs/biome" = "2.6.7"                    # JS/TS/JSON/CSS formatter + linter
-"npm:vscode-langservers-extracted" = "4.10.0"     # JSON + ESLint LSPs
-"npm:yaml-language-server" = "2.0.0"              # YAML LSP (also used by helm-ls)
-"aqua:mrjosh/helm-ls" = "0.5.4"                   # Helm LSP
-"aqua:LuaLS/lua-language-server" = "3.19.2"       # Lua LSP
-"aqua:JohnnyMorganz/StyLua" = "2.6.0"             # Lua formatter
-"npm:bash-language-server" = "5.8.1"              # Shell LSP (runs shellcheck itself)
-"aqua:koalaman/shellcheck" = "0.11.0"             # Shell linter (used by bashls)
-"aqua:mvdan/sh" = "3.14.1"                        # shfmt
-"github:docker/docker-language-server" = "0.20.1" # Dockerfile/Compose LSP
-"aqua:hadolint/hadolint" = "2.15.1"               # Dockerfile linter
-"aqua:astral-sh/ty" = "0.0.104"                   # Python type checker LSP
-"aqua:astral-sh/ruff" = "0.17.5"                  # Python linter + formatter (LSP)
-"aqua:tamasfe/taplo" = "0.10.0"                   # TOML LSP + formatter
-"aqua:rvben/rumdl" = "0.2.76"                     # Markdown LSP + linter
-"aqua:google/yamlfmt" = "0.21.0"                  # YAML formatter
+"aqua:tree-sitter/tree-sitter" = "0.27.2"                                       # Parser compiler for nvim-treesitter
+"go:golang.org/x/tools/gopls" = { version = "0.24.0", depends = ["go"] }        # Go LSP (no prebuilt binaries)
+"aqua:golangci/golangci-lint" = "2.15.0"                                        # Go linter
+"npm:@vtsls/language-server" = { version = "0.3.0", depends = ["node"] }        # TypeScript LSP
+"aqua:biomejs/biome" = "2.6.7"                                                  # JS/TS/JSON/CSS formatter + linter
+"npm:vscode-langservers-extracted" = { version = "4.10.0", depends = ["node"] } # JSON + ESLint LSPs
+"npm:yaml-language-server" = { version = "2.0.0", depends = ["node"] }          # YAML LSP (also used by helm-ls)
+"aqua:mrjosh/helm-ls" = "0.5.4"                                                 # Helm LSP
+"aqua:LuaLS/lua-language-server" = "3.19.2"                                     # Lua LSP
+"aqua:JohnnyMorganz/StyLua" = "2.6.0"                                           # Lua formatter
+"npm:bash-language-server" = { version = "5.8.1", depends = ["node"] }          # Shell LSP (runs shellcheck itself)
+"aqua:koalaman/shellcheck" = "0.11.0"                                           # Shell linter (used by bashls)
+"aqua:mvdan/sh" = "3.14.1"                                                      # shfmt
+"github:docker/docker-language-server" = "0.20.1"                               # Dockerfile/Compose LSP
+"aqua:hadolint/hadolint" = "2.15.1"                                             # Dockerfile linter
+"aqua:astral-sh/ty" = "0.0.104"                                                 # Python type checker LSP
+"aqua:astral-sh/ruff" = "0.17.5"                                                # Python linter + formatter (LSP)
+"aqua:tamasfe/taplo" = "0.10.0"                                                 # TOML LSP + formatter
+"aqua:rvben/rumdl" = "0.2.76"                                                   # Markdown LSP + linter
+"aqua:artempyanykh/marksman" = "2026-02-08"                                     # Markdown links/outline LSP
+"aqua:gotestyourself/gotestsum" = "1.13.0"                                      # Go test runner (neotest)
+"aqua:google/yamlfmt" = "0.21.0"                                                # YAML formatter
 
 # Language runtimes and toolchains
 python = "3.15.2" # Python runtime

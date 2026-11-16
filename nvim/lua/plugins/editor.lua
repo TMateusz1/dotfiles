@@ -220,7 +220,9 @@ return {
       mux = { backend = "smart-splits-backend-zellij-lua" },
       ignored_buftypes = { "nofile", "quickfix", "prompt" },
       ignored_filetypes = { "snacks_layout_box" },
-      move = { at_edge = "wrap" }, -- outside Zellij only; inside, the backend hands off
+      -- At nvim's edge the backend runs `zellij action move-focus-or-tab`, matching Zellij's own
+      -- Ctrl+arrows; "wrap" would make the backend jump to the opposite Zellij pane instead.
+      move = { at_edge = "stop" },
       resize = { amount = 3 },
     },
     config = function(_, opts)
@@ -228,7 +230,14 @@ return {
       ss.setup(opts)
       local modes = { "n", "i", "t" }
       for key, dir in pairs({ Left = "left", Down = "down", Up = "up", Right = "right" }) do
-        vim.keymap.set(modes, "<C-" .. key .. ">", ss["move_cursor_" .. dir], { desc = "Move to " .. dir })
+        vim.keymap.set(modes, "<C-" .. key .. ">", function()
+          local win = vim.api.nvim_get_current_win()
+          ss["move_cursor_" .. dir]()
+          -- At nvim's edge the backend moved Zellij focus; leaving a tab sends no FocusLost.
+          if win == vim.api.nvim_get_current_win() then
+            require("config.zellij").sync()
+          end
+        end, { desc = "Move to " .. dir })
         vim.keymap.set(modes, "<A-" .. key .. ">", ss["resize_" .. dir], { desc = "Resize " .. dir })
         vim.keymap.set("n", "<leader><C-" .. key .. ">", ss["swap_buf_" .. dir], { desc = "Swap buffer " .. dir })
       end

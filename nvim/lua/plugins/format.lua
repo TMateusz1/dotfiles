@@ -1,5 +1,20 @@
--- Prettier when the project configures it, otherwise Biome.
-local web = { "prettier", "biome-check", stop_after_first = true }
+-- Follow the project: its own tool config wins, then a Prettier config, then our default.
+local function project(default, own_configs)
+  return function(buf)
+    if vim.fs.root(buf, own_configs) then
+      return default
+    end
+    -- `require_cwd` makes Prettier available only when the project configures it.
+    if require("conform").get_formatter_info("prettier", buf).available then
+      return { "prettier" }
+    end
+    return default
+  end
+end
+
+local web = project({ "biome-check" }, { "biome.json", "biome.jsonc" })
+local yaml = project({ "yamlfmt" }, { ".yamlfmt", ".yamlfmt.yml", ".yamlfmt.yaml", "yamlfmt.yml", "yamlfmt.yaml" })
+local markdown = project({ "rumdl" }, { ".rumdl.toml", "rumdl.toml" })
 
 return {
   {
@@ -28,7 +43,8 @@ return {
         lua = { "stylua" },
         sh = { "shfmt" },
         bash = { "shfmt" },
-        yaml = { "yamlfmt" },
+        yaml = yaml,
+        markdown = markdown,
         javascript = web,
         javascriptreact = web,
         typescript = web,
@@ -39,12 +55,19 @@ return {
         graphql = web,
         python = { "ruff_organize_imports", "ruff_format" },
         toml = { "taplo" },
-        -- go, rust, markdown, dockerfile: LSP fallback (gopls+gofumpt, rustfmt, rumdl)
+        -- go, rust, dockerfile: LSP fallback (gopls+gofumpt, rustfmt)
         -- helm: intentionally not formatted (templates break)
       },
       formatters = {
         prettier = { require_cwd = true }, -- only with a Prettier config in the project
         shfmt = { prepend_args = { "-i", "2", "-ci" } },
+        -- Not built into the pinned conform; rumdl exits 1 when unfixable issues remain.
+        rumdl = {
+          command = "rumdl",
+          args = { "fmt", "--silent", "--stdin-filename", "$FILENAME", "-" },
+          stdin = true,
+          exit_codes = { 0, 1 },
+        },
       },
     },
     init = function()

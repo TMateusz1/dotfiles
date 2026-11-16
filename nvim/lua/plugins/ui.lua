@@ -71,6 +71,8 @@ return {
     event = "VeryLazy",
     dependencies = { "catppuccin" },
     keys = {
+      { "<leader><space>", "<cmd>BufferLinePick<cr>", desc = "Pick buffer (by letter)" },
+      { "<leader>bc", "<cmd>BufferLinePickClose<cr>", desc = "Pick buffer to close" },
       { "<leader>bp", "<cmd>BufferLineTogglePin<cr>", desc = "Toggle pin" },
       { "<leader>bP", "<cmd>BufferLineGroupClose ungrouped<cr>", desc = "Close unpinned" },
     },
@@ -124,6 +126,7 @@ return {
         { "<leader>u", group = "ui/toggles" },
         { "<leader>S", group = "session" },
         { "<leader>r", group = "replace" },
+        { "<leader>t", group = "test" },
         { "[", group = "prev" },
         { "]", group = "next" },
         { "g", group = "goto" },
@@ -162,6 +165,12 @@ return {
       filter_kind = false,
       keymaps = { ["<C-j>"] = "actions.down_and_scroll", ["<C-k>"] = "actions.up_and_scroll" },
     },
+  },
+
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    ft = "markdown",
+    opts = { completions = { blink = { enabled = true } } },
   },
 
   {

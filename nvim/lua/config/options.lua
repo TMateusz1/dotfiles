@@ -57,14 +57,3 @@ opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize,winpos,localopt
 opt.grepprg = "rg --vimgrep"
 opt.grepformat = "%f:%l:%c:%m"
 opt.spelllang = { "en" }
-
--- Chart templates are Helm; values.yaml and Chart.yaml stay yaml.
-vim.filetype.add({
-  pattern = {
-    [".*/templates/.*%.ya?ml"] = function(path)
-      return vim.fs.root(path, "Chart.yaml") and "helm" or "yaml"
-    end,
-    [".*/templates/.*%.tpl"] = "helm",
-    ["helmfile.*%.ya?ml"] = "helm",
-  },
-})

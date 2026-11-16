@@ -21,6 +21,8 @@ return {
         gitsigns = true,
         grug_far = true,
         lsp_trouble = true,
+        neotest = true,
+        render_markdown = true,
         treesitter_context = true,
         which_key = true,
         snacks = { enabled = true, indent_scope_color = "lavender" },

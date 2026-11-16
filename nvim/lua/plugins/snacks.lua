@@ -10,7 +10,19 @@ return {
       input = { enabled = true },
       indent = { enabled = true, animate = { enabled = false }, scope = { enabled = true } },
       scope = { enabled = true },
-      words = { enabled = true, debounce = 200 },
+      words = {
+        enabled = true,
+        debounce = 200,
+        -- Only highlight references of names: on keywords (Go's `return`, `for`, `break`) LSPs
+        -- highlight every exit point or loop branch instead. Keywords are anonymous TS nodes.
+        filter = function(buf)
+          if vim.g.snacks_words == false or vim.b[buf].snacks_words == false then
+            return false
+          end
+          local ok, node = pcall(vim.treesitter.get_node, { bufnr = buf, include_anonymous = true })
+          return not (ok and node and not node:named())
+        end,
+      },
       statuscolumn = {
         enabled = true,
         left = { "mark", "sign" },
@@ -48,15 +60,6 @@ return {
           files = { hidden = true },
           grep = { hidden = true },
         },
-        -- Zellij owns Ctrl-p/Ctrl-n; match blink's list keys.
-        win = {
-          input = {
-            keys = {
-              ["<C-j>"] = { "list_down", mode = { "i", "n" } },
-              ["<C-k>"] = { "list_up", mode = { "i", "n" } },
-            },
-          },
-        },
       },
       lazygit = { configure = false }, -- keep the repo's Catppuccin lazygit theme
       gitbrowse = { enabled = true },
@@ -70,7 +73,6 @@ return {
     },
     -- stylua: ignore
     keys = {
-      { "<leader><space>", function() Snacks.picker.buffers() end, desc = "Buffers" },
       { "<leader>/", function() Snacks.picker.grep() end, desc = "Grep" },
       { "<leader>e", function() Snacks.explorer() end, desc = "Explorer" },
       -- find

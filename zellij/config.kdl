@@ -153,31 +153,11 @@ keybinds clear-defaults=true {
         }
     }
     shared_except "locked" {
-        // vim-zellij-navigator lets nvim (smart-splits) handle Ctrl+arrows first.
-        bind "Ctrl left" {
-            MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.3.0/vim-zellij-navigator.wasm" {
-                name "move_focus_or_tab"; payload "left";
-                move_mod "ctrl"; use_arrow_keys "true";
-            };
-        }
-        bind "Ctrl down" {
-            MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.3.0/vim-zellij-navigator.wasm" {
-                name "move_focus"; payload "down";
-                move_mod "ctrl"; use_arrow_keys "true";
-            };
-        }
-        bind "Ctrl up" {
-            MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.3.0/vim-zellij-navigator.wasm" {
-                name "move_focus"; payload "up";
-                move_mod "ctrl"; use_arrow_keys "true";
-            };
-        }
-        bind "Ctrl right" {
-            MessagePlugin "https://github.com/hiasr/vim-zellij-navigator/releases/download/0.3.0/vim-zellij-navigator.wasm" {
-                name "move_focus_or_tab"; payload "right";
-                move_mod "ctrl"; use_arrow_keys "true";
-            };
-        }
+        // nvim locks Zellij while focused (see nvim autocmds), so there these reach smart-splits.
+        bind "Ctrl left" { MoveFocusOrTab "left"; }
+        bind "Ctrl down" { MoveFocus "down"; }
+        bind "Ctrl up" { MoveFocus "up"; }
+        bind "Ctrl right" { MoveFocusOrTab "right"; }
         bind "Ctrl Shift left" "Ctrl Shift [" { GoToPreviousTab; }
         bind "Ctrl Shift right" "Ctrl Shift ]" { GoToNextTab; }
         bind "Alt +" { Resize "Increase"; }

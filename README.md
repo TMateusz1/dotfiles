@@ -17,6 +17,8 @@ mise run global:setup
   Lima is installed as Colima's dependency.
 - Neovim is part of both: bootstrap links its config and lazy.nvim, setup restores
   plugins from `nvim/lazy-lock.json` and builds Treesitter parsers.
+- Neovim locks Zellij while it has focus, so every Neovim key works there, and
+  unlocks it on leaving; Ctrl+arrows still cross panes, and `Ctrl+g` unlocks by hand.
 - Start the container runtime when needed: `colima start`.
 
 Use `mise run global:update` to upgrade global tools and macOS packages,

@@ -6,6 +6,25 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {},
   },
+  {
+    -- `ft` sources its ftdetect at startup: templates -> helm, values*.yaml -> yaml.helm-values.
+    "qvalentin/helm-ls.nvim",
+    ft = { "helm", "yaml.helm-values" },
+    opts = {
+      conceal_templates = { enabled = true },
+      indent_hints = { enabled = true, only_for_current_line = true },
+      action_highlight = { enabled = true },
+    },
+    init = function()
+      -- Template conceal handles wrapped lines correctly only with conceal on.
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "helm",
+        callback = function()
+          vim.opt_local.conceallevel = 2
+        end,
+      })
+    end,
+  },
 
   {
     -- Data only: provides lsp/*.lua defaults; overrides live in after/lsp/.
@@ -33,6 +52,7 @@ return {
         "rust_analyzer",
         "taplo",
         "rumdl",
+        "marksman",
       })
 
       local group = vim.api.nvim_create_augroup("user_lsp", { clear = true })

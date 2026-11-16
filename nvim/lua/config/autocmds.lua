@@ -40,7 +40,18 @@ au("BufReadPost", {
 })
 
 au("FileType", {
-  pattern = { "help", "qf", "man", "lspinfo", "checkhealth", "notify", "grug-far", "gitsigns-blame", "dbout" },
+  pattern = {
+    "help",
+    "qf",
+    "man",
+    "lspinfo",
+    "checkhealth",
+    "notify",
+    "grug-far",
+    "gitsigns-blame",
+    "dbout",
+    "nvim-undotree",
+  },
   callback = function(ev)
     vim.bo[ev.buf].buflisted = false
     vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf, silent = true, desc = "Close" })
@@ -56,6 +67,22 @@ au("BufWritePre", {
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
+
+-- Zellij lock follows nvim's focus; leaving via Ctrl+arrows syncs from the smart-splits keymaps.
+if vim.env.ZELLIJ then
+  local zellij = require("config.zellij")
+  au({ "VimEnter", "FocusGained", "FocusLost", "VimResume" }, { callback = zellij.sync })
+  au("VimSuspend", {
+    callback = function()
+      zellij.mode("normal")
+    end,
+  })
+  au("VimLeave", {
+    callback = function()
+      zellij.mode("normal"):wait(500)
+    end,
+  })
+end
 
 -- Zellij pane resizes resize the whole nvim UI.
 au("VimResized", {
@@ -104,6 +131,41 @@ au("VimEnter", {
     end
     if #Snacks.picker.get({ source = "explorer" }) == 0 then
       Snacks.explorer()
+    end
+    -- The explorer grabs focus when it opens; start on the dashboard instead.
+    if main then
+      vim.schedule(function()
+        if vim.api.nvim_win_is_valid(main) then
+          vim.api.nvim_set_current_win(main)
+        end
+      end)
+    end
+  end,
+})
+
+-- `:q` on the last editor window also closes the sidebars, so nvim quits instead of leaving
+-- only the explorer (or outline/trouble/quickfix) open.
+local sidebars = { snacks_layout_box = true, aerial = true, trouble = true, qf = true }
+au("QuitPre", {
+  callback = function()
+    local cur = vim.api.nvim_get_current_win()
+    if vim.api.nvim_win_get_config(cur).relative ~= "" or sidebars[vim.bo.filetype] then
+      return
+    end
+    local others = {}
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if win ~= cur and vim.api.nvim_win_get_config(win).relative == "" then
+        if not sidebars[vim.bo[vim.api.nvim_win_get_buf(win)].filetype] then
+          return -- another editor window remains; plain :q is fine
+        end
+        others[#others + 1] = win
+      end
+    end
+    for _, picker in ipairs(Snacks.picker.get({ source = "explorer" })) do
+      picker:close()
+    end
+    for _, win in ipairs(others) do
+      pcall(vim.api.nvim_win_close, win, true)
     end
   end,
 })

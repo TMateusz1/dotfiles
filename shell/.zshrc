@@ -16,6 +16,8 @@ path_append_if_dir() {
 path_append_if_dir "$HOME/.local/bin"
 path_append_if_dir "$HOME/bin"
 path_append_if_dir "$HOME/go/bin"
+path_append_if_dir /usr/sbin
+path_append_if_dir /sbin
 typeset -U path PATH
 
 if [[ -n "${TERM:-}" ]] && ! infocmp "$TERM" >/dev/null 2>&1; then

@@ -10,7 +10,7 @@ return sc.setup_client(
     },
   }),
   {
-    filetypes = { "yaml" }, -- never "helm"
+    filetypes = { "yaml", "yaml.helm-values" }, -- never "helm"; helm_ls runs its own yamlls
     settings = {
       redhat = { telemetry = { enabled = false } },
       yaml = {
