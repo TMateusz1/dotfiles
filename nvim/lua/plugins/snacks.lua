@@ -45,24 +45,13 @@ return {
           { section = "startup" },
         },
       },
-      explorer = { enabled = true, replace_netrw = true },
+      explorer = { enabled = false },
       picker = {
         ui_select = true,
         layout = { preset = "default", cycle = true },
         matcher = { frecency = true },
         formatters = { file = { filename_first = true } },
         sources = {
-          explorer = {
-            layout = { preset = "sidebar", layout = { position = "left", width = 30 } },
-            auto_close = false,
-            follow_file = true,
-            git_status = true,
-            git_untracked = true,
-            diagnostics = true,
-            hidden = false, -- toggle with H / I inside the explorer
-            ignored = false,
-            jump = { close = false },
-          },
           files = { hidden = true },
           grep = { hidden = true },
         },
@@ -80,7 +69,6 @@ return {
     -- stylua: ignore
     keys = {
       { "<leader>/", function() Snacks.picker.grep() end, desc = "Grep" },
-      { "<leader>e", function() Snacks.explorer() end, desc = "Explorer" },
       -- find
       { "<leader>ff", function() Snacks.picker.files() end, desc = "Files" },
       { "<leader>fg", function() Snacks.picker.grep() end, desc = "Grep" },

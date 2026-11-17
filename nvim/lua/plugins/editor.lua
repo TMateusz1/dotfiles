@@ -192,8 +192,8 @@ return {
       vim.api.nvim_create_autocmd("User", {
         pattern = "PersistenceSavePre",
         callback = function()
-          for _, p in ipairs(Snacks.picker.get({ source = "explorer" })) do
-            p:close()
+          if package.loaded["neo-tree.command"] then
+            require("neo-tree.command").execute({ action = "close" })
           end
           pcall(vim.cmd, "AerialCloseAll")
         end,
@@ -220,7 +220,7 @@ return {
       mux = { backend = "smart-splits-backend-zellij-lua" },
       -- Only affect resizing (and at_edge = "split"); <C-Arrow> still enters the explorer.
       ignored_buftypes = { "nofile", "quickfix", "prompt" },
-      ignored_filetypes = { "snacks_layout_box" },
+      ignored_filetypes = { "neo-tree" },
       -- At nvim's edge the backend runs `zellij action move-focus-or-tab`, matching Zellij's own
       -- Ctrl+arrows; "wrap" would make the backend jump to the opposite Zellij pane instead.
       move = { at_edge = "stop" },
@@ -233,10 +233,8 @@ return {
       for key, dir in pairs({ Left = "left", Down = "down", Up = "up", Right = "right" }) do
         local lhs = "<C-" .. key .. ">"
         vim.keymap.set(modes, lhs, function()
-          -- In pickers, inputs and floating terminals keep the key's own meaning. Embedded floats
-          -- (the explorer sidebar, zindex 33) still navigate.
-          local cfg = vim.api.nvim_win_get_config(0)
-          if cfg.relative ~= "" and (cfg.zindex or 50) >= 50 then
+          -- Keep <C-Arrow> intact inside floating windows (pickers, inputs, terminals).
+          if vim.api.nvim_win_get_config(0).relative ~= "" then
             vim.api.nvim_feedkeys(vim.keycode(lhs), "n", false)
             return
           end
@@ -253,7 +251,7 @@ return {
           local target = vim.fn.win_getid(vim.fn.winnr(({ left = "h", down = "j", up = "k", right = "l" })[dir]))
           if
             vim.api.nvim_win_get_config(0).relative ~= ""
-            or vim.bo[vim.api.nvim_win_get_buf(target)].filetype == "snacks_layout_box"
+            or vim.bo[vim.api.nvim_win_get_buf(target)].filetype == "neo-tree"
           then
             return
           end

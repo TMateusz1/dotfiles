@@ -74,7 +74,7 @@ return {
           end,
         },
       },
-      extensions = { "lazy", "quickfix", "man", "trouble", "aerial" },
+      extensions = { "lazy", "quickfix", "man", "trouble", "aerial", "neo-tree" },
     },
   },
 
@@ -115,7 +115,7 @@ return {
           separator_style = "thin",
           -- Keep tabs clear of the explorer (left) and aerial (right).
           offsets = {
-            { filetype = "snacks_layout_box", text = "Explorer", highlight = "Directory", separator = true },
+            { filetype = "neo-tree", text = "Explorer", highlight = "Directory", separator = true },
             { filetype = "aerial", text = "Outline", highlight = "Directory", separator = true },
             { filetype = "DiffviewFiles", text = "Diffview", highlight = "Directory", separator = true },
           },

@@ -23,6 +23,7 @@ return {
         gitsigns = true,
         grug_far = true,
         lsp_trouble = true,
+        neotree = true,
         neotest = true,
         render_markdown = true,
         treesitter_context = true,

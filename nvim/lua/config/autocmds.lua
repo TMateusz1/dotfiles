@@ -118,35 +118,20 @@ au("VimEnter", {
       return
     end
     vim.cmd.cd(vim.fn.fnamemodify(argv[1], ":p"))
-    -- snacks' netrw replacement has already opened the explorer and emptied this buffer.
-    local main = vim.iter(vim.api.nvim_tabpage_list_wins(0)):find(function(win)
-      return vim.api.nvim_win_get_config(win).relative == ""
-        and vim.bo[vim.api.nvim_win_get_buf(win)].filetype ~= "snacks_layout_box"
-    end)
-    if main then
-      local buf = vim.api.nvim_win_get_buf(main)
-      Snacks.dashboard.open({ win = main })
-      if vim.api.nvim_buf_get_name(buf) == "" and buf ~= vim.api.nvim_win_get_buf(main) then
-        pcall(vim.api.nvim_buf_delete, buf, { force = true })
-      end
+    local main = vim.api.nvim_get_current_win()
+    local buf = vim.api.nvim_win_get_buf(main)
+    Snacks.dashboard.open({ win = main })
+    local name = vim.api.nvim_buf_get_name(buf)
+    if (name == "" or vim.fn.isdirectory(name) == 1) and buf ~= vim.api.nvim_win_get_buf(main) then
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
     end
-    if #Snacks.picker.get({ source = "explorer" }) == 0 then
-      Snacks.explorer()
-    end
-    -- The explorer grabs focus when it opens; start on the dashboard instead.
-    if main then
-      vim.schedule(function()
-        if vim.api.nvim_win_is_valid(main) then
-          vim.api.nvim_set_current_win(main)
-        end
-      end)
-    end
+    require("neo-tree.command").execute({ action = "show", source = "filesystem", position = "left" })
   end,
 })
 
 -- `:q` on the last editor window also closes the sidebars, so nvim quits instead of leaving
 -- only the explorer (or outline/trouble/quickfix) open.
-local sidebars = { snacks_layout_box = true, aerial = true, trouble = true, qf = true }
+local sidebars = { ["neo-tree"] = true, aerial = true, trouble = true, qf = true }
 au("QuitPre", {
   callback = function()
     local cur = vim.api.nvim_get_current_win()
@@ -161,9 +146,6 @@ au("QuitPre", {
         end
         others[#others + 1] = win
       end
-    end
-    for _, picker in ipairs(Snacks.picker.get({ source = "explorer" })) do
-      picker:close()
     end
     for _, win in ipairs(others) do
       pcall(vim.api.nvim_win_close, win, true)

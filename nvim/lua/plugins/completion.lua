@@ -58,7 +58,22 @@ return {
           },
         },
       },
-      cmdline = { enabled = true, keymap = { preset = "cmdline" }, completion = { menu = { auto_show = true } } },
+      cmdline = {
+        enabled = true,
+        -- Inherit insert-mode navigation (<Up>/<Down>, <C-j>/<C-k>, <Tab>/<CR>) instead of
+        -- blink's cmdline preset, which binds <Left>/<Right>, omits <Up>/<Down>, and auto-accepts on <Tab>.
+        keymap = {
+          preset = "inherit",
+          ["<C-u>"] = false,
+          ["<C-d>"] = false,
+        },
+        completion = {
+          -- Cmdline doesn't inherit top-level `completion.list.selection`; disable both so
+          -- typing a command + `<CR>` runs it instead of accepting the first completion.
+          list = { selection = { preselect = false, auto_insert = false } },
+          menu = { auto_show = true },
+        },
+      },
       fuzzy = { implementation = "prefer_rust_with_warning" },
     },
   },
