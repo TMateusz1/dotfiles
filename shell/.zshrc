@@ -102,6 +102,14 @@ fi
 # Tool configuration, aliases, and helpers
 # ---------------------------------------------------------------------------
 
+if command -v gh >/dev/null 2>&1; then
+  alias ghc="gh pr checkout"
+fi
+
+if command -v glab >/dev/null 2>&1; then
+  alias glc="glab mr checkout"
+fi
+
 if command -v eza >/dev/null 2>&1; then
   # LS_COLORS (set elsewhere: a system default, oh-my-zsh, .zshrc.local...)
   # silently overrides eza's own theme.yml for file-kind colors with no

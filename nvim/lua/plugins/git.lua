@@ -80,6 +80,8 @@ return {
       { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Diffview open" },
       { "<leader>gD", "<cmd>DiffviewClose<cr>", desc = "Diffview close" },
       { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history" },
+      { "<leader>gm", "<cmd>DiffviewOpen origin/main...HEAD<cr>", desc = "Review against main" },
+      { "<leader>gM", "<cmd>DiffviewFileHistory --range=origin/main..HEAD<cr>", desc = "Review commits against main" },
     },
     opts = {
       enhanced_diff_hl = true,
