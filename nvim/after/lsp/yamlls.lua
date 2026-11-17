@@ -10,7 +10,9 @@ return sc.setup_client(
     },
   }),
   {
-    filetypes = { "yaml", "yaml.helm-values" }, -- never "helm"; helm_ls runs its own yamlls
+    -- schema-companion rebuilds capabilities from the defaults; keep blink's.
+    capabilities = require("blink.cmp").get_lsp_capabilities(),
+    filetypes = { "yaml", "yaml.helm-values", "yaml.docker-compose", "yaml.gitlab" }, -- never "helm"; helm_ls runs its own yamlls
     settings = {
       redhat = { telemetry = { enabled = false } },
       yaml = {

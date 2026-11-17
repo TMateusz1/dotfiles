@@ -55,6 +55,12 @@ return {
         "marksman",
       })
 
+      -- Built-in gr* maps are covered by gr / gI / gy / <leader>c*; drop them so `gr` fires at once.
+      for _, lhs in ipairs({ "grn", "grr", "gri", "grt", "grx" }) do
+        pcall(vim.keymap.del, "n", lhs)
+      end
+      pcall(vim.keymap.del, { "n", "x" }, "gra")
+
       local group = vim.api.nvim_create_augroup("user_lsp", { clear = true })
 
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -77,7 +83,7 @@ return {
           end, "Definition in vsplit")
           map("gr", function()
             Snacks.picker.lsp_references()
-          end, "References", "n", { nowait = true })
+          end, "References")
           map("gI", function()
             Snacks.picker.lsp_implementations()
           end, "Implementations")
@@ -98,6 +104,7 @@ return {
               apply = true,
             })
           end, "Organize imports")
+          map("<leader>cc", vim.lsp.codelens.run, "Run codelens")
         end,
       })
 
@@ -106,13 +113,22 @@ return {
         group = group,
         pattern = "*.go",
         callback = function(ev)
+          if vim.g.autoformat == false or vim.b[ev.buf].autoformat == false then
+            return
+          end
           local client = vim.lsp.get_clients({ bufnr = ev.buf, name = "gopls" })[1]
           if not client then
             return
           end
-          local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
-          ---@diagnostic disable-next-line: inject-field
-          params.context = { only = { "source.organizeImports" } }
+          -- Params for the buffer being written, not the current window (`:wa`).
+          local params = {
+            textDocument = { uri = vim.uri_from_bufnr(ev.buf) },
+            range = {
+              start = { line = 0, character = 0 },
+              ["end"] = { line = vim.api.nvim_buf_line_count(ev.buf), character = 0 },
+            },
+            context = { only = { "source.organizeImports" }, diagnostics = {} },
+          }
           local result = client:request_sync("textDocument/codeAction", params, 1000, ev.buf) or {}
           for _, action in pairs(result.result or {}) do
             if action.edit then

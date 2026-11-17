@@ -1,19 +1,21 @@
--- Follow the project: its own tool config wins, then a Prettier config, then our default.
-local function project(default, own_configs)
+-- Follow the project: its own tool config wins, then a Prettier config, then our fallback.
+local function project(own, own_configs, fallback)
   return function(buf)
     if vim.fs.root(buf, own_configs) then
-      return default
+      return own
     end
     -- `require_cwd` makes Prettier available only when the project configures it.
     if require("conform").get_formatter_info("prettier", buf).available then
       return { "prettier" }
     end
-    return default
+    return fallback or own
   end
 end
 
-local web = project({ "biome-check" }, { "biome.json", "biome.jsonc" })
-local yaml = project({ "yamlfmt" }, { ".yamlfmt", ".yamlfmt.yml", ".yamlfmt.yaml", "yamlfmt.yml", "yamlfmt.yaml" })
+-- biome-check also applies lint fixes, so only where the project opted into Biome.
+local web = project({ "biome-check" }, { "biome.json", "biome.jsonc" }, { "biome" })
+local yamlfmt_configs = { ".yamlfmt", ".yamlfmt.yml", ".yamlfmt.yaml", "yamlfmt.yml", "yamlfmt.yaml" }
+local yaml = project({ "yamlfmt" }, yamlfmt_configs)
 local markdown = project({ "rumdl" }, { ".rumdl.toml", "rumdl.toml" })
 
 return {
@@ -59,8 +61,36 @@ return {
         -- helm: intentionally not formatted (templates break)
       },
       formatters = {
-        prettier = { require_cwd = true }, -- only with a Prettier config in the project
-        shfmt = { prepend_args = { "-i", "2", "-ci" } },
+        prettier = {
+          require_cwd = true, -- only with a Prettier config in the project
+          -- The pinned conform misses TypeScript config files.
+          cwd = function(self, ctx)
+            return require("conform.formatters.prettier").cwd(self, ctx)
+              or vim.fs.root(ctx.dirname, {
+                "prettier.config.ts",
+                "prettier.config.cts",
+                "prettier.config.mts",
+                ".prettierrc.ts",
+                ".prettierrc.cts",
+                ".prettierrc.mts",
+              })
+          end,
+        },
+        -- Without an .editorconfig: 2-space indent, indented case branches. With one, shfmt reads it.
+        shfmt = {
+          prepend_args = function(_, ctx)
+            if vim.fs.find(".editorconfig", { path = ctx.dirname, upward = true })[1] then
+              return {}
+            end
+            return { "-i", "2", "-ci" }
+          end,
+        },
+        -- yamlfmt finds its config from the cwd; run it where the buffer's config lives.
+        yamlfmt = {
+          cwd = function(_, ctx)
+            return vim.fs.root(ctx.dirname, yamlfmt_configs)
+          end,
+        },
         -- Not built into the pinned conform; rumdl exits 1 when unfixable issues remain.
         rumdl = {
           command = "rumdl",

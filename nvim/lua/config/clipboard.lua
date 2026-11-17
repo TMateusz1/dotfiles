@@ -5,7 +5,7 @@ vim.schedule(function()
     -- (Cmd+V covers the macOS clipboard). An OSC52 read would wait for a timeout.
     local osc52 = require("vim.ui.clipboard.osc52")
     local function paste()
-      return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+      return { vim.fn.getreg("", 1, true), vim.fn.getregtype("") }
     end
     vim.g.clipboard = {
       name = "OSC 52 (copy only)",

@@ -19,7 +19,13 @@ return {
           if vim.g.snacks_words == false or vim.b[buf].snacks_words == false then
             return false
           end
-          local ok, node = pcall(vim.treesitter.get_node, { bufnr = buf, include_anonymous = true })
+          local win = vim.fn.bufwinid(buf)
+          if win == -1 then
+            return false
+          end
+          local row, col = unpack(vim.api.nvim_win_get_cursor(win))
+          local ok, node =
+            pcall(vim.treesitter.get_node, { bufnr = buf, pos = { row - 1, col }, include_anonymous = true })
           return not (ok and node and not node:named())
         end,
       },
@@ -110,7 +116,22 @@ return {
           local t = Snacks.toggle
           t.option("wrap", { name = "Wrap" }):map("<leader>uw")
           t.option("spell", { name = "Spell" }):map("<leader>us")
-          t.option("relativenumber", { name = "Relative numbers" }):map("<leader>ul")
+          -- A global flag, so the normal/insert autocmd doesn't undo the toggle.
+          t.new({
+            id = "relativenumber",
+            name = "Relative numbers",
+            get = function()
+              return vim.g.relativenumber ~= false
+            end,
+            set = function(state)
+              vim.g.relativenumber = state
+              for _, win in ipairs(vim.api.nvim_list_wins()) do
+                if vim.wo[win].number and vim.bo[vim.api.nvim_win_get_buf(win)].buftype == "" then
+                  vim.wo[win].relativenumber = state
+                end
+              end
+            end,
+          }):map("<leader>ul")
           t.option("conceallevel", { off = 0, on = 2, name = "Conceal" }):map("<leader>uc")
           t.diagnostics():map("<leader>ud")
           t.inlay_hints():map("<leader>uh")

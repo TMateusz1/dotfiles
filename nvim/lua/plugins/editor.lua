@@ -218,6 +218,7 @@ return {
     },
     opts = {
       mux = { backend = "smart-splits-backend-zellij-lua" },
+      -- Only affect resizing (and at_edge = "split"); <C-Arrow> still enters the explorer.
       ignored_buftypes = { "nofile", "quickfix", "prompt" },
       ignored_filetypes = { "snacks_layout_box" },
       -- At nvim's edge the backend runs `zellij action move-focus-or-tab`, matching Zellij's own
@@ -230,7 +231,15 @@ return {
       ss.setup(opts)
       local modes = { "n", "i", "t" }
       for key, dir in pairs({ Left = "left", Down = "down", Up = "up", Right = "right" }) do
-        vim.keymap.set(modes, "<C-" .. key .. ">", function()
+        local lhs = "<C-" .. key .. ">"
+        vim.keymap.set(modes, lhs, function()
+          -- In pickers, inputs and floating terminals keep the key's own meaning. Embedded floats
+          -- (the explorer sidebar, zindex 33) still navigate.
+          local cfg = vim.api.nvim_win_get_config(0)
+          if cfg.relative ~= "" and (cfg.zindex or 50) >= 50 then
+            vim.api.nvim_feedkeys(vim.keycode(lhs), "n", false)
+            return
+          end
           local win = vim.api.nvim_get_current_win()
           ss["move_cursor_" .. dir]()
           -- At nvim's edge the backend moved Zellij focus; leaving a tab sends no FocusLost.
@@ -239,7 +248,17 @@ return {
           end
         end, { desc = "Move to " .. dir })
         vim.keymap.set(modes, "<A-" .. key .. ">", ss["resize_" .. dir], { desc = "Resize " .. dir })
-        vim.keymap.set("n", "<leader><C-" .. key .. ">", ss["swap_buf_" .. dir], { desc = "Swap buffer " .. dir })
+        vim.keymap.set("n", "<leader><C-" .. key .. ">", function()
+          -- Never swap a buffer into or out of the explorer sidebar.
+          local target = vim.fn.win_getid(vim.fn.winnr(({ left = "h", down = "j", up = "k", right = "l" })[dir]))
+          if
+            vim.api.nvim_win_get_config(0).relative ~= ""
+            or vim.bo[vim.api.nvim_win_get_buf(target)].filetype == "snacks_layout_box"
+          then
+            return
+          end
+          ss["swap_buf_" .. dir]()
+        end, { desc = "Swap buffer " .. dir })
       end
     end,
   },

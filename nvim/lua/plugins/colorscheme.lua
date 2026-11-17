@@ -13,6 +13,8 @@ return {
       dim_inactive = { enabled = false },
       -- Listed explicitly: auto-detection probes vim.pack, which creates an empty pack dir.
       auto_integrations = false,
+      default_integrations = false,
+      lsp_styles = { underlines = { errors = { "undercurl" }, warnings = { "undercurl" } } },
       integrations = {
         aerial = true,
         blink_cmp = true,
@@ -27,7 +29,6 @@ return {
         which_key = true,
         snacks = { enabled = true, indent_scope_color = "lavender" },
         mini = { enabled = true },
-        native_lsp = { enabled = true, underlines = { errors = { "undercurl" }, warnings = { "undercurl" } } },
       },
     },
     config = function(_, opts)

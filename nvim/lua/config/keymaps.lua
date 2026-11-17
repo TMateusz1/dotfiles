@@ -17,7 +17,10 @@ map("n", "K", function()
   if #vim.lsp.get_clients({ bufnr = 0, method = "textDocument/hover" }) > 0 then
     vim.lsp.buf.hover()
   elseif vim.bo.filetype == "help" or vim.bo.filetype == "vim" then
-    vim.cmd.help(vim.fn.expand("<cword>"))
+    local ok, err = pcall(vim.cmd.help, vim.fn.expand("<cword>"))
+    if not ok then
+      vim.notify(err:gsub("^.-E149", "E149"), vim.log.levels.INFO)
+    end
   else
     vim.notify("No hover provider for " .. vim.bo.filetype, vim.log.levels.INFO)
   end

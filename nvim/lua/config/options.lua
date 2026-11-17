@@ -53,7 +53,29 @@ opt.foldtext = ""
 opt.virtualedit = "block"
 opt.completeopt = "menu,menuone,noselect"
 opt.shortmess:append("WIcC")
-opt.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize,winpos,localoptions"
+opt.sessionoptions = "buffers,curdir,folds,globals,help,tabpages,winsize,winpos"
 opt.grepprg = "rg --vimgrep"
 opt.grepformat = "%f:%l:%c:%m"
 opt.spelllang = { "en" }
+
+-- Outranks helm-ls.nvim's ftdetect (priority 0): templates are Helm only inside a chart,
+-- `values*.yml` counts like `values*.yaml`, and Compose files reach docker-language-server.
+vim.filetype.add({
+  filename = {
+    ["compose.yaml"] = "yaml.docker-compose",
+    ["compose.yml"] = "yaml.docker-compose",
+    ["docker-compose.yaml"] = "yaml.docker-compose",
+    ["docker-compose.yml"] = "yaml.docker-compose",
+  },
+  pattern = {
+    -- `.+`, not helm-ls's `.*`: an identical key would be overwritten when its ftdetect loads.
+    [".*/templates/.+%.ya?ml"] = {
+      function(path)
+        return vim.fs.root(path, "Chart.yaml") and "helm" or "yaml"
+      end,
+      { priority = 10 },
+    },
+    ["values.*%.yml"] = { "yaml.helm-values", { priority = 10 } },
+    ["docker%-compose%..*%.ya?ml"] = { "yaml.docker-compose", { priority = 10 } },
+  },
+})

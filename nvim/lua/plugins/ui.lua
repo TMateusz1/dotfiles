@@ -6,9 +6,13 @@ local function lsp_and_formatters()
   local parts = { table.concat(names, ", ") }
   local ok, conform = pcall(require, "conform")
   if ok then
-    local fmt = vim.tbl_map(function(f)
-      return f.name
-    end, conform.list_formatters(0))
+    -- Resolving formatters walks the filesystem; cache per buffer (cleared by the autocmd below).
+    if vim.b.formatter_names == nil then
+      vim.b.formatter_names = vim.tbl_map(function(f)
+        return f.name
+      end, conform.list_formatters(0))
+    end
+    local fmt = vim.b.formatter_names
     if vim.g.autoformat == false or vim.b.autoformat == false then
       table.insert(parts, "󰉿 off")
     elseif #fmt > 0 then
@@ -27,6 +31,14 @@ return {
   {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
+    init = function()
+      vim.api.nvim_create_autocmd({ "BufWritePost", "FileType", "LspAttach", "LspDetach" }, {
+        group = vim.api.nvim_create_augroup("user_statusline", { clear = true }),
+        callback = function(ev)
+          vim.b[ev.buf].formatter_names = nil
+        end,
+      })
+    end,
     opts = {
       options = {
         theme = "catppuccin-nvim", -- follows the active flavour
@@ -105,6 +117,7 @@ return {
           offsets = {
             { filetype = "snacks_layout_box", text = "Explorer", highlight = "Directory", separator = true },
             { filetype = "aerial", text = "Outline", highlight = "Directory", separator = true },
+            { filetype = "DiffviewFiles", text = "Diffview", highlight = "Directory", separator = true },
           },
         },
       }
@@ -170,7 +183,7 @@ return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     ft = "markdown",
-    opts = { completions = { blink = { enabled = true } } },
+    opts = { completions = { blink = { enabled = true } }, latex = { enabled = false } },
   },
 
   {

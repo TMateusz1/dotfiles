@@ -13,7 +13,7 @@ au("InsertEnter", {
 })
 au({ "InsertLeave", "FocusGained", "BufEnter" }, {
   callback = function()
-    if vim.wo.number and vim.bo.buftype == "" and vim.fn.mode() ~= "i" then
+    if vim.g.relativenumber ~= false and vim.wo.number and vim.bo.buftype == "" and vim.fn.mode() ~= "i" then
       vim.wo.relativenumber = true
     end
   end,
@@ -46,7 +46,7 @@ au("FileType", {
     "man",
     "lspinfo",
     "checkhealth",
-    "notify",
+    "snacks_notif",
     "grug-far",
     "gitsigns-blame",
     "dbout",
@@ -79,6 +79,7 @@ if vim.env.ZELLIJ then
   })
   au("VimLeave", {
     callback = function()
+      zellij.stop()
       zellij.mode("normal"):wait(500)
     end,
   })
