@@ -85,6 +85,8 @@ return {
     keys = {
       { "<leader><space>", "<cmd>BufferLinePick<cr>", desc = "Pick buffer (by letter)" },
       { "<leader>bc", "<cmd>BufferLinePickClose<cr>", desc = "Pick buffer to close" },
+      { "<leader>bh", "<cmd>BufferLineCloseLeft<cr>", desc = "Close buffers to the left" },
+      { "<leader>bl", "<cmd>BufferLineCloseRight<cr>", desc = "Close buffers to the right" },
       { "<leader>bp", "<cmd>BufferLineTogglePin<cr>", desc = "Toggle pin" },
       { "<leader>bP", "<cmd>BufferLineGroupClose ungrouped<cr>", desc = "Close unpinned" },
     },
