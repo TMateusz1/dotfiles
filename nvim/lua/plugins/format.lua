@@ -15,7 +15,8 @@ end
 -- biome-check also applies lint fixes, so only where the project opted into Biome.
 local web = project({ "biome-check" }, { "biome.json", "biome.jsonc" }, { "biome" })
 local yamlfmt_configs = { ".yamlfmt", ".yamlfmt.yml", ".yamlfmt.yaml", "yamlfmt.yml", "yamlfmt.yaml" }
-local yaml = project({ "yamlfmt" }, yamlfmt_configs)
+-- Without a project .yamlfmt or Prettier config, fall back to yamlls (Prettier) so single blank lines stay.
+local yaml = project({ "yamlfmt" }, yamlfmt_configs, {})
 local markdown = project({ "rumdl" }, { ".rumdl.toml", "rumdl.toml" })
 
 return {
@@ -57,7 +58,7 @@ return {
         graphql = web,
         python = { "ruff_organize_imports", "ruff_format" },
         toml = { "taplo" },
-        -- go, rust, dockerfile: LSP fallback (gopls+gofumpt, rustfmt)
+        -- go, rust, dockerfile, unconfigured yaml: LSP fallback (gopls+gofumpt, rustfmt, yamlls)
         -- helm: intentionally not formatted (templates break)
       },
       formatters = {

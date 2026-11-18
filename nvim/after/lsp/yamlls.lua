@@ -13,11 +13,15 @@ return sc.setup_client(
     -- schema-companion rebuilds capabilities from the defaults; keep blink's.
     capabilities = require("blink.cmp").get_lsp_capabilities(),
     filetypes = { "yaml", "yaml.helm-values", "yaml.docker-compose", "yaml.gitlab" }, -- never "helm"; helm_ls runs its own yamlls
+    on_init = function(client)
+      -- yamlls omits compound filetypes (e.g. yaml.helm-values) from dynamic formatting registration.
+      client.server_capabilities.documentFormattingProvider = true
+    end,
     settings = {
       redhat = { telemetry = { enabled = false } },
       yaml = {
         keyOrdering = false,
-        format = { enable = false },
+        format = { enable = true },
         validate = true,
         hover = true,
         completion = true,
