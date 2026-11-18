@@ -68,23 +68,6 @@ au("BufWritePre", {
   end,
 })
 
--- Zellij lock follows nvim's focus; leaving via Ctrl+arrows syncs from the smart-splits keymaps.
-if vim.env.ZELLIJ then
-  local zellij = require("config.zellij")
-  au({ "VimEnter", "FocusGained", "FocusLost", "VimResume" }, { callback = zellij.sync })
-  au("VimSuspend", {
-    callback = function()
-      zellij.mode("normal")
-    end,
-  })
-  au("VimLeave", {
-    callback = function()
-      zellij.stop()
-      zellij.mode("normal"):wait(500)
-    end,
-  })
-end
-
 -- Zellij pane resizes resize the whole nvim UI.
 au("VimResized", {
   callback = function()

@@ -18,8 +18,10 @@ mise run global:setup
 - Neovim is part of both: bootstrap links its config, and setup (or the first
   launch, which also fetches lazy.nvim) restores plugins from
   `nvim/lazy-lock.json` and builds Treesitter parsers.
-- Neovim locks Zellij while it has focus, so every Neovim key works there, and
-  unlocks it on leaving; Ctrl+arrows still cross panes, and `Ctrl+g` unlocks by hand.
+- Zellij starts locked by default so every `Ctrl+<letter>` key reaches Neovim
+  and Zsh directly. Use `Ctrl+g` to unlock Zellij modes; `Alt` and `Ctrl+Shift`
+  shortcuts stay active everywhere, and `Ctrl+arrows` cross Neovim splits and
+  Zsh panes seamlessly.
 - Start the container runtime when needed: `colima start`.
 
 Use `mise run global:update` to upgrade global tools and macOS packages,

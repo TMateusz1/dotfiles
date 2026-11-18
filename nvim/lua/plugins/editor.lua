@@ -238,12 +238,7 @@ return {
             vim.api.nvim_feedkeys(vim.keycode(lhs), "n", false)
             return
           end
-          local win = vim.api.nvim_get_current_win()
           ss["move_cursor_" .. dir]()
-          -- At nvim's edge the backend moved Zellij focus; leaving a tab sends no FocusLost.
-          if win == vim.api.nvim_get_current_win() then
-            require("config.zellij").sync()
-          end
         end, { desc = "Move to " .. dir })
         vim.keymap.set(modes, "<A-" .. key .. ">", ss["resize_" .. dir], { desc = "Resize " .. dir })
         vim.keymap.set("n", "<leader><C-" .. key .. ">", function()

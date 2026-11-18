@@ -139,6 +139,22 @@ if command -v zellij >/dev/null 2>&1; then
     fi
   }
   alias zs="zellij -l welcome"
+  # Zellij stays locked by default; bind Ctrl+Arrow in Zsh so pane navigation
+  # matches Neovim's smart-splits without unlocking Zellij.
+  if [[ -n "${ZELLIJ:-}" ]]; then
+    _zellij_nav_left() { zellij action move-focus-or-tab left >/dev/null 2>&1; }
+    _zellij_nav_down() { zellij action move-focus down >/dev/null 2>&1; }
+    _zellij_nav_up() { zellij action move-focus up >/dev/null 2>&1; }
+    _zellij_nav_right() { zellij action move-focus-or-tab right >/dev/null 2>&1; }
+    zle -N _zellij_nav_left
+    zle -N _zellij_nav_down
+    zle -N _zellij_nav_up
+    zle -N _zellij_nav_right
+    bindkey '^[[1;5D' _zellij_nav_left
+    bindkey '^[[1;5B' _zellij_nav_down
+    bindkey '^[[1;5A' _zellij_nav_up
+    bindkey '^[[1;5C' _zellij_nav_right
+  fi
 fi
 
 # ---------------------------------------------------------------------------
