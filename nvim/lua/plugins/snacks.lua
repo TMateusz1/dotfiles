@@ -51,6 +51,18 @@ return {
         layout = { preset = "default", cycle = true },
         matcher = { frecency = true },
         formatters = { file = { filename_first = true } },
+        win = {
+          input = {
+            keys = {
+              ["<C-x>"] = { "edit_split", mode = { "i", "n" } },
+            },
+          },
+          list = {
+            keys = {
+              ["<C-x>"] = "edit_split",
+            },
+          },
+        },
         sources = {
           files = { hidden = true },
           grep = { hidden = true },

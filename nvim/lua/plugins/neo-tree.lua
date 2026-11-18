@@ -53,6 +53,8 @@ return {
         mappings = {
           -- Keep <Space> free as mapleader.
           ["<space>"] = "none",
+          ["<C-v>"] = "open_vsplit",
+          ["<C-x>"] = "open_split",
         },
       }
 

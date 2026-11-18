@@ -240,7 +240,13 @@ return {
           end
           ss["move_cursor_" .. dir]()
         end, { desc = "Move to " .. dir })
-        vim.keymap.set(modes, "<A-" .. key .. ">", ss["resize_" .. dir], { desc = "Resize " .. dir })
+        vim.keymap.set(modes, "<A-" .. key .. ">", function()
+          if vim.api.nvim_win_get_config(0).relative ~= "" then
+            vim.api.nvim_feedkeys(vim.keycode("<A-" .. key .. ">"), "n", false)
+            return
+          end
+          ss["resize_" .. dir]()
+        end, { desc = "Resize " .. dir })
         vim.keymap.set("n", "<leader><C-" .. key .. ">", function()
           -- Never swap a buffer into or out of the explorer sidebar.
           local target = vim.fn.win_getid(vim.fn.winnr(({ left = "h", down = "j", up = "k", right = "l" })[dir]))

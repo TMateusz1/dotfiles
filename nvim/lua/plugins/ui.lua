@@ -44,7 +44,7 @@ return {
         theme = "catppuccin-nvim", -- follows the active flavour
         globalstatus = true,
         component_separators = "",
-        section_separators = { left = "", right = "" },
+        section_separators = { left = "", right = "" },
         disabled_filetypes = { statusline = { "snacks_dashboard" } },
       },
       sections = {
@@ -68,7 +68,8 @@ return {
         },
         lualine_x = { lsp_and_formatters },
         lualine_y = { "progress", "location" },
-        lualine_z = {
+        -- Zellij's zjstatus already displays the clock on the top bar.
+        lualine_z = vim.env.ZELLIJ and {} or {
           function()
             return os.date(" %R")
           end,
@@ -142,6 +143,7 @@ return {
         { "<leader>S", group = "session" },
         { "<leader>r", group = "replace" },
         { "<leader>t", group = "test" },
+        { "<leader>w", group = "window" },
         { "[", group = "prev" },
         { "]", group = "next" },
         { "g", group = "goto" },

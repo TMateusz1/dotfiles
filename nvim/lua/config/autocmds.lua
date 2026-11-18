@@ -79,7 +79,7 @@ au("VimResized", {
 
 au({ "FocusGained", "TermClose", "TermLeave" }, {
   callback = function()
-    if vim.o.buftype ~= "nofile" then
+    if vim.bo.buftype ~= "nofile" and vim.fn.mode() ~= "c" then
       vim.cmd("checktime")
     end
   end,

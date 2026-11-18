@@ -39,6 +39,17 @@ map("x", ">", ">gv")
 map("n", "n", "nzzzv", { desc = "Next match" })
 map("n", "N", "Nzzzv", { desc = "Prev match" })
 
+map({ "n", "i", "x" }, "<C-s>", "<cmd>w<cr>", { desc = "Save file" })
+map("n", "<C-w>", function()
+  Snacks.bufdelete()
+end, { desc = "Delete buffer" })
+
+map("n", "<leader>wv", "<cmd>vsplit<cr>", { desc = "Split vertical" })
+map("n", "<leader>wx", "<cmd>split<cr>", { desc = "Split horizontal" })
+map("n", "<leader>wd", "<cmd>close<cr>", { desc = "Close window" })
+map("n", "<leader>wo", "<cmd>only<cr>", { desc = "Close other windows" })
+map("n", "<leader>w=", "<C-w>=", { desc = "Equalize windows" })
+
 map("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
 map("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New file" })
 map("n", "<leader>uu", function()
