@@ -5,6 +5,7 @@ command_timeout = 500
 scan_timeout = 10
 
 format = """
+$hostname\
 $directory\
 $git_branch\
 $git_status\
@@ -12,6 +13,7 @@ $git_state\
 $golang\
 $python\
 $nodejs\
+$rust\
 $helm\
 $line_break\
 $jobs\
@@ -31,6 +33,17 @@ palette = "catppuccin_mocha"
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
 vimcmd_symbol = "[❮](blue)"
+
+
+# ----------------------------
+# Hostname (SSH only)
+# ----------------------------
+
+[hostname]
+ssh_only = true
+ssh_symbol = "󰣀 "
+style = "bold mauve"
+format = "[$ssh_symbol$hostname]($style) "
 
 
 # ----------------------------
@@ -98,6 +111,11 @@ python_binary = ["python3"]
 [nodejs]
 symbol = " "
 style = "green"
+format = "[$symbol($version )]($style) "
+
+[rust]
+symbol = " "
+style = "peach"
 format = "[$symbol($version )]($style) "
 
 # Symbol only: rendering $version would exec `helm version` on every prompt

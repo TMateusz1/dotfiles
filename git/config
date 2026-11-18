@@ -3,4 +3,5 @@
 ; (see git/*.gitconfig) rather than one growing file.
 
 [include]
+    path = defaults.gitconfig
     path = delta.gitconfig

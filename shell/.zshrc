@@ -33,9 +33,9 @@ if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh)"
 fi
 
-# Wait for GUI editing to finish when called by Git and other CLI tools.
-if command -v zed >/dev/null 2>&1; then
-  export EDITOR="zed --wait"
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR="nvim"
+  export MANPAGER="nvim +Man!"
 else
   export EDITOR="vi"
 fi
@@ -92,6 +92,14 @@ if command -v fzf >/dev/null 2>&1; then
   # fzf hard-fails (rather than falling back) if this points to a file that
   # doesn't exist yet — e.g. before this repo is symlinked into place.
   [[ -r "$XDG_CONFIG_HOME/fzf/config" ]] && export FZF_DEFAULT_OPTS_FILE="$XDG_CONFIG_HOME/fzf/config"
+  if command -v fd >/dev/null 2>&1; then
+    export FZF_DEFAULT_COMMAND="fd --type f --hidden --exclude .git"
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+    export FZF_ALT_C_COMMAND="fd --type d --hidden --exclude .git"
+  fi
+  if command -v bat >/dev/null 2>&1; then
+    export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :200 {}'"
+  fi
   # Clear the old exported opt-out, including when inherited by a new shell.
   unset FZF_CTRL_R_COMMAND
   source <(fzf --zsh)

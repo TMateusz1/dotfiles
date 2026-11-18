@@ -1,0 +1,21 @@
+[branch]
+    sort = -committerdate
+
+[diff]
+    algorithm = histogram
+
+[fetch]
+    prune = true
+
+[pull]
+    rebase = true
+
+[push]
+    autoSetupRemote = true
+
+[rebase]
+    autoSquash = true
+    autoStash = true
+
+[rerere]
+    enabled = true
