@@ -210,6 +210,19 @@ return {
   },
 
   {
+    "rachartier/tiny-inline-diagnostic.nvim",
+    event = "VeryLazy",
+    priority = 1000,
+    opts = {
+      preset = "modern",
+      options = {
+        show_source = { enabled = true, if_many = true },
+        multilines = { enabled = true },
+      },
+    },
+  },
+
+  {
     "folke/trouble.nvim",
     cmd = "Trouble",
     opts = { focus = true },

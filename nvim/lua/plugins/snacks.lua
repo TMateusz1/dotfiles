@@ -144,6 +144,14 @@ return {
             end,
             set = function(state)
               vim.diagnostic.config({ virtual_lines = state and { current_line = true } or false })
+              local ok, tid = pcall(require, "tiny-inline-diagnostic")
+              if ok then
+                if state then
+                  tid.disable()
+                else
+                  tid.enable()
+                end
+              end
             end,
           }):map("<leader>uv")
           t.new({
