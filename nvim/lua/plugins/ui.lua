@@ -194,6 +194,15 @@ return {
     "MeanderingProgrammer/render-markdown.nvim",
     ft = "markdown",
     opts = { completions = { blink = { enabled = true } }, latex = { enabled = false } },
+    config = function(_, opts)
+      local rm = require("render-markdown")
+      rm.setup(opts)
+      Snacks.toggle({
+        name = "Render markdown",
+        get = rm.get,
+        set = rm.set,
+      }):map("<leader>um")
+    end,
   },
 
   {
