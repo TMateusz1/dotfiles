@@ -63,6 +63,12 @@ return {
         },
         lualine_c = {
           "diagnostics",
+          {
+            "grapple",
+            cond = function()
+              return package.loaded["grapple"] and require("grapple").exists()
+            end,
+          },
           { "filetype", icon_only = true, padding = { left = 1, right = 0 } },
           { "filename", path = 1, symbols = { modified = " ●", readonly = "󰌾 ", unnamed = "" } },
         },

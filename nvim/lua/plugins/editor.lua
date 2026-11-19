@@ -202,6 +202,53 @@ return {
   },
 
   {
+    "stevearc/oil.nvim",
+    cmd = "Oil",
+    dependencies = { "nvim-mini/mini.icons" },
+    keys = {
+      { "<leader>E", "<cmd>Oil<cr>", desc = "Oil (edit directory)" },
+    },
+    opts = {
+      default_file_explorer = false,
+      view_options = { show_hidden = true },
+      keymaps = {
+        ["<C-h>"] = false,
+        ["<C-l>"] = false,
+        ["<C-s>"] = false, -- keep global <C-s> save
+        ["<C-v>"] = { "actions.select", opts = { vertical = true } },
+        ["<C-x>"] = { "actions.select", opts = { horizontal = true } },
+        ["q"] = { "actions.close", mode = "n" },
+      },
+    },
+    init = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "OilActionsPost",
+        callback = function(ev)
+          if ev.data.actions and ev.data.actions[1] and ev.data.actions[1].type == "move" then
+            Snacks.rename.on_rename_file(ev.data.actions[1].src_url, ev.data.actions[1].dest_url)
+          end
+        end,
+      })
+    end,
+  },
+
+  {
+    "cbochs/grapple.nvim",
+    cmd = "Grapple",
+    dependencies = { "nvim-mini/mini.icons" },
+    opts = { scope = "git_branch", icons = true, status = true },
+    keys = {
+      { "<leader>m", "<cmd>Grapple toggle<cr>", desc = "Tag file (Grapple)" },
+      { "<leader>M", "<cmd>Grapple toggle_tags<cr>", desc = "Grapple tags" },
+      { "<leader>1", "<cmd>Grapple select index=1<cr>", desc = "Grapple 1" },
+      { "<leader>2", "<cmd>Grapple select index=2<cr>", desc = "Grapple 2" },
+      { "<leader>3", "<cmd>Grapple select index=3<cr>", desc = "Grapple 3" },
+      { "<leader>4", "<cmd>Grapple select index=4<cr>", desc = "Grapple 4" },
+      { "<leader>5", "<cmd>Grapple select index=5<cr>", desc = "Grapple 5" },
+    },
+  },
+
+  {
     "smart-splits-nvim/smart-splits.nvim",
     version = "^3.0.0",
     lazy = false,
