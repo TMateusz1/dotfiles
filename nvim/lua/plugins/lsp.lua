@@ -5,6 +5,15 @@ return {
     lazy = true,
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {},
+    keys = {
+      {
+        "<leader>cs",
+        function()
+          require("schema-companion").select_schema()
+        end,
+        desc = "Select schema",
+      },
+    },
   },
   {
     -- `ft` sources its ftdetect at startup: templates -> helm, values*.yaml -> yaml.helm-values.
@@ -54,6 +63,7 @@ return {
         "rumdl",
         "marksman",
       })
+      vim.lsp.codelens.enable(true)
 
       -- Built-in gr* maps are covered by gr / gI / gy / <leader>c*; drop them so `gr` fires at once.
       for _, lhs in ipairs({ "grn", "grr", "gri", "grt", "grx" }) do

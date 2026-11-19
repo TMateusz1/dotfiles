@@ -49,7 +49,6 @@ au("FileType", {
     "snacks_notif",
     "grug-far",
     "gitsigns-blame",
-    "dbout",
     "nvim-undotree",
   },
   callback = function(ev)
@@ -114,7 +113,15 @@ au("VimEnter", {
 
 -- `:q` on the last editor window also closes the sidebars, so nvim quits instead of leaving
 -- only the explorer (or outline/trouble/quickfix) open.
-local sidebars = { ["neo-tree"] = true, aerial = true, trouble = true, qf = true }
+local sidebars = {
+  ["neo-tree"] = true,
+  aerial = true,
+  trouble = true,
+  qf = true,
+  ["neotest-summary"] = true,
+  ["neotest-output-panel"] = true,
+  ["nvim-undotree"] = true,
+}
 au("QuitPre", {
   callback = function()
     local cur = vim.api.nvim_get_current_win()

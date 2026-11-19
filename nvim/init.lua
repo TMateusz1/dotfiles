@@ -1,5 +1,5 @@
 vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
+vim.g.maplocalleader = " "
 -- No remote-plugin providers are used.
 for _, p in ipairs({ "node", "perl", "python3", "ruby" }) do
   vim.g["loaded_" .. p .. "_provider"] = 0
