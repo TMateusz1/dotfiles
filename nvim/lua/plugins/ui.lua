@@ -210,6 +210,18 @@ return {
   },
 
   {
+    "j-hui/fidget.nvim",
+    event = "LspAttach",
+    opts = {
+      -- Keep snacks.notifier in charge of vim.notify; fidget handles LSP progress only.
+      notification = {
+        override_vim_notify = false,
+        window = { winblend = 0 },
+      },
+    },
+  },
+
+  {
     "rachartier/tiny-inline-diagnostic.nvim",
     event = "VeryLazy",
     priority = 1000,
